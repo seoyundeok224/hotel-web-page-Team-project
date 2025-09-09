@@ -1,8 +1,9 @@
 
 package com.hotel.hotelreservation.repository;
 
-import com.hotel.hotelreservation.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.hotel.hotelreservation.model.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 }
