@@ -4,17 +4,46 @@ import KakaoMap from '../components/map/KakaoMap';
 
 const Directions = () => {
     return (
-        <Box sx={{ bgcolor: '#f7f9fc', py: 5 }}>
-            <Container maxWidth="lg">
-                <Typography variant="h3" component="h1" gutterBottom align="center" sx={{ fontWeight: 'bold', mb: 4, color: '#333' }}>
-                    오시는 길
-                </Typography>
-                <Typography variant="h6" align="center" color="text.secondary" paragraph sx={{ mb: 5 }}>
-                    도심 속 완벽한 휴식처, 저희 호텔에서 여러분을 기다립니다.
-                    <br />
-                    아래의 상세한 안내를 따라 편안하고 안전하게 도착하세요.
-                </Typography>
+        <Box sx={{ bgcolor: '#f7f9fc' }}>
+            {/* Hero Section */}
+            <Box
+                sx={{
+                    position: 'relative',
+                    height: '40vh',
+                    minHeight: '300px',
+                    backgroundImage: 'url(https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=80&w=2070&auto=format&fit=crop)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                }}
+            >
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        zIndex: 1,
+                    }}
+                />
+                <Container sx={{ zIndex: 2, position: 'relative' }}>
+                    <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
+                        오시는 길
+                    </Typography>
+                    <Typography variant="h6" paragraph>
+                        도심 속 완벽한 휴식처, 저희 호텔에서 여러분을 기다립니다.
+                    </Typography>
+                </Container>
+            </Box>
 
+            {/* Content Section */}
+            <Container maxWidth="lg" sx={{ py: 5 }}>
                 <Box
                     sx={{
                         position: 'relative',
