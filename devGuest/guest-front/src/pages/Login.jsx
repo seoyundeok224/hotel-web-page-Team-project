@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Typography, Container, Box, TextField, Button, Alert, Tab, Tabs } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { authService } from '../services/hotelService';
+import RegisterForm from '../components/RegisterForm';
 
 const Login = () => {
   const [tabValue, setTabValue] = useState(0);
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: ''
   });
   const [error, setError] = useState('');
@@ -33,45 +35,43 @@ const Login = () => {
     setError('');
 
     try {
-      // 임시 로그인 로직 (실제로는 API 호출)
-      if (tabValue === 0) {
-        // 고객 로그인
-        if (formData.email === 'customer@test.com' && formData.password === 'password') {
-          const userData = {
-            id: 1,
-            name: '고객',
-            email: formData.email,
-            role: 'CUSTOMER'
-          };
-          login(userData, 'customer-token');
-          navigate('/');
-        } else {
-          setError('이메일 또는 비밀번호가 잘못되었습니다.');
-        }
+      // 실제 API 호출로 변경
+      const response = await authService.login({
+        username: formData.username,
+        password: formData.password
+      });
+
+      const { user, token } = response.data;
+      login(user, token);
+      
+      // 관리자면 관리자 페이지로, 아니면 홈으로
+      if (user.role === 'ADMIN') {
+        navigate('/admin');
       } else {
-        // 관리자 로그인
-        if (formData.email === 'admin@test.com' && formData.password === 'admin') {
-          const userData = {
-            id: 1,
-            name: '관리자',
-            email: formData.email,
-            role: 'ADMIN'
-          };
-          login(userData, 'admin-token');
-          navigate('/admin');
-        } else {
-          setError('관리자 계정 정보가 잘못되었습니다.');
-        }
+        navigate('/');
       }
     } catch (error) {
-      setError('로그인 중 오류가 발생했습니다.');
+      setError(error.message || '로그인 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleRegisterSuccess = (userData) => {
+    // 회원가입 성공 시 자동으로 로그인 탭으로 전환
+    setTabValue(0);
+    setFormData({
+      username: userData.username,
+      password: ''
+    });
+  };
+
+  const handleSwitchToLogin = () => {
+    setTabValue(0);
+  };
+
   return (
-    <Container maxWidth="xs">
+    <Container maxWidth="sm">
       <Box
         sx={{
           marginTop: 8,
@@ -80,80 +80,94 @@ const Login = () => {
           alignItems: 'center',
         }}
       >
-        <Typography component="h1" variant="h5">
-          로그인
+        <Typography component="h1" variant="h4" sx={{ mb: 3 }}>
+          Dev Hotel
         </Typography>
         
         <Box sx={{ width: '100%', mt: 2 }}>
           <Tabs value={tabValue} onChange={handleTabChange} centered>
-            <Tab label="고객 로그인" />
+            <Tab label="로그인" />
             <Tab label="관리자 로그인" />
+            <Tab label="회원가입" />
           </Tabs>
         </Box>
 
-        {error && (
-          <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
-            {error}
-          </Alert>
+        {/* 로그인 및 관리자 로그인 폼 */}
+        {(tabValue === 0 || tabValue === 1) && (
+          <>
+            {error && (
+              <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
+                {error}
+              </Alert>
+            )}
+
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="username"
+                label="사용자명"
+                name="username"
+                autoComplete="username"
+                autoFocus
+                value={formData.username}
+                onChange={handleChange}
+                placeholder={tabValue === 0 ? "customer" : "admin"}
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="비밀번호"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder={tabValue === 0 ? "password" : "admin"}
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                disabled={loading}
+              >
+                {loading ? '로그인 중...' : (tabValue === 0 ? '고객 로그인' : '관리자 로그인')}
+              </Button>
+              
+              {tabValue === 0 && (
+                <Box sx={{ mt: 2, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    테스트 계정:<br />
+                    사용자명: customer<br />
+                    비밀번호: password
+                  </Typography>
+                </Box>
+              )}
+              
+              {tabValue === 1 && (
+                <Box sx={{ mt: 2, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    관리자 계정:<br />
+                    사용자명: admin<br />
+                    비밀번호: admin
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          </>
         )}
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="이메일 주소"
-            name="email"
-            autoComplete="email"
-            autoFocus
-            value={formData.email}
-            onChange={handleChange}
-            placeholder={tabValue === 0 ? "customer@test.com" : "admin@test.com"}
+        {/* 회원가입 폼 */}
+        {tabValue === 2 && (
+          <RegisterForm 
+            onSuccess={handleRegisterSuccess}
+            onSwitchToLogin={handleSwitchToLogin}
           />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="비밀번호"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder={tabValue === 0 ? "password" : "admin"}
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-            disabled={loading}
-          >
-            {loading ? '로그인 중...' : (tabValue === 0 ? '고객 로그인' : '관리자 로그인')}
-          </Button>
-          
-          {tabValue === 0 && (
-            <Box sx={{ mt: 2, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
-              <Typography variant="body2" color="text.secondary">
-                테스트 계정:<br />
-                이메일: customer@test.com<br />
-                비밀번호: password
-              </Typography>
-            </Box>
-          )}
-          
-          {tabValue === 1 && (
-            <Box sx={{ mt: 2, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
-              <Typography variant="body2" color="text.secondary">
-                관리자 계정:<br />
-                이메일: admin@test.com<br />
-                비밀번호: admin
-              </Typography>
-            </Box>
-          )}
-        </Box>
+        )}
       </Box>
     </Container>
   );

@@ -1,12 +1,27 @@
 package com.hotel.hotelreservation.dto;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+
+import java.time.LocalDateTime;
+import java.util.Set;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserDto {
     
+    private Long id;
+    private String username;
+    private String email;
+    private String name;
+    private String phone;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private Boolean enabled;
+    private String role; // 주요 권한 (ADMIN 또는 USER)
+    private Set<String> roles; // 모든 권한 목록
 }
-
-// 사용자 관련 요청/응답 DTO //
-// 필수(중요)로 만들어야 함 //
-// 난이도: 초급 (데이터 전달 객체) //
-
-// 백앤드 - DTO
-// API 요청/응답 시 주고받는 데이터 객체 (JSON 변환 대상)
