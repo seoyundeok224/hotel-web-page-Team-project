@@ -8,6 +8,7 @@ import Booking from './pages/Booking';
 import Login from './pages/Login';
 import Dining from './pages/Dining';
 import Facilities from './pages/Facilities';
+import Directions from './pages/Directions'; // 오시는 길 페이지 추가
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/dining" element={<Dining />} /> {/* New route */}
         <Route path="/facilities" element={<Facilities />} /> {/* New route */}
+        <Route path="/location" element={<Directions />} />
       </Routes>
     </Router>
   );
