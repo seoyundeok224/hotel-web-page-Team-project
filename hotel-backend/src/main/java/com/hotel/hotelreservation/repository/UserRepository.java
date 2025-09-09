@@ -1,7 +1,11 @@
+
 package com.hotel.hotelreservation.repository;
 
-public class UserRepository {
-    
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.hotel.hotelreservation.model.User;
+
+public interface UserRepository extends JpaRepository<User, Long> {
 }
 
 // 사용자 관련 DB 쿼리 인터페이스 //
