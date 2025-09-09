@@ -1,13 +1,13 @@
-package kr.or.ysedu.devHotel_spring;
+package kr.or.ysedu.devhotel;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DevHotelSpringApplication {
+public class DevhotelApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DevHotelSpringApplication.class, args);
+		SpringApplication.run(DevhotelApplication.class, args);
 	}
 
 }
