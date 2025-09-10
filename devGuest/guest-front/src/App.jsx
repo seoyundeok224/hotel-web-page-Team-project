@@ -6,6 +6,7 @@ import Rooms from './pages/Rooms';
 import Services from './pages/Services';
 import Booking from './pages/Booking';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import Dining from './pages/Dining';
 import Facilities from './pages/Facilities';
 import Directions from './pages/Directions'; // 오시는 길 페이지 추가
@@ -56,6 +57,12 @@ const App = () => {
             <>
               <Navbar />
               <Login />
+            </>
+          } />
+          <Route path="/register" element={
+            <>
+              <Navbar />
+              <Register />
             </>
           } />
           <Route path="/dining" element={
