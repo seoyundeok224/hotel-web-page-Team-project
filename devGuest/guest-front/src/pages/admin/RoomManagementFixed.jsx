@@ -1,22 +1,52 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Users, Home, BarChart3 } from 'lucide-react'
+import {
+    Box,
+    Container,
+    Typography,
+    Card,
+    CardContent,
+    Grid,
+    Button,
+    TextField,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Chip,
+    Paper,
+    IconButton,
+    InputAdornment,
+    Avatar,
+    Divider
+} from '@mui/material'
+import {
+    Add as PlusIcon,
+    Search as SearchIcon,
+    Edit as EditIcon,
+    People as UsersIcon,
+    Home as HomeIcon,
+    BarChart as BarChartIcon
+} from '@mui/icons-material'
 import { roomService } from '../../services/hotelService'
-import '../../styles/Grid.css'
 
 // 개별 객실 카드 컴포넌트
 const RoomCard = ({ room, onStatusChange, onEdit }) => {
     const getStatusInfo = (status) => {
         switch (status) {
             case 'AVAILABLE':
-                return { label: '이용가능', color: 'bg-green-500', bgColor: 'bg-green-50 border-green-200' }
+                return { label: '이용가능', color: '#2e7d32', bgColor: '#e8f5e8' }
             case 'OCCUPIED':
-                return { label: '투숙중', color: 'bg-red-500', bgColor: 'bg-red-50 border-red-200' }
+                return { label: '투숙중', color: '#d32f2f', bgColor: '#ffebee' }
             case 'MAINTENANCE':
-                return { label: '정비중', color: 'bg-yellow-500', bgColor: 'bg-yellow-50 border-yellow-200' }
+                return { label: '정비중', color: '#ed6c02', bgColor: '#fff3e0' }
             case 'CLEANING':
-                return { label: '청소중', color: 'bg-blue-500', bgColor: 'bg-blue-50 border-blue-200' }
+                return { label: '청소중', color: '#1976d2', bgColor: '#e3f2fd' }
             default:
-                return { label: status, color: 'bg-gray-500', bgColor: 'bg-gray-50 border-gray-200' }
+                return { label: status, color: '#757575', bgColor: '#f5f5f5' }
         }
     }
 
@@ -41,80 +71,119 @@ const RoomCard = ({ room, onStatusChange, onEdit }) => {
     }
 
     return (
-        <div className={`border-2 rounded-lg p-3 transition-all duration-200 hover:shadow-lg cursor-pointer ${statusInfo.bgColor} min-w-0 max-w-xs`}>
-            {/* 객실 번호 및 타입 */}
-            <div className="flex justify-between items-start mb-2">
-                <div className="min-w-0 flex-1">
-                    <h3 className="text-lg font-bold text-gray-800 truncate">{room.roomNumber}</h3>
-                    <div className="flex items-center gap-1 text-xs text-gray-600">
-                        <span>{typeInfo.icon}</span>
-                        <span className="truncate">{typeInfo.label}</span>
-                    </div>
-                </div>
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        onEdit(room)
-                    }}
-                    className="p-1 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
-                >
-                    <Edit size={14} />
-                </button>
-            </div>
+        <Card
+            sx={{
+                height: '100%',
+                backgroundColor: statusInfo.bgColor,
+                border: `2px solid ${statusInfo.color}20`,
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: '0 8px 25px rgba(0,0,0,0.15)'
+                },
+                cursor: 'pointer'
+            }}
+        >
+            <CardContent sx={{ p: 2 }}>
+                {/* 객실 번호 및 타입 */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#212121' }}>
+                            {room.roomNumber}
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                {typeInfo.icon} {typeInfo.label}
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <IconButton
+                        size="small"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            onEdit(room)
+                        }}
+                        sx={{ color: 'text.secondary' }}
+                    >
+                        <EditIcon fontSize="small" />
+                    </IconButton>
+                </Box>
 
-            {/* 상태 표시 및 토글 버튼 */}
-            <div className="mb-2">
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        handleStatusToggle()
-                    }}
-                    className={`w-full py-1.5 px-2 rounded text-white text-sm font-medium transition-all duration-200 ${statusInfo.color} hover:opacity-90`}
-                >
-                    {statusInfo.label}
-                </button>
-            </div>
+                {/* 상태 표시 및 토글 버튼 */}
+                <Box sx={{ mb: 2 }}>
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            handleStatusToggle()
+                        }}
+                        sx={{
+                            backgroundColor: statusInfo.color,
+                            '&:hover': {
+                                backgroundColor: statusInfo.color,
+                                opacity: 0.9
+                            },
+                            py: 1,
+                            fontSize: '0.875rem'
+                        }}
+                    >
+                        {statusInfo.label}
+                    </Button>
+                </Box>
 
-            {/* 객실 정보 */}
-            <div className="space-y-1 text-xs text-gray-600">
-                <div className="flex items-center gap-1">
-                    <Users size={12} />
-                    <span className="truncate">최대 {room.capacity}명</span>
-                </div>
-                <div className="flex items-center gap-1">
-                    <span>💰</span>
-                    <span className="truncate">₩{room.price?.toLocaleString()}</span>
-                </div>
-                {room.description && (
-                    <div className="text-xs text-gray-500 mt-1 truncate">
-                        {room.description}
-                    </div>
-                )}
-            </div>
-        </div>
+                {/* 객실 정보 */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <UsersIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                        <Typography variant="caption" color="text.secondary">
+                            최대 {room.capacity}명
+                        </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="caption" sx={{ fontSize: 16 }}>💰</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                            ₩{room.price?.toLocaleString()}
+                        </Typography>
+                    </Box>
+                    {room.description && (
+                        <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                            {room.description}
+                        </Typography>
+                    )}
+                </Box>
+            </CardContent>
+        </Card>
     )
 }
 
 // 층별 객실 그룹 컴포넌트
 const FloorSection = ({ floor, rooms, onStatusChange, onEdit }) => {
     return (
-        <div className="mb-8">
-            <div className="flex items-center gap-2 mb-4 pb-2 border-b-2 border-gray-200">
-                <Home size={20} className="text-gray-600" />
-                <h2 className="text-lg font-semibold text-gray-800">{floor}층</h2>
-                <span className="text-sm text-gray-500">({rooms.length}개 객실)</span>
-            </div>
-            <div className="room-grid">
+        <Box sx={{ mb: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3, pb: 2, borderBottom: '2px solid #e0e0e0' }}>
+                <HomeIcon sx={{ color: 'text.secondary' }} />
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#212121' }}>
+                    {floor}층
+                </Typography>
+                <Chip
+                    label={`${rooms.length}개 객실`}
+                    size="small"
+                    sx={{ backgroundColor: '#f5f5f5', color: 'text.secondary' }}
+                />
+            </Box>
+            <Grid container spacing={2}>
                 {rooms.map((room) => (
-                    <RoomCard
-                        key={room.id}
-                        room={room}
-                        onStatusChange={onStatusChange}
-                        onEdit={onEdit}
-                    />
+                    <Grid item xs={12} sm={6} md={4} lg={3} key={room.id}>
+                        <RoomCard
+                            room={room}
+                            onStatusChange={onStatusChange}
+                            onEdit={onEdit}
+                        />
+                    </Grid>
                 ))}
-            </div>
-        </div>
+            </Grid>
+        </Box>
     )
 }
 
@@ -123,16 +192,45 @@ const StatCard = ({ title, count, total, color, icon: Icon }) => {
     const percentage = total > 0 ? Math.round((count / total) * 100) : 0
 
     return (
-        <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <p className="text-sm font-medium text-gray-600">{title}</p>
-                    <p className="text-2xl font-bold text-gray-900">{count}</p>
-                    <p className="text-xs text-gray-500">{percentage}%</p>
-                </div>
-                <Icon className={`h-8 w-8 ${color}`} />
-            </div>
-        </div>
+        <Card
+            sx={{
+                height: '100%',
+                background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                borderRadius: 2,
+                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: '0 8px 30px rgba(0,0,0,0.15)'
+                }
+            }}
+        >
+            <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                            {title}
+                        </Typography>
+                        <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#212121' }}>
+                            {count}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                            {percentage}%
+                        </Typography>
+                    </Box>
+                    <Avatar
+                        sx={{
+                            bgcolor: color + '20',
+                            width: 56,
+                            height: 56,
+                            '& .MuiSvgIcon-root': { color: color, fontSize: '1.8rem' }
+                        }}
+                    >
+                        <Icon />
+                    </Avatar>
+                </Box>
+            </CardContent>
+        </Card>
     )
 }
 
@@ -355,9 +453,19 @@ const RoomManagement = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-lg text-gray-600">로딩 중...</div>
-            </div>
+            <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: '100vh',
+                    backgroundColor: '#f5f5f5'
+                }}
+            >
+                <Typography variant="h6" color="text.secondary">
+                    로딩 중...
+                </Typography>
+            </Box>
         )
     }
 
@@ -365,233 +473,272 @@ const RoomManagement = () => {
     const stats = getStatusStats()
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
-            {/* 헤더 */}
-            <div className="flex justify-between items-center mb-6">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900">객실 관리</h1>
-                    <p className="text-gray-600 mt-1">호텔 객실 현황을 한눈에 확인하고 관리하세요</p>
-                </div>
-                <button
-                    onClick={() => {
-                        resetForm()
-                        setEditingRoom(null)
-                        setShowModal(true)
-                    }}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 transition-colors"
-                >
-                    <Plus size={20} />
-                    객실 추가
-                </button>
-            </div>
+        <Box sx={{ minHeight: '100vh', backgroundColor: '#f5f5f5', py: 4 }}>
+            <Container maxWidth="xl">
+                {/* 헤더 */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                    <Box>
+                        <Typography variant="h3" component="h1" sx={{ fontWeight: 'bold', color: '#212121', mb: 1 }}>
+                            객실 관리
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary">
+                            호텔 객실 현황을 한눈에 확인하고 관리하세요
+                        </Typography>
+                    </Box>
+                    <Button
+                        variant="contained"
+                        startIcon={<PlusIcon />}
+                        onClick={() => {
+                            resetForm()
+                            setEditingRoom(null)
+                            setShowModal(true)
+                        }}
+                        sx={{
+                            backgroundColor: '#1976d2',
+                            '&:hover': { backgroundColor: '#1565c0' },
+                            px: 3,
+                            py: 1.5
+                        }}
+                    >
+                        객실 추가
+                    </Button>
+                </Box>
 
-            {/* 통계 카드 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-                <StatCard
-                    title="전체 객실"
-                    count={stats.total}
-                    total={stats.total}
-                    color="text-blue-600"
-                    icon={Home}
-                />
-                <StatCard
-                    title="이용가능"
-                    count={stats.available}
-                    total={stats.total}
-                    color="text-green-600"
-                    icon={BarChart3}
-                />
-                <StatCard
-                    title="투숙중"
-                    count={stats.occupied}
-                    total={stats.total}
-                    color="text-red-600"
-                    icon={Users}
-                />
-                <StatCard
-                    title="청소중"
-                    count={stats.cleaning}
-                    total={stats.total}
-                    color="text-blue-600"
-                    icon={BarChart3}
-                />
-                <StatCard
-                    title="정비중"
-                    count={stats.maintenance}
-                    total={stats.total}
-                    color="text-yellow-600"
-                    icon={BarChart3}
-                />
-            </div>
-
-            {/* 필터 섹션 */}
-            <div className="bg-white p-4 rounded-lg shadow mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                        <input
-                            type="text"
-                            placeholder="객실 번호 검색..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                {/* 통계 카드 */}
+                <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#212121', mb: 3 }}>
+                    객실 현황 통계
+                </Typography>
+                <Grid container spacing={3} sx={{ mb: 4 }}>
+                    <Grid item xs={12} sm={6} md={2.4}>
+                        <StatCard
+                            title="전체 객실"
+                            count={stats.total}
+                            total={stats.total}
+                            color="#1976d2"
+                            icon={HomeIcon}
                         />
-                    </div>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={2.4}>
+                        <StatCard
+                            title="이용가능"
+                            count={stats.available}
+                            total={stats.total}
+                            color="#2e7d32"
+                            icon={BarChartIcon}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={2.4}>
+                        <StatCard
+                            title="투숙중"
+                            count={stats.occupied}
+                            total={stats.total}
+                            color="#d32f2f"
+                            icon={UsersIcon}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={2.4}>
+                        <StatCard
+                            title="청소중"
+                            count={stats.cleaning}
+                            total={stats.total}
+                            color="#1976d2"
+                            icon={BarChartIcon}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={2.4}>
+                        <StatCard
+                            title="정비중"
+                            count={stats.maintenance}
+                            total={stats.total}
+                            color="#ed6c02"
+                            icon={BarChartIcon}
+                        />
+                    </Grid>
+                </Grid>
 
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className="w-full py-2 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                        <option value="ALL">모든 상태</option>
-                        <option value="AVAILABLE">이용가능</option>
-                        <option value="OCCUPIED">투숙중</option>
-                        <option value="CLEANING">청소중</option>
-                        <option value="MAINTENANCE">정비중</option>
-                    </select>
+                {/* 필터 섹션 */}
+                <Paper sx={{ p: 3, mb: 4 }}>
+                    <Grid container spacing={3} alignItems="center">
+                        <Grid item xs={12} md={3}>
+                            <TextField
+                                fullWidth
+                                placeholder="객실 번호 검색..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon color="action" />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        '&:hover fieldset': { borderColor: '#1976d2' },
+                                        '&.Mui-focused fieldset': { borderColor: '#1976d2' }
+                                    }
+                                }}
+                            />
+                        </Grid>
 
-                    <select
-                        value={typeFilter}
-                        onChange={(e) => setTypeFilter(e.target.value)}
-                        className="w-full py-2 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                        <option value="ALL">모든 타입</option>
-                        <option value="SINGLE">싱글</option>
-                        <option value="DOUBLE">더블</option>
-                        <option value="DELUXE">디럭스</option>
-                        <option value="SUITE">스위트</option>
-                    </select>
+                        <Grid item xs={12} md={3}>
+                            <FormControl fullWidth>
+                                <InputLabel>상태 필터</InputLabel>
+                                <Select
+                                    value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    label="상태 필터"
+                                >
+                                    <MenuItem value="ALL">모든 상태</MenuItem>
+                                    <MenuItem value="AVAILABLE">이용가능</MenuItem>
+                                    <MenuItem value="OCCUPIED">투숙중</MenuItem>
+                                    <MenuItem value="CLEANING">청소중</MenuItem>
+                                    <MenuItem value="MAINTENANCE">정비중</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
 
-                    <div className="text-sm text-gray-600 flex items-center">
-                        총 {stats.total}개 객실
-                    </div>
-                </div>
-            </div>
+                        <Grid item xs={12} md={3}>
+                            <FormControl fullWidth>
+                                <InputLabel>타입 필터</InputLabel>
+                                <Select
+                                    value={typeFilter}
+                                    onChange={(e) => setTypeFilter(e.target.value)}
+                                    label="타입 필터"
+                                >
+                                    <MenuItem value="ALL">모든 타입</MenuItem>
+                                    <MenuItem value="SINGLE">싱글</MenuItem>
+                                    <MenuItem value="DOUBLE">더블</MenuItem>
+                                    <MenuItem value="DELUXE">디럭스</MenuItem>
+                                    <MenuItem value="SUITE">스위트</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
 
-            {/* 객실 목록 - 층별 표시 */}
-            <div className="space-y-6">
-                {floorGroups.map(({ floor, rooms }) => (
-                    <FloorSection
-                        key={floor}
-                        floor={floor}
-                        rooms={rooms}
-                        onStatusChange={handleStatusChange}
-                        onEdit={handleEdit}
-                    />
-                ))}
-            </div>
+                        <Grid item xs={12} md={3}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                                <Typography variant="body2" color="text.secondary">
+                                    총 {stats.total}개 객실
+                                </Typography>
+                            </Box>
+                        </Grid>
+                    </Grid>
+                </Paper>
 
-            {/* 객실 추가/편집 모달 */}
-            {showModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-                        <h2 className="text-xl font-bold mb-4">
-                            {editingRoom ? '객실 편집' : '객실 추가'}
-                        </h2>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    객실 번호
-                                </label>
-                                <input
-                                    type="text"
+                {/* 객실 목록 - 층별 표시 */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    {floorGroups.map(({ floor, rooms }) => (
+                        <FloorSection
+                            key={floor}
+                            floor={floor}
+                            rooms={rooms}
+                            onStatusChange={handleStatusChange}
+                            onEdit={handleEdit}
+                        />
+                    ))}
+                </Box>
+
+                {/* 객실 추가/편집 모달 */}
+                <Dialog
+                    open={showModal}
+                    onClose={() => setShowModal(false)}
+                    maxWidth="sm"
+                    fullWidth
+                >
+                    <DialogTitle sx={{ fontWeight: 'bold', color: '#212121' }}>
+                        {editingRoom ? '객실 편집' : '객실 추가'}
+                    </DialogTitle>
+                    <form onSubmit={handleSubmit}>
+                        <DialogContent>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
+                                <TextField
+                                    fullWidth
+                                    label="객실 번호"
                                     value={formData.roomNumber}
                                     onChange={(e) => setFormData({ ...formData, roomNumber: e.target.value })}
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     required
                                 />
-                            </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    객실 타입
-                                </label>
-                                <select
-                                    value={formData.roomType}
-                                    onChange={(e) => setFormData({ ...formData, roomType: e.target.value })}
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                >
-                                    <option value="SINGLE">싱글</option>
-                                    <option value="DOUBLE">더블</option>
-                                    <option value="DELUXE">디럭스</option>
-                                    <option value="SUITE">스위트</option>
-                                </select>
-                            </div>
+                                <FormControl fullWidth>
+                                    <InputLabel>객실 타입</InputLabel>
+                                    <Select
+                                        value={formData.roomType}
+                                        onChange={(e) => setFormData({ ...formData, roomType: e.target.value })}
+                                        label="객실 타입"
+                                    >
+                                        <MenuItem value="SINGLE">싱글</MenuItem>
+                                        <MenuItem value="DOUBLE">더블</MenuItem>
+                                        <MenuItem value="DELUXE">디럭스</MenuItem>
+                                        <MenuItem value="SUITE">스위트</MenuItem>
+                                    </Select>
+                                </FormControl>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    가격 (원/박)
-                                </label>
-                                <input
+                                <TextField
+                                    fullWidth
+                                    label="가격 (원/박)"
                                     type="number"
                                     value={formData.price}
                                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     required
                                 />
-                            </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    수용 인원
-                                </label>
-                                <input
+                                <TextField
+                                    fullWidth
+                                    label="수용 인원"
                                     type="number"
                                     value={formData.capacity}
                                     onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     required
                                 />
-                            </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    상태
-                                </label>
-                                <select
-                                    value={formData.status}
-                                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                >
-                                    <option value="AVAILABLE">이용가능</option>
-                                    <option value="OCCUPIED">투숙중</option>
-                                    <option value="CLEANING">청소중</option>
-                                    <option value="MAINTENANCE">정비중</option>
-                                </select>
-                            </div>
+                                <FormControl fullWidth>
+                                    <InputLabel>상태</InputLabel>
+                                    <Select
+                                        value={formData.status}
+                                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                        label="상태"
+                                    >
+                                        <MenuItem value="AVAILABLE">이용가능</MenuItem>
+                                        <MenuItem value="OCCUPIED">투숙중</MenuItem>
+                                        <MenuItem value="CLEANING">청소중</MenuItem>
+                                        <MenuItem value="MAINTENANCE">정비중</MenuItem>
+                                    </Select>
+                                </FormControl>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    설명
-                                </label>
-                                <textarea
+                                <TextField
+                                    fullWidth
+                                    label="설명"
+                                    multiline
+                                    rows={3}
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    rows="3"
                                 />
-                            </div>
-
-                            <div className="flex gap-2 pt-4">
-                                <button
-                                    type="submit"
-                                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-                                >
-                                    {editingRoom ? '수정' : '추가'}
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowModal(false)}
-                                    className="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors"
-                                >
-                                    취소
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-        </div>
+                            </Box>
+                        </DialogContent>
+                        <DialogActions sx={{ p: 3, pt: 2 }}>
+                            <Button
+                                onClick={() => setShowModal(false)}
+                                variant="outlined"
+                                sx={{ flex: 1 }}
+                            >
+                                취소
+                            </Button>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                sx={{
+                                    flex: 1,
+                                    backgroundColor: '#1976d2',
+                                    '&:hover': { backgroundColor: '#1565c0' }
+                                }}
+                            >
+                                {editingRoom ? '수정' : '추가'}
+                            </Button>
+                        </DialogActions>
+                    </form>
+                </Dialog>
+            </Container>
+        </Box>
     )
 }
 

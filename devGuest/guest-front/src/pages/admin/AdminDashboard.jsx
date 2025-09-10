@@ -1,7 +1,26 @@
 import { useState, useEffect } from 'react'
-import { Users, Bed, Calendar, TrendingUp, Clock, CheckCircle } from 'lucide-react'
+import {
+  Box,
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  Grid,
+  LinearProgress,
+  Chip,
+  Paper,
+  Avatar,
+  Divider
+} from '@mui/material'
+import {
+  People as UsersIcon,
+  Bed as BedIcon,
+  Event as CalendarIcon,
+  TrendingUp as TrendingUpIcon,
+  Schedule as ClockIcon,
+  CheckCircle as CheckCircleIcon
+} from '@mui/icons-material'
 import { dashboardService } from '../../services/hotelService'
-import '../../styles/Grid.css'
 
 const Dashboard = () => {
   const [stats, setStats] = useState({})
@@ -32,25 +51,52 @@ const Dashboard = () => {
     }
   }
 
-  const StatCard = ({ title, value, icon: Icon, color = 'blue' }) => (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className={`text-3xl font-bold text-${color}-600`}>{value}</p>
-        </div>
-        <Icon className={`h-12 w-12 text-${color}-600`} />
-      </div>
-    </div>
+  const StatCard = ({ title, value, icon: Icon, color = '#212121' }) => (
+    <Card
+      sx={{
+        height: '100%',
+        background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+        borderRadius: 2,
+        transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          boxShadow: '0 8px 30px rgba(0,0,0,0.15)'
+        }
+      }}
+    >
+      <CardContent sx={{ p: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              {title}
+            </Typography>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', color: color }}>
+              {value}
+            </Typography>
+          </Box>
+          <Avatar
+            sx={{
+              bgcolor: color + '20',
+              width: 56,
+              height: 56,
+              '& .MuiSvgIcon-root': { color: color, fontSize: '1.8rem' }
+            }}
+          >
+            <Icon />
+          </Avatar>
+        </Box>
+      </CardContent>
+    </Card>
   )
 
   const getRoomStatusColor = (status) => {
     switch (status) {
-      case 'AVAILABLE': return 'text-green-600 bg-green-100'
-      case 'OCCUPIED': return 'text-red-600 bg-red-100'
-      case 'MAINTENANCE': return 'text-yellow-600 bg-yellow-100'
-      case 'CLEANING': return 'text-blue-600 bg-blue-100'
-      default: return 'text-gray-600 bg-gray-100'
+      case 'AVAILABLE': return { color: '#2e7d32', bgColor: '#e8f5e8' }
+      case 'OCCUPIED': return { color: '#d32f2f', bgColor: '#ffebee' }
+      case 'MAINTENANCE': return { color: '#ed6c02', bgColor: '#fff3e0' }
+      case 'CLEANING': return { color: '#1976d2', bgColor: '#e3f2fd' }
+      default: return { color: '#757575', bgColor: '#f5f5f5' }
     }
   }
 
@@ -66,149 +112,263 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-lg text-gray-600">로딩 중...</div>
-      </div>
+      <Box
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#f5f5f5'
+        }}
+      >
+        <Typography variant="h6" color="text.secondary">
+          로딩 중...
+        </Typography>
+      </Box>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">DEV호텔 관리 대시보드</h1>
+    <Box sx={{ minHeight: '100vh', backgroundColor: '#f5f5f5', py: 4 }}>
+      <Container maxWidth="xl">
+        <Typography
+          variant="h3"
+          component="h1"
+          sx={{
+            fontWeight: 'bold',
+            color: '#212121',
+            mb: 4,
+            textAlign: 'center'
+          }}
+        >
+          Dev Hotel 관리 대시보드
+        </Typography>
 
-        {/* 통계 카드 */}
-        <div className="dashboard-stats-grid">
-          <StatCard
-            title="전체 객실"
-            value={stats.totalRooms || 0}
-            icon={Bed}
-            color="blue"
-          />
-          <StatCard
-            title="이용가능 객실"
-            value={stats.availableRooms || 0}
-            icon={CheckCircle}
-            color="green"
-          />
-          <StatCard
-            title="투숙중 객실"
-            value={stats.occupiedRooms || 0}
-            icon={Users}
-            color="red"
-          />
-          <StatCard
-            title="객실 점유율"
-            value={`${stats.occupancyRate || 0}%`}
-            icon={TrendingUp}
-            color="purple"
-          />
-        </div>
+        {/* 주요 통계 카드 */}
+        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#212121', mb: 3 }}>
+          객실 현황
+        </Typography>
+        <Grid container spacing={3} sx={{ mb: 5 }}>
+          <Grid item xs={12} sm={6} lg={3}>
+            <StatCard
+              title="전체 객실"
+              value={stats.totalRooms || 0}
+              icon={BedIcon}
+              color="#1976d2"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} lg={3}>
+            <StatCard
+              title="이용가능 객실"
+              value={stats.availableRooms || 0}
+              icon={CheckCircleIcon}
+              color="#2e7d32"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} lg={3}>
+            <StatCard
+              title="투숙중 객실"
+              value={stats.occupiedRooms || 0}
+              icon={UsersIcon}
+              color="#d32f2f"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} lg={3}>
+            <StatCard
+              title="객실 점유율"
+              value={`${stats.occupancyRate || 0}%`}
+              icon={TrendingUpIcon}
+              color="#7b1fa2"
+            />
+          </Grid>
+        </Grid>
 
-        <div className="dashboard-secondary-grid">
-          <StatCard
-            title="총 고객 수"
-            value={stats.totalGuests || 0}
-            icon={Users}
-            color="indigo"
-          />
-          <StatCard
-            title="총 예약 수"
-            value={stats.totalReservations || 0}
-            icon={Calendar}
-            color="blue"
-          />
-          <StatCard
-            title="확정 예약"
-            value={stats.confirmedReservations || 0}
-            icon={CheckCircle}
-            color="green"
-          />
-        </div>
+        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#212121', mb: 3 }}>
+          예약 및 고객 현황
+        </Typography>
+        <Grid container spacing={3} sx={{ mb: 5 }}>
+          <Grid item xs={12} sm={4}>
+            <StatCard
+              title="총 고객 수"
+              value={stats.totalGuests || 0}
+              icon={UsersIcon}
+              color="#3f51b5"
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <StatCard
+              title="총 예약 수"
+              value={stats.totalReservations || 0}
+              icon={CalendarIcon}
+              color="#1976d2"
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <StatCard
+              title="확정 예약"
+              value={stats.confirmedReservations || 0}
+              icon={CheckCircleIcon}
+              color="#2e7d32"
+            />
+          </Grid>
+        </Grid>
 
-        <div className="dashboard-content-grid">
+        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#212121', mb: 3 }}>
+          실시간 정보
+        </Typography>
+
+        <Grid container spacing={3}>
           {/* 오늘의 활동 */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-              <Clock className="mr-2" />
-              오늘의 활동
-            </h2>
+          <Grid item xs={12} lg={6}>
+            <Card
+              sx={{
+                height: 'fit-content',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                borderRadius: 2
+              }}
+            >
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <ClockIcon sx={{ mr: 1, color: '#212121' }} />
+                  <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold' }}>
+                    오늘의 활동
+                  </Typography>
+                </Box>
 
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-medium text-gray-700 mb-2">
-                  체크인 예정 ({todayActivities.checkIns?.length || 0}건)
-                </h3>
-                {todayActivities.checkIns?.length > 0 ? (
-                  <div className="space-y-2">
-                    {todayActivities.checkIns.map((reservation, index) => (
-                      <div key={index} className="flex justify-between items-center p-2 bg-green-50 rounded">
-                        <span className="font-medium">{reservation.guest?.name}</span>
-                        <span className="text-sm text-gray-600">객실 {reservation.room?.roomNumber}</span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500">체크인 예정이 없습니다.</p>
-                )}
-              </div>
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'medium', mb: 2, color: '#212121' }}>
+                    체크인 예정 ({todayActivities.checkIns?.length || 0}건)
+                  </Typography>
+                  {todayActivities.checkIns?.length > 0 ? (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      {todayActivities.checkIns.map((reservation, index) => (
+                        <Paper
+                          key={index}
+                          sx={{
+                            p: 2,
+                            backgroundColor: '#e8f5e8',
+                            borderLeft: '4px solid #2e7d32',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                          }}
+                        >
+                          <Typography sx={{ fontWeight: 'medium' }}>
+                            {reservation.guest?.name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            객실 {reservation.room?.roomNumber}
+                          </Typography>
+                        </Paper>
+                      ))}
+                    </Box>
+                  ) : (
+                    <Typography color="text.secondary">체크인 예정이 없습니다.</Typography>
+                  )}
+                </Box>
 
-              <div>
-                <h3 className="text-lg font-medium text-gray-700 mb-2">
-                  체크아웃 예정 ({todayActivities.checkOuts?.length || 0}건)
-                </h3>
-                {todayActivities.checkOuts?.length > 0 ? (
-                  <div className="space-y-2">
-                    {todayActivities.checkOuts.map((reservation, index) => (
-                      <div key={index} className="flex justify-between items-center p-2 bg-blue-50 rounded">
-                        <span className="font-medium">{reservation.guest?.name}</span>
-                        <span className="text-sm text-gray-600">객실 {reservation.room?.roomNumber}</span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500">체크아웃 예정이 없습니다.</p>
-                )}
-              </div>
-            </div>
-          </div>
+                <Divider sx={{ my: 2 }} />
+
+                <Box>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'medium', mb: 2, color: '#212121' }}>
+                    체크아웃 예정 ({todayActivities.checkOuts?.length || 0}건)
+                  </Typography>
+                  {todayActivities.checkOuts?.length > 0 ? (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      {todayActivities.checkOuts.map((reservation, index) => (
+                        <Paper
+                          key={index}
+                          sx={{
+                            p: 2,
+                            backgroundColor: '#e3f2fd',
+                            borderLeft: '4px solid #1976d2',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                          }}
+                        >
+                          <Typography sx={{ fontWeight: 'medium' }}>
+                            {reservation.guest?.name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            객실 {reservation.room?.roomNumber}
+                          </Typography>
+                        </Paper>
+                      ))}
+                    </Box>
+                  ) : (
+                    <Typography color="text.secondary">체크아웃 예정이 없습니다.</Typography>
+                  )}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
 
           {/* 객실 상태 요약 */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-              <Bed className="mr-2" />
-              객실 상태 요약
-            </h2>
+          <Grid item xs={12} lg={6}>
+            <Card
+              sx={{
+                height: 'fit-content',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                borderRadius: 2
+              }}
+            >
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <BedIcon sx={{ mr: 1, color: '#212121' }} />
+                  <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold' }}>
+                    객실 상태 요약
+                  </Typography>
+                </Box>
 
-            <div className="space-y-3">
-              {Object.entries(roomStatusSummary).map(([status, count]) => (
-                <div key={status} className="flex justify-between items-center">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getRoomStatusColor(status)}`}>
-                    {getStatusLabel(status)}
-                  </span>
-                  <span className="text-lg font-semibold text-gray-900">{count}개</span>
-                </div>
-              ))}
-            </div>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {Object.entries(roomStatusSummary).map(([status, count]) => {
+                    const colors = getRoomStatusColor(status);
+                    return (
+                      <Box key={status} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Chip
+                          label={getStatusLabel(status)}
+                          sx={{
+                            backgroundColor: colors.bgColor,
+                            color: colors.color,
+                            fontWeight: 'medium'
+                          }}
+                        />
+                        <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#212121' }}>
+                          {count}개
+                        </Typography>
+                      </Box>
+                    );
+                  })}
+                </Box>
 
-            {stats.totalRooms > 0 && (
-              <div className="mt-4 pt-4 border-t">
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>점유율</span>
-                  <span>{stats.occupancyRate}%</span>
-                </div>
-                <div className="mt-2 bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full"
-                    style={{ width: `${stats.occupancyRate}%` }}
-                  ></div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+                {stats.totalRooms > 0 && (
+                  <Box sx={{ mt: 3, pt: 3, borderTop: '1px solid #e0e0e0' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography variant="body2" color="text.secondary">점유율</Typography>
+                      <Typography variant="body2" color="text.secondary">{stats.occupancyRate}%</Typography>
+                    </Box>
+                    <LinearProgress
+                      variant="determinate"
+                      value={stats.occupancyRate}
+                      sx={{
+                        height: 8,
+                        borderRadius: 4,
+                        backgroundColor: '#e0e0e0',
+                        '& .MuiLinearProgress-bar': {
+                          borderRadius: 4,
+                          backgroundColor: '#1976d2'
+                        }
+                      }}
+                    />
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Container>
+    </Box>
   )
 }
 

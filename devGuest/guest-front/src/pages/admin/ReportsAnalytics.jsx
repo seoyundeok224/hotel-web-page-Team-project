@@ -1,15 +1,36 @@
 import { useState, useEffect } from 'react'
-import { 
-  Calendar, 
-  TrendingUp, 
-  DollarSign, 
-  Users, 
-  Bed,
-  Download,
-  Filter,
-  BarChart,
-  PieChart
-} from 'lucide-react'
+import {
+  Box,
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  Grid,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Paper,
+  LinearProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow
+} from '@mui/material'
+import {
+  Event as CalendarIcon,
+  TrendingUp as TrendingUpIcon,
+  AttachMoney as DollarSignIcon,
+  People as UsersIcon,
+  Bed as BedIcon,
+  Download as DownloadIcon,
+  FilterList as FilterIcon,
+  BarChart as BarChartIcon,
+  DonutLarge as DonutLargeIcon
+} from '@mui/icons-material'
 
 const Reports = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('month')
@@ -69,7 +90,7 @@ const Reports = () => {
   }
 
   const getCurrentData = () => {
-    switch(selectedPeriod) {
+    switch (selectedPeriod) {
       case 'week':
         return revenueData.daily
       case 'month':
@@ -128,7 +149,7 @@ const Reports = () => {
             </select>
           </div>
           <button className="btn btn-primary">
-            <Download size={16} />
+            <DownloadIcon sx={{ fontSize: 16 }} />
             리포트 다운로드
           </button>
         </div>
@@ -138,7 +159,7 @@ const Reports = () => {
       <div className="dashboard-grid" style={{ marginBottom: '2rem' }}>
         <div className="stat-card">
           <div className="stat-icon" style={{ backgroundColor: '#3498db' }}>
-            <DollarSign size={24} />
+            <DollarSignIcon sx={{ fontSize: 24 }} />
           </div>
           <div className="stat-content">
             <h3>₩{getTotalRevenue().toLocaleString()}</h3>
@@ -147,7 +168,7 @@ const Reports = () => {
         </div>
         <div className="stat-card">
           <div className="stat-icon" style={{ backgroundColor: '#27ae60' }}>
-            <Calendar size={24} />
+            <CalendarIcon sx={{ fontSize: 24 }} />
           </div>
           <div className="stat-content">
             <h3>{getTotalBookings()}</h3>
@@ -156,7 +177,7 @@ const Reports = () => {
         </div>
         <div className="stat-card">
           <div className="stat-icon" style={{ backgroundColor: '#f39c12' }}>
-            <TrendingUp size={24} />
+            <TrendingUpIcon sx={{ fontSize: 24 }} />
           </div>
           <div className="stat-content">
             <h3>₩{Math.round(getAverageRevenue()).toLocaleString()}</h3>
@@ -165,7 +186,7 @@ const Reports = () => {
         </div>
         <div className="stat-card">
           <div className="stat-icon" style={{ backgroundColor: '#9b59b6' }}>
-            <Bed size={24} />
+            <BedIcon sx={{ fontSize: 24 }} />
           </div>
           <div className="stat-content">
             <h3>{Math.round(occupancyData.reduce((sum, room) => sum + room.rate, 0) / occupancyData.length)}%</h3>
@@ -183,7 +204,7 @@ const Reports = () => {
             </div>
             <div style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
               <div style={{ textAlign: 'center', color: '#7f8c8d' }}>
-                <BarChart size={48} style={{ marginBottom: '1rem' }} />
+                <BarChartIcon sx={{ fontSize: 48, mb: 2 }} />
                 <p>차트 컴포넌트 영역</p>
                 <p style={{ fontSize: '0.9rem' }}>실제 구현시 Chart.js 또는 Recharts 등의 라이브러리 사용</p>
               </div>
@@ -243,16 +264,16 @@ const Reports = () => {
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           <span>{room.rate}%</span>
-                          <div style={{ 
-                            width: '60px', 
-                            height: '8px', 
-                            backgroundColor: '#ecf0f1', 
+                          <div style={{
+                            width: '60px',
+                            height: '8px',
+                            backgroundColor: '#ecf0f1',
                             borderRadius: '4px',
                             overflow: 'hidden'
                           }}>
-                            <div style={{ 
-                              width: `${room.rate}%`, 
-                              height: '100%', 
+                            <div style={{
+                              width: `${room.rate}%`,
+                              height: '100%',
                               backgroundColor: room.rate > 85 ? '#e74c3c' : room.rate > 70 ? '#f39c12' : '#27ae60'
                             }} />
                           </div>
@@ -270,7 +291,7 @@ const Reports = () => {
             </div>
             <div style={{ height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
               <div style={{ textAlign: 'center', color: '#7f8c8d' }}>
-                <PieChart size={48} style={{ marginBottom: '1rem' }} />
+                <DonutLargeIcon sx={{ fontSize: 48, mb: 2 }} />
                 <p>파이 차트 영역</p>
               </div>
             </div>
@@ -302,16 +323,16 @@ const Reports = () => {
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           <span>{vip.percentage}%</span>
-                          <div style={{ 
-                            width: '60px', 
-                            height: '8px', 
-                            backgroundColor: '#ecf0f1', 
+                          <div style={{
+                            width: '60px',
+                            height: '8px',
+                            backgroundColor: '#ecf0f1',
                             borderRadius: '4px',
                             overflow: 'hidden'
                           }}>
-                            <div style={{ 
-                              width: `${vip.percentage}%`, 
-                              height: '100%', 
+                            <div style={{
+                              width: `${vip.percentage}%`,
+                              height: '100%',
                               backgroundColor: '#3498db'
                             }} />
                           </div>
@@ -344,16 +365,16 @@ const Reports = () => {
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           <span>{nation.percentage}%</span>
-                          <div style={{ 
-                            width: '60px', 
-                            height: '8px', 
-                            backgroundColor: '#ecf0f1', 
+                          <div style={{
+                            width: '60px',
+                            height: '8px',
+                            backgroundColor: '#ecf0f1',
                             borderRadius: '4px',
                             overflow: 'hidden'
                           }}>
-                            <div style={{ 
-                              width: `${nation.percentage}%`, 
-                              height: '100%', 
+                            <div style={{
+                              width: `${nation.percentage}%`,
+                              height: '100%',
                               backgroundColor: '#27ae60'
                             }} />
                           </div>

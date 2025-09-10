@@ -1,17 +1,46 @@
 import { useState, useEffect } from 'react'
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Edit, 
-  Trash2, 
-  Eye,
-  Calendar,
-  User,
-  Bed,
-  Clock,
-  DollarSign
-} from 'lucide-react'
+import {
+  Box,
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  Grid,
+  Button,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Chip,
+  Paper,
+  IconButton,
+  InputAdornment,
+  Avatar,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow
+} from '@mui/material'
+import {
+  Add as AddIcon,
+  Search as SearchIcon,
+  FilterList as FilterIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Visibility as VisibilityIcon,
+  CalendarToday as CalendarTodayIcon,
+  Person as PersonIcon,
+  Bed as BedIcon,
+  AccessTime as AccessTimeIcon,
+  AttachMoney as AttachMoneyIcon
+} from '@mui/icons-material'
 
 const Reservations = () => {
   const [reservations, setReservations] = useState([
@@ -83,13 +112,13 @@ const Reservations = () => {
 
   const filteredReservations = reservations.filter(reservation => {
     const matchesSearch = reservation.guestName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         reservation.reservationNumber.toLowerCase().includes(searchTerm.toLowerCase())
+      reservation.reservationNumber.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === 'all' || reservation.status === statusFilter
     return matchesSearch && matchesStatus
   })
 
   const getStatusText = (status) => {
-    switch(status) {
+    switch (status) {
       case 'confirmed': return '확정'
       case 'pending': return '대기'
       case 'cancelled': return '취소'
@@ -125,12 +154,12 @@ const Reservations = () => {
         <div className="card-header">
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flex: 1 }}>
             <div style={{ position: 'relative', minWidth: '300px' }}>
-              <Search size={20} style={{ 
-                position: 'absolute', 
-                left: '12px', 
-                top: '50%', 
-                transform: 'translateY(-50%)', 
-                color: '#7f8c8d' 
+              <SearchIcon size={20} style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#7f8c8d'
               }} />
               <input
                 type="text"
@@ -156,7 +185,7 @@ const Reservations = () => {
             </select>
           </div>
           <button className="btn btn-primary" onClick={handleNewReservation}>
-            <Plus size={16} />
+            <AddIcon sx={{ fontSize: 16 }} />
             새 예약
           </button>
         </div>
@@ -166,7 +195,7 @@ const Reservations = () => {
       <div className="dashboard-grid" style={{ marginBottom: '2rem' }}>
         <div className="stat-card">
           <div className="stat-icon" style={{ backgroundColor: '#3498db' }}>
-            <Calendar size={24} />
+            <CalendarTodayIcon sx={{ fontSize: 24 }} />
           </div>
           <div className="stat-content">
             <h3>{reservations.filter(r => r.status === 'confirmed').length}</h3>
@@ -175,7 +204,7 @@ const Reservations = () => {
         </div>
         <div className="stat-card">
           <div className="stat-icon" style={{ backgroundColor: '#f39c12' }}>
-            <Clock size={24} />
+            <AccessTimeIcon sx={{ fontSize: 24 }} />
           </div>
           <div className="stat-content">
             <h3>{reservations.filter(r => r.status === 'pending').length}</h3>
@@ -184,7 +213,7 @@ const Reservations = () => {
         </div>
         <div className="stat-card">
           <div className="stat-icon" style={{ backgroundColor: '#27ae60' }}>
-            <User size={24} />
+            <PersonIcon sx={{ fontSize: 24 }} />
           </div>
           <div className="stat-content">
             <h3>{reservations.reduce((sum, r) => sum + r.guests, 0)}</h3>
@@ -193,7 +222,7 @@ const Reservations = () => {
         </div>
         <div className="stat-card">
           <div className="stat-icon" style={{ backgroundColor: '#9b59b6' }}>
-            <DollarSign size={24} />
+            <AttachMoneyIcon sx={{ fontSize: 24 }} />
           </div>
           <div className="stat-content">
             <h3>₩{reservations.reduce((sum, r) => sum + r.totalAmount, 0).toLocaleString()}</h3>
@@ -267,28 +296,28 @@ const Reservations = () => {
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button 
+                      <button
                         className="btn btn-primary"
                         style={{ padding: '0.25rem 0.5rem' }}
                         title="상세보기"
                       >
-                        <Eye size={14} />
+                        <VisibilityIcon sx={{ fontSize: 14 }} />
                       </button>
-                      <button 
+                      <button
                         className="btn btn-warning"
                         style={{ padding: '0.25rem 0.5rem' }}
                         title="수정"
                         onClick={() => handleEditReservation(reservation.id)}
                       >
-                        <Edit size={14} />
+                        <EditIcon sx={{ fontSize: 14 }} />
                       </button>
-                      <button 
+                      <button
                         className="btn btn-danger"
                         style={{ padding: '0.25rem 0.5rem' }}
                         title="삭제"
                         onClick={() => handleDeleteReservation(reservation.id)}
                       >
-                        <Trash2 size={14} />
+                        <DeleteIcon sx={{ fontSize: 14 }} />
                       </button>
                     </div>
                   </td>
