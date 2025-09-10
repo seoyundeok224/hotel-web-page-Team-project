@@ -45,13 +45,13 @@ const AdminNavbar = () => {
           {user?.name || '관리자'}님 환영합니다
         </Typography>
       </Box>
-      
+
       <List>
         {adminMenuItems.map((item) => (
-          <ListItem 
+          <ListItem
             key={item.text}
-            button 
-            component={RouterLink} 
+            button
+            component={RouterLink}
             to={item.path}
             onClick={isMobile ? handleDrawerToggle : undefined}
             sx={{
@@ -64,12 +64,12 @@ const AdminNavbar = () => {
             <ListItemText primary={item.text} />
           </ListItem>
         ))}
-        
+
         <Divider sx={{ my: 1 }} />
-        
-        <ListItem 
-          button 
-          component={RouterLink} 
+
+        <ListItem
+          button
+          component={RouterLink}
           to="/"
           onClick={isMobile ? handleDrawerToggle : undefined}
           sx={{
@@ -81,9 +81,9 @@ const AdminNavbar = () => {
           <ListItemIcon><HomeIcon /></ListItemIcon>
           <ListItemText primary="고객 사이트로" />
         </ListItem>
-        
-        <ListItem 
-          button 
+
+        <ListItem
+          button
           onClick={() => {
             handleLogout();
             if (isMobile) handleDrawerToggle();
@@ -105,13 +105,13 @@ const AdminNavbar = () => {
     <>
       <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>
         <Toolbar sx={{ justifyContent: 'space-between' }}>
-          <Typography 
-            variant="h6" 
-            component={RouterLink} 
+          <Typography
+            variant="h6"
+            component={RouterLink}
             to="/admin"
-            sx={{ 
-              textDecoration: 'none', 
-              color: 'white', 
+            sx={{
+              textDecoration: 'none',
+              color: 'white',
               fontWeight: 'bold',
               '&:hover': {
                 opacity: 0.8
@@ -120,7 +120,7 @@ const AdminNavbar = () => {
           >
             Dev Hotel - 관리자
           </Typography>
-          
+
           {isMobile ? (
             <IconButton
               color="inherit"
@@ -133,43 +133,43 @@ const AdminNavbar = () => {
           ) : (
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               {adminMenuItems.map((item) => (
-                <Button 
+                <Button
                   key={item.text}
-                  color="inherit" 
-                  component={RouterLink} 
+                  color="inherit"
+                  component={RouterLink}
                   to={item.path}
-                  sx={{ 
+                  sx={{
                     mx: 1,
-                    '&:hover': { 
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)' 
-                    } 
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                    }
                   }}
                 >
                   {item.text}
                 </Button>
               ))}
-              <Button 
+              <Button
                 color="inherit"
                 component={RouterLink}
                 to="/"
-                sx={{ 
+                sx={{
                   mx: 1,
-                  '&:hover': { 
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)' 
-                  } 
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                  }
                 }}
               >
-                고객 사이트
+                홈페이지
               </Button>
-              <Button 
+              <Button
                 color="inherit"
                 onClick={handleLogout}
                 startIcon={<LogoutIcon />}
-                sx={{ 
+                sx={{
                   ml: 2,
-                  '&:hover': { 
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)' 
-                  } 
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                  }
                 }}
               >
                 로그아웃
@@ -178,7 +178,7 @@ const AdminNavbar = () => {
           )}
         </Toolbar>
       </AppBar>
-      
+
       <Drawer
         anchor="right"
         open={drawerOpen}
