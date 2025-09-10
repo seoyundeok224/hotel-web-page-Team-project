@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { 
-  Box, 
-  TextField, 
-  Button, 
-  Alert, 
-  InputAdornment, 
-  IconButton, 
+import {
+  Box,
+  TextField,
+  Button,
+  Alert,
+  InputAdornment,
+  IconButton,
   FormHelperText,
   CircularProgress
 } from '@mui/material';
@@ -21,7 +21,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }) => {
     name: '',
     phone: ''
   });
-  
+
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -36,7 +36,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }) => {
       ...prev,
       [name]: value
     }));
-    
+
     // 에러 메시지 클리어
     if (errors[name]) {
       setErrors(prev => ({
@@ -49,7 +49,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }) => {
   // 사용자명 중복 확인
   const checkUsername = async (username) => {
     if (!username || username.length < 3) return;
-    
+
     setChecking(prev => ({ ...prev, username: true }));
     try {
       const response = await authService.checkUsername(username);
@@ -70,7 +70,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }) => {
   const checkEmail = async (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) return;
-    
+
     setChecking(prev => ({ ...prev, email: true }));
     try {
       const response = await authService.checkEmail(email);
@@ -142,7 +142,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }) => {
   // 회원가입 제출
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -177,7 +177,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }) => {
       });
 
       setMessage(response.message || '회원가입이 완료되었습니다.');
-      
+
       // 성공 콜백 실행
       if (onSuccess) {
         setTimeout(() => {
@@ -195,8 +195,8 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }) => {
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
       {message && (
-        <Alert 
-          severity={message.includes('완료') ? 'success' : 'error'} 
+        <Alert
+          severity={message.includes('완료') ? 'success' : 'error'}
           sx={{ mb: 2 }}
         >
           {message}
@@ -345,16 +345,6 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }) => {
         disabled={loading}
       >
         {loading ? '회원가입 중...' : '회원가입'}
-      </Button>
-
-      {/* 로그인으로 돌아가기 */}
-      <Button
-        fullWidth
-        variant="text"
-        onClick={onSwitchToLogin}
-        sx={{ mt: 1 }}
-      >
-        이미 계정이 있나요? 로그인하기
       </Button>
     </Box>
   );
