@@ -1,13 +1,8 @@
 import React, { useState, forwardRef } from 'react';
 import { AppBar, Toolbar, Typography, Button, IconButton, Drawer, List, ListItem, ListItemText, useTheme, useMediaQuery, Box, Divider } from '@mui/material';
-<<<<<<< HEAD
-import { Link as RouterLink } from 'react-router-dom';
-import MenuIcon from '@mui/icons-material/Menu';
-=======
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useAuth } from '../contexts/AuthContext';
->>>>>>> sjh
 
 
 
@@ -20,24 +15,18 @@ const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-<<<<<<< HEAD
-=======
   const navigate = useNavigate();
   const { isAuthenticated, isAdmin, user, logout } = useAuth();
->>>>>>> sjh
 
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
   };
 
-<<<<<<< HEAD
-=======
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
->>>>>>> sjh
   const drawer = (
     <Box sx={{ width: 250 }} role="presentation" onClick={handleDrawerToggle} onKeyDown={handleDrawerToggle}>
       <List>
@@ -57,11 +46,6 @@ const Navbar = () => {
           <ListItemText primary="예약" />
         </ListItem>
         <Divider />
-<<<<<<< HEAD
-        <ListItem button component={LinkBehavior} href="/login">
-          <ListItemText primary="로그인" />
-        </ListItem>
-=======
         {isAuthenticated ? (
           <>
             {isAdmin && (
@@ -78,7 +62,6 @@ const Navbar = () => {
             <ListItemText primary="로그인" />
           </ListItem>
         )}
->>>>>>> sjh
       </List>
     </Box>
   );
@@ -105,26 +88,22 @@ const Navbar = () => {
               <Button color="inherit" component={LinkBehavior} href="/rooms" sx={{ '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>객실 소개</Button>
               <Button color="inherit" component={LinkBehavior} href="/services" sx={{ '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>서비스</Button>
               <Button color="inherit" component={LinkBehavior} href="/location" sx={{ '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>오시는 길</Button>
-<<<<<<< HEAD
-              <Button variant="outlined" component={LinkBehavior} href="/login" sx={{ ml: 2 }}>로그인</Button>
               <Button variant="contained" component={LinkBehavior} href="/booking" sx={{ ml: 2 }}>예약</Button>
-=======
-              <Button variant="contained" component={LinkBehavior} href="/booking" sx={{ ml: 2 }}>예약</Button>
-              
+
               {isAuthenticated ? (
                 <>
                   {isAdmin && (
-                    <Button 
-                      variant="outlined" 
-                      component={LinkBehavior} 
-                      href="/admin" 
+                    <Button
+                      variant="outlined"
+                      component={LinkBehavior}
+                      href="/admin"
                       sx={{ ml: 2, borderColor: 'primary.main', color: 'primary.main' }}
                     >
                       관리자 패널
                     </Button>
                   )}
-                  <Button 
-                    color="inherit" 
+                  <Button
+                    color="inherit"
                     onClick={handleLogout}
                     sx={{ ml: 2 }}
                   >
@@ -134,7 +113,6 @@ const Navbar = () => {
               ) : (
                 <Button variant="outlined" component={LinkBehavior} href="/login" sx={{ ml: 2 }}>로그인</Button>
               )}
->>>>>>> sjh
             </Box>
           )}
         </Toolbar>
