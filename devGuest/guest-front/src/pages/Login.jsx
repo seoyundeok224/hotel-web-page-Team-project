@@ -1,9 +1,66 @@
+<<<<<<< HEAD
 import React from 'react';
 import { Typography, Container, Box, TextField, Button } from '@mui/material';
 
 const Login = () => {
   return (
     <Container maxWidth="xs">
+=======
+import React, { useState } from 'react';
+import { Typography, Container, Box, TextField, Button, Alert, Link } from '@mui/material';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { authService } from '../services/hotelService';
+
+const Login = () => {
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      // 실제 API 호출로 변경
+      const response = await authService.login({
+        username: formData.username,
+        password: formData.password
+      });
+
+      const { user, token } = response.data;
+      login(user, token);
+
+      // 관리자면 관리자 페이지로, 아니면 홈으로
+      if (user.role === 'ADMIN') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
+    } catch (error) {
+      setError(error.message || '로그인 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Container maxWidth="sm">
+>>>>>>> sjh
       <Box
         sx={{
           marginTop: 8,
@@ -12,19 +69,43 @@ const Login = () => {
           alignItems: 'center',
         }}
       >
+<<<<<<< HEAD
         <Typography component="h1" variant="h5">
           로그인
         </Typography>
         <Box component="form" sx={{ mt: 1 }}>
+=======
+        <Typography component="h1" variant="h4" sx={{ mb: 3 }}>
+          Dev Hotel
+        </Typography>
+
+        {error && (
+          <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
+            {error}
+          </Alert>
+        )}
+
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
+>>>>>>> sjh
           <TextField
             margin="normal"
             required
             fullWidth
+<<<<<<< HEAD
             id="email"
             label="이메일 주소"
             name="email"
             autoComplete="email"
             autoFocus
+=======
+            id="username"
+            label="사용자명"
+            name="username"
+            autoComplete="username"
+            autoFocus
+            value={formData.username}
+            onChange={handleChange}
+>>>>>>> sjh
           />
           <TextField
             margin="normal"
@@ -35,15 +116,55 @@ const Login = () => {
             type="password"
             id="password"
             autoComplete="current-password"
+<<<<<<< HEAD
+=======
+            value={formData.password}
+            onChange={handleChange}
+>>>>>>> sjh
           />
           <Button
             type="submit"
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
+<<<<<<< HEAD
           >
             로그인
           </Button>
+=======
+            disabled={loading}
+          >
+            {loading ? '로그인 중...' : '로그인'}
+          </Button>
+
+          <Box sx={{ textAlign: 'center', mt: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              계정이 없으신가요?{' '}
+              <Link
+                component={RouterLink}
+                to="/register"
+                sx={{
+                  textDecoration: 'none',
+                  '&:hover': {
+                    textDecoration: 'underline'
+                  }
+                }}
+              >
+                회원가입
+              </Link>
+            </Typography>
+          </Box>
+
+          <Box sx={{ mt: 3, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              <strong>테스트 계정:</strong>
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              일반 사용자 - 사용자명: customer, 비밀번호: password<br />
+              관리자 - 사용자명: admin, 비밀번호: admin
+            </Typography>
+          </Box>
+>>>>>>> sjh
         </Box>
       </Box>
     </Container>

@@ -1,9 +1,28 @@
 package com.hotel.hotelreservation.model;
 
-public class Role {
-    
-}
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
-// 사용자 역할 (ADMIN, USER) 정의 enum //
-// 권장 (필수는 아님) - 필요 시 사용자 역할을 정의할 수 있음 //
-// 난이도: 초급~중급 (enum 타입) //
+@Entity
+@Table(name = "roles")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Role {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true, nullable = false, length = 50)
+    private String name;
+
+    // 생성자
+    public Role(String name) {
+        this.name = name;
+    }
+}
