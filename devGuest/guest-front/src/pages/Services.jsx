@@ -36,7 +36,7 @@ const services = [
 
 const Services = () => {
   return (
-    <Container sx={{ py: 4 }}>
+    <Container sx={{ py: 4, maxWidth: 'lg' }}>
       <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>
         고객을 위한 최상의 서비스
       </Typography>
@@ -44,15 +44,29 @@ const Services = () => {
         Dev hotel은 고객님의 모든 순간이 특별한 경험이 되도록, 세심하고 품격 높은 서비스를 제공합니다.
       </Typography>
 
-      <Grid container spacing={4}>
+      <Grid container spacing={4} alignItems="stretch">
         {services.map((service) => (
-          <Grid item xs={12} sm={6} md={4} key={service.name}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Grid 
+            item 
+            xs={12} sm={6} md={4} 
+            key={service.name}
+            sx={{ display: 'flex' }} // 🟡 Grid 셀이 flexbox가 되게
+          >
+            <Card 
+              sx={{ 
+                flexGrow: 1, // 🟢 가로로 셀 공간 다 채움
+                display: 'flex', 
+                flexDirection: 'column', 
+              }}
+            >
               <CardMedia
                 component="img"
-                height="250"
                 image={service.image}
                 alt={service.name}
+                sx={{
+                  height: 250,
+                  objectFit: 'cover'
+                }}
               />
               <CardContent sx={{ flexGrow: 1 }}>
                 <Typography gutterBottom variant="h5" component="h2">

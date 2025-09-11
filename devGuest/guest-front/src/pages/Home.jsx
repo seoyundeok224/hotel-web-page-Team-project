@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState, useEffect } from 'react';
 import { Typography, Container, Grid, Card, CardMedia, CardContent, CardActions, Button, Box } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -8,6 +8,22 @@ const LinkBehavior = forwardRef((props, ref) => {
 });
 
 const Home = () => {
+  const heroImages = [
+    'https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=2070&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=2070&auto=format&fit=crop',
+  ];
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentImageIndex(prevIndex => (prevIndex + 1) % heroImages.length);
+    }, 3000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <Box>
       {/* Hero Section */}
@@ -16,7 +32,7 @@ const Home = () => {
           position: 'relative',
           height: '60vh',
           minHeight: '400px',
-          backgroundImage: 'url(https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=2070&auto=format&fit=crop)',
+          backgroundImage: `url(${heroImages[currentImageIndex]})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           color: '#fff',
@@ -24,6 +40,7 @@ const Home = () => {
           alignItems: 'center',
           justifyContent: 'center',
           textAlign: 'center',
+          transition: 'background-image 0.8s ease-in-out',
         }}
       >
         <Box
@@ -56,13 +73,15 @@ const Home = () => {
           저희 호텔은 고객님께 편안하고 특별한 시간을 선사하기 위해 다양한 서비스와 최고급 시설을 자랑합니다.
         </Typography>
         <Grid container columns={12} spacing={4}>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          {/* 카드 1 */}
+          <Grid item xs={12} sm={6} md={4} sx={{ width: '100%' }}>
+            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
               <CardMedia
                 component="img"
-                height="200"
+                height="300"
                 image="https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=2070&auto=format&fit=crop"
                 alt="객실"
+                sx={{ width: '100%', objectFit: 'cover' }}
               />
               <CardContent sx={{ flexGrow: 1 }}>
                 <Typography gutterBottom variant="h5" component="h2">
@@ -73,17 +92,22 @@ const Home = () => {
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button component={LinkBehavior} href="/rooms" size="small">자세히 보기</Button>
+                <Button component={LinkBehavior} href="/rooms" size="small">
+                  자세히 보기
+                </Button>
               </CardActions>
             </Card>
           </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+
+          {/* 카드 2 */}
+          <Grid item xs={12} sm={6} md={4} sx={{ width: '100%' }}>
+            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
               <CardMedia
                 component="img"
-                height="200"
+                height="300"
                 image="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&auto=format&fit=crop"
                 alt="다이닝"
+                sx={{ width: '100%', objectFit: 'cover' }}
               />
               <CardContent sx={{ flexGrow: 1 }}>
                 <Typography gutterBottom variant="h5" component="h2">
@@ -94,17 +118,22 @@ const Home = () => {
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button component={LinkBehavior} href="/dining" size="small">자세히 보기</Button>
+                <Button component={LinkBehavior} href="/dining" size="small">
+                  자세히 보기
+                </Button>
               </CardActions>
             </Card>
           </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+
+          {/* 카드 3 */}
+          <Grid item xs={12} sm={6} md={4} sx={{ width: '100%' }}>
+            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
               <CardMedia
                 component="img"
-                height="200"
+                height="300"
                 image="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=1949&auto=format&fit=crop"
                 alt="부대시설"
+                sx={{ width: '100%', objectFit: 'cover' }}
               />
               <CardContent sx={{ flexGrow: 1 }}>
                 <Typography gutterBottom variant="h5" component="h2">
@@ -115,7 +144,9 @@ const Home = () => {
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button component={LinkBehavior} href="/facilities" size="small">자세히 보기</Button>
+                <Button component={LinkBehavior} href="/facilities" size="small">
+                  자세히 보기
+                </Button>
               </CardActions>
             </Card>
           </Grid>
