@@ -5,6 +5,8 @@ import com.hotel.hotelreservation.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -70,10 +72,14 @@ public class AuthController {
         }
     }
 
-    // 현재 사용자 정보 조회
+    // 현재 사용자 정보 조회 (JWT 인증 필요)
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserDto>> getCurrentUser(@RequestParam String username) {
+    public ResponseEntity<ApiResponse<UserDto>> getCurrentUser() {
         try {
+            // SecurityContext에서 인증된 사용자 정보 가져오기
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            
             UserDto user = authService.findByUsername(username);
             return ResponseEntity.ok(ApiResponse.success(user));
         } catch (Exception e) {
