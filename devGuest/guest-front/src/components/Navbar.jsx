@@ -36,6 +36,12 @@ const Navbar = () => {
         <ListItem button component={LinkBehavior} href="/rooms">
           <ListItemText primary="객실 소개" />
         </ListItem>
+        <ListItem button component={LinkBehavior} href="/dining">
+          <ListItemText primary="다이닝" />
+        </ListItem>
+        <ListItem button component={LinkBehavior} href="/facilities">
+          <ListItemText primary="부대시설" />
+        </ListItem>
         <ListItem button component={LinkBehavior} href="/services">
           <ListItemText primary="서비스" />
         </ListItem>
@@ -86,6 +92,8 @@ const Navbar = () => {
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Button color="inherit" component={LinkBehavior} href="/" sx={{ '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>호텔 소개</Button>
               <Button color="inherit" component={LinkBehavior} href="/rooms" sx={{ '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>객실 소개</Button>
+              <Button color="inherit" component={LinkBehavior} href="/dining" sx={{ '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>다이닝</Button>
+              <Button color="inherit" component={LinkBehavior} href="/facilities" sx={{ '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>부대시설</Button>
               <Button color="inherit" component={LinkBehavior} href="/services" sx={{ '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>서비스</Button>
               <Button color="inherit" component={LinkBehavior} href="/location" sx={{ '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>오시는 길</Button>
               <Button variant="contained" component={LinkBehavior} href="/booking" sx={{ ml: 2 }}>예약</Button>
