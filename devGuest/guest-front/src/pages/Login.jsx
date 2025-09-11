@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-import React from 'react';
-import { Typography, Container, Box, TextField, Button } from '@mui/material';
-
-const Login = () => {
-  return (
-    <Container maxWidth="xs">
-=======
 import React, { useState } from 'react';
 import { Typography, Container, Box, TextField, Button, Alert, Link } from '@mui/material';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
@@ -60,7 +52,6 @@ const Login = () => {
 
   return (
     <Container maxWidth="sm">
->>>>>>> sjh
       <Box
         sx={{
           marginTop: 8,
@@ -69,12 +60,6 @@ const Login = () => {
           alignItems: 'center',
         }}
       >
-<<<<<<< HEAD
-        <Typography component="h1" variant="h5">
-          로그인
-        </Typography>
-        <Box component="form" sx={{ mt: 1 }}>
-=======
         <Typography component="h1" variant="h4" sx={{ mb: 3 }}>
           Dev Hotel
         </Typography>
@@ -86,18 +71,10 @@ const Login = () => {
         )}
 
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
->>>>>>> sjh
           <TextField
             margin="normal"
             required
             fullWidth
-<<<<<<< HEAD
-            id="email"
-            label="이메일 주소"
-            name="email"
-            autoComplete="email"
-            autoFocus
-=======
             id="username"
             label="사용자명"
             name="username"
@@ -105,7 +82,6 @@ const Login = () => {
             autoFocus
             value={formData.username}
             onChange={handleChange}
->>>>>>> sjh
           />
           <TextField
             margin="normal"
@@ -116,22 +92,14 @@ const Login = () => {
             type="password"
             id="password"
             autoComplete="current-password"
-<<<<<<< HEAD
-=======
             value={formData.password}
             onChange={handleChange}
->>>>>>> sjh
           />
           <Button
             type="submit"
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-<<<<<<< HEAD
-          >
-            로그인
-          </Button>
-=======
             disabled={loading}
           >
             {loading ? '로그인 중...' : '로그인'}
@@ -164,10 +132,9 @@ const Login = () => {
               관리자 - 사용자명: admin, 비밀번호: admin
             </Typography>
           </Box>
->>>>>>> sjh
         </Box>
       </Box>
-    </Container>
+    </Container >
   );
 };
 
