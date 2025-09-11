@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState, useEffect } from 'react';
 import { Typography, Container, Grid, Card, CardMedia, CardContent, CardActions, Button, Box } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -8,6 +8,22 @@ const LinkBehavior = forwardRef((props, ref) => {
 });
 
 const Home = () => {
+  const heroImages = [
+    'https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=2070&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=2070&auto=format&fit=crop',
+  ];
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentImageIndex(prevIndex => (prevIndex + 1) % heroImages.length);
+    }, 3000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <Box>
       {/* Hero Section */}
@@ -16,8 +32,7 @@ const Home = () => {
           position: 'relative',
           height: '60vh',
           minHeight: '400px',
-          backgroundImage:
-            'url(https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=2070&auto=format&fit=crop)',
+          backgroundImage: `url(${heroImages[currentImageIndex]})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           color: '#fff',
@@ -25,6 +40,7 @@ const Home = () => {
           alignItems: 'center',
           justifyContent: 'center',
           textAlign: 'center',
+          transition: 'background-image 0.8s ease-in-out',
         }}
       >
         <Box
