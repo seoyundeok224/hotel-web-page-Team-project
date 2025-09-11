@@ -1,27 +1,6 @@
 
 package com.hotel.hotelreservation.config;
 
-<<<<<<< HEAD
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
-
-@Configuration
-public class SecurityConfig {
-
-	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http
-			.csrf(csrf -> csrf.disable())
-			.authorizeHttpRequests(auth -> auth
-				.anyRequest().permitAll()
-			)
-			.cors(cors -> cors.disable());
-
-		return http.build();
-	}
-=======
 import com.hotel.hotelreservation.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -105,6 +84,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
->>>>>>> sjh
 }
 // 프론트엔드 React 앱에서 오는 요청을 허용하기 위한 CORS 설정 매우 중요
