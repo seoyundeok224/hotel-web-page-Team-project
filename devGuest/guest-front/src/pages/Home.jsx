@@ -1,15 +1,5 @@
 import React, { forwardRef } from 'react';
-import {
-  Typography,
-  Container,
-  Grid,
-  Card,
-  CardMedia,
-  CardContent,
-  CardActions,
-  Button,
-  Box,
-} from '@mui/material';
+import { Typography, Container, Grid, Card, CardMedia, CardContent, CardActions, Button, Box } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
 const LinkBehavior = forwardRef((props, ref) => {
@@ -60,39 +50,22 @@ const Home = () => {
 
       {/* Content Section */}
       <Container sx={{ py: 8 }}>
-        <Typography
-          variant="h4"
-          component="h2"
-          gutterBottom
-          align="center"
-          sx={{ mb: 4 }}
-        >
+        <Typography variant="h4" component="h2" gutterBottom align="center" sx={{ mb: 4 }}>
           최상의 서비스와 시설
         </Typography>
-        <Typography
-          variant="h6"
-          align="center"
-          color="text.secondary"
-          paragraph
-          sx={{ mb: 8 }}
-        >
+        <Typography variant="h6" align="center" color="text.secondary" paragraph sx={{ mb: 8 }}>
           저희 호텔은 고객님께 편안하고 특별한 시간을 선사하기 위해 다양한 서비스와 최고급 시설을 자랑합니다.
         </Typography>
-
         <Grid container columns={12} spacing={4}>
           {/* 카드 1 */}
-          <Grid item xs={12} sm={6} md={4}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Grid item xs={12} sm={6} md={4} sx={{ width: '100%' }}>
+            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
               <CardMedia
-                component="div"
-                sx={{
-                  height: 0,
-                  paddingTop: '56.25%',
-                  backgroundImage:
-                    'url(https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=2070&auto=format&fit=crop)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
+                component="img"
+                height="300"
+                image="https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=2070&auto=format&fit=crop"
+                alt="객실"
+                sx={{ width: '100%', objectFit: 'cover' }}
               />
               <CardContent sx={{ flexGrow: 1 }}>
                 <Typography gutterBottom variant="h5" component="h2">
@@ -111,18 +84,14 @@ const Home = () => {
           </Grid>
 
           {/* 카드 2 */}
-          <Grid item xs={12} sm={6} md={4}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Grid item xs={12} sm={6} md={4} sx={{ width: '100%' }}>
+            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
               <CardMedia
-                component="div"
-                sx={{
-                  height: 0,
-                  paddingTop: '56.25%',
-                  backgroundImage:
-                    'url(https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&auto=format&fit=crop)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
+                component="img"
+                height="300"
+                image="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&auto=format&fit=crop"
+                alt="다이닝"
+                sx={{ width: '100%', objectFit: 'cover' }}
               />
               <CardContent sx={{ flexGrow: 1 }}>
                 <Typography gutterBottom variant="h5" component="h2">
@@ -141,18 +110,14 @@ const Home = () => {
           </Grid>
 
           {/* 카드 3 */}
-          <Grid item xs={12} sm={6} md={4}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Grid item xs={12} sm={6} md={4} sx={{ width: '100%' }}>
+            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
               <CardMedia
-                component="div"
-                sx={{
-                  height: 0,
-                  paddingTop: '56.25%',
-                  backgroundImage:
-                    'url(https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=1949&auto=format&fit=crop)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
+                component="img"
+                height="300"
+                image="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?q=80&w=1949&auto=format&fit=crop"
+                alt="부대시설"
+                sx={{ width: '100%', objectFit: 'cover' }}
               />
               <CardContent sx={{ flexGrow: 1 }}>
                 <Typography gutterBottom variant="h5" component="h2">
