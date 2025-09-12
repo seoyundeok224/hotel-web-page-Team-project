@@ -86,6 +86,8 @@
             <scope>runtime</scope> <!-- 런타임 시 로딩 -->
         </dependency>
 
+        
+
         <!-- JWT 토큰 처리 -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

@@ -185,12 +185,24 @@ export const reservationService = {
   },
 
   // 예약 생성
+  // 예약 생성 (더미)
   createReservation: async (reservationData) => {
     try {
       // return apiPost('/reservations', reservationData);
       return { data: { ...reservationData, id: Date.now() } };
     } catch (error) {
       console.error('Failed to create reservation:', error);
+      throw error;
+    }
+  },
+
+  // 신규 예약 생성 (실제 API 호출)
+  createBooking: async (bookingData) => {
+    try {
+      // api.js에서 정의된 apiPost 함수를 사용하여 실제 백엔드 API 호출
+      return apiPost('/bookings', bookingData);
+    } catch (error) {
+      console.error('Failed to create booking:', error);
       throw error;
     }
   },
