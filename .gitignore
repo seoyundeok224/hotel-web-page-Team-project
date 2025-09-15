@@ -1,0 +1,50 @@
+# Gradle files
+.gradle/
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+.gradletasknamecache
+
+# Gradle cache and temporary files
+**/build/
+**/.gradle/
+gradle/wrapper/gradle-wrapper.jar
+
+# Specific files you mentioned
+file-system.probe
+executionHistory.bin
+executionHistory.lock
+fileHashes.bin
+fileHashes.lock
+resourceHashesCache.bin
+buildOutputCleanup.lock
+subprojects.ser
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Java files
+*.class
+*.jar
+*.war
+*.ear
+target/
+bin/
+
+# Log files
+*.log
+logs/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
