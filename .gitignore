@@ -14,6 +14,7 @@ gradle/wrapper/gradle-wrapper.jar
 
 # Specific files you mentioned
 file-system.probe
+**/file-system.probe
 executionHistory.bin
 executionHistory.lock
 fileHashes.bin
