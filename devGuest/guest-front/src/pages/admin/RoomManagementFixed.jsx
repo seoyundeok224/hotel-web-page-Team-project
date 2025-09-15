@@ -54,8 +54,10 @@ const RoomCard = ({ room, onStatusChange, onEdit }) => {
         switch (type) {
             case 'SINGLE': return { label: '싱글', icon: '🛏️' }
             case 'DOUBLE': return { label: '더블', icon: '🛏️🛏️' }
+            case 'FAMILY': return { label: '패밀리', icon: '👨‍👩‍👧‍👦' }
             case 'DELUXE': return { label: '디럭스', icon: '✨' }
             case 'SUITE': return { label: '스위트', icon: '👑' }
+            case 'CONFERENCE': return { label: '컨퍼런스', icon: '💼' }
             default: return { label: type, icon: '🏠' }
         }
     }
@@ -283,38 +285,100 @@ const RoomManagement = () => {
 
     // 더미 데이터 생성 함수
     const generateDummyRooms = () => {
-        const rooms = []
-        const types = ['SINGLE', 'DOUBLE', 'DELUXE', 'SUITE']
-        const statuses = ['AVAILABLE', 'OCCUPIED', 'CLEANING', 'MAINTENANCE']
+        const rooms = [];
+        const statuses = ['AVAILABLE', 'OCCUPIED', 'CLEANING', 'MAINTENANCE'];
+        const randomStatus = () => statuses[Math.floor(Math.random() * statuses.length)];
 
-        // 1~5층, 각 층마다 10개 객실
-        for (let floor = 1; floor <= 5; floor++) {
-            for (let roomNum = 1; roomNum <= 10; roomNum++) {
-                const roomNumber = `${floor}${roomNum.toString().padStart(2, '0')}`
-                const type = types[Math.floor(Math.random() * types.length)]
-                const status = statuses[Math.floor(Math.random() * statuses.length)]
-
-                rooms.push({
-                    id: `room_${roomNumber}`,
-                    roomNumber,
-                    roomType: type,
-                    price: type === 'SUITE' ? 300000 : type === 'DELUXE' ? 200000 : type === 'DOUBLE' ? 150000 : 100000,
-                    capacity: type === 'SUITE' ? 4 : type === 'DELUXE' ? 3 : type === 'DOUBLE' ? 2 : 1,
-                    status,
-                    description: `${getTypeLabel(type)} 객실입니다.`,
-                    floor
-                })
-            }
+        // 3층 - 싱글 (20)
+        for (let i = 1; i <= 20; i++) {
+            rooms.push({
+                id: `room_3${String(i).padStart(2, '0')}`,
+                roomNumber: `3${String(i).padStart(2, '0')}`,
+                roomType: 'SINGLE',
+                price: 150000,
+                capacity: 1,
+                status: randomStatus(),
+                description: '싱글 객실입니다.',
+                floor: 3
+            });
         }
-        return rooms
+
+        // 4층 - 더블(10), 패밀리(10)
+        for (let i = 1; i <= 10; i++) {
+            rooms.push({
+                id: `room_4${String(i).padStart(2, '0')}`,
+                roomNumber: `4${String(i).padStart(2, '0')}`,
+                roomType: 'DOUBLE',
+                price: 200000,
+                capacity: 2,
+                status: randomStatus(),
+                description: '더블 객실입니다.',
+                floor: 4
+            });
+        }
+        for (let i = 11; i <= 20; i++) {
+            rooms.push({
+                id: `room_4${String(i).padStart(2, '0')}`,
+                roomNumber: `4${String(i).padStart(2, '0')}`,
+                roomType: 'FAMILY',
+                price: 250000,
+                capacity: 4,
+                status: randomStatus(),
+                description: '패밀리 객실입니다.',
+                floor: 4
+            });
+        }
+
+        // 5층 - 디럭스(10),스위트(10)
+        for (let i = 1; i <= 10; i++) {
+            rooms.push({
+                id: `room_5${String(i).padStart(2, '0')}`,
+                roomNumber: `5${String(i).padStart(2, '0')}`,
+                roomType: 'DELUXE',
+                price: 250000,
+                capacity: 3,
+                status: randomStatus(),
+                description: '디럭스 객실입니다.',
+                floor: 5
+            });
+        }
+        for (let i = 11; i <= 20; i++) {
+            rooms.push({
+                id: `room_5${String(i).padStart(2, '0')}`,
+                roomNumber: `5${String(i).padStart(2, '0')}`,
+                roomType: 'SUITE',
+                price: 300000,
+                capacity: 4,
+                status: randomStatus(),
+                description: '스위트 객실입니다.',
+                floor: 5
+            });
+        }
+
+        // 6층 - 컨퍼런스(5)
+        for (let i = 1; i <= 5; i++) {
+            rooms.push({
+                id: `room_6${String(i).padStart(2, '0')}`,
+                roomNumber: `6${String(i).padStart(2, '0')}`,
+                roomType: 'CONFERENCE',
+                price: 400000,
+                capacity: 20,
+                status: randomStatus(),
+                description: '컨퍼런스 룸입니다.',
+                floor: 6
+            });
+        }
+        return rooms;
     }
 
     const getTypeLabel = (type) => {
         switch (type) {
             case 'SINGLE': return '싱글'
             case 'DOUBLE': return '더블'
+            case 'FAMILY': return '패밀리'
             case 'DELUXE': return '디럭스'
             case 'SUITE': return '스위트'
+            case 'CONFERENCE': return '컨퍼런스'
             default: return type
         }
     }
