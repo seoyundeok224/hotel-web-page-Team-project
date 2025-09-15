@@ -2,6 +2,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "HotelReservationApplication",
+            "request": "launch",
+            "mainClass": "kr.or.hotelpms.hotel.HotelReservationApplication",
+            "projectName": "hotel"
+        },
+        {
+            "type": "java",
+            "name": "HotelApplication",
+            "request": "launch",
+            "mainClass": "kr.or.hotelpms.hotel.HotelApplication",
+            "projectName": ""
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-HotelReservationApplication<hotel-reservation>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
