@@ -1,21 +1,23 @@
 package kr.or.hotelpms.hotel.model;
 
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "reservations")
 public class Reservation {
 
@@ -37,14 +39,14 @@ public class Reservation {
     @Column(name = "check_out", nullable = false)
     private LocalDate checkOut; // 체크아웃 날짜
 
-    @Column(name = "payment_status", columnDefinition = "VARCHAR(20) DEFAULT 'PENDING'")
-    private String paymentStatus; // 결제 상태
+    @Column(name = "payment_status", nullable = false, length = 20)
+    private String paymentStatus = "PENDING"; // 결제 상태
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt; // 예약 생성일
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDate createdAt; // 예약 생성일
 
-    @UpdateTimestamp
+    @LastModifiedDate
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt; // 예약 수정일
+    private LocalDate updatedAt; // 예약 수정일
 }
