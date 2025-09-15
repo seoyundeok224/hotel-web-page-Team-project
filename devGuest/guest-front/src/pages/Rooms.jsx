@@ -4,6 +4,8 @@ import { Container, Typography, Box, IconButton, useMediaQuery } from '@mui/mate
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import RoomCard from '../components/RoomCard';
+import grandDeluxeImg from './images/grand_deluxe_room.webp';
+import juniorSuiteImg from './images/junia.jpg';
 
 // 객실 데이터 (롯데호텔 정보 기반)
 const rooms = [
@@ -15,13 +17,13 @@ const rooms = [
   },
   {
     name: "그랜드 디럭스 룸",
-    image: "https://images.unsplash.com/photo-1582719478250-c8dbe16ad9cf?q=80&w=400&h=200&fit=crop",
+    image: grandDeluxeImg, // 문자열이 아닌, 실제 import된 이미지 변수
     desc: "럭셔리한 경험에 초점을 맞춘 이그제큐티브 타워의 기본 객실로, 현대적이고 세련된 인테리어를 자랑합니다.",
     features: ["이그제큐티브 타워", "40㎡", "킹/트윈 베드", "르 살롱 라운지", "해온(he:on) 침구류"]
   },
   {
     name: "주니어 스위트",
-    image: "https://images.unsplash.com/photo-1598035743484-022792572d33?q=80&w=2070&auto=format&fit=crop",
+    image: juniorSuiteImg, // ✅ 이미지 파일 변수로 수정
     desc: "침실과 거실이 분리된 구조로, 편안한 휴식과 효율적인 비즈니스 업무가 모두 가능한 공간입니다.",
     features: ["메인 타워", "62㎡", "거실 분리", "전망 욕실 옵션", "클럽 라운지"]
   },

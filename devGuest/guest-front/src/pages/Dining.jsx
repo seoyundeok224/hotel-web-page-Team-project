@@ -1,5 +1,7 @@
 import React from 'react';
 import { Typography, Container, Box, Grid, Card, CardMedia, CardContent } from '@mui/material';
+import cajuairImg from './images/cajuair.jpg';
+import barImg from './images/bar.jpg';
 
 const Dining = () => {
   return (
@@ -35,7 +37,7 @@ const Dining = () => {
             <CardMedia
               component="img"
               height="300"
-              image="https://images.unsplash.com/photo-1555396273-367ba0b6ee65?q=80&w=2070&auto=format&fit=crop"
+              image={cajuairImg}
               alt="캐주얼 다이닝"
             />
             <CardContent>
@@ -53,7 +55,7 @@ const Dining = () => {
             <CardMedia
               component="img"
               height="300"
-              image="https://images.unsplash.com/photo-1578474846640-404270117561?q=80&w=2070&auto=format&fit=crop"
+              image={barImg}
               alt="바 & 라운지"
             />
             <CardContent>

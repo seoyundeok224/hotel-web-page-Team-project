@@ -36,40 +36,78 @@ const services = [
 
 const Services = () => {
   return (
-    <Container sx={{ py: 4, maxWidth: 'lg' }}>
-      <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Typography
+        variant="h4"
+        component="h1"
+        gutterBottom
+        align="center"
+        sx={{ mb: 4 }}
+      >
         고객을 위한 최상의 서비스
       </Typography>
-      <Typography variant="body1" align="center" color="text.secondary" paragraph sx={{ mb: 8 }}>
+      <Typography
+        variant="body1"
+        align="center"
+        color="text.secondary"
+        paragraph
+        sx={{ mb: 8 }}
+      >
         Dev hotel은 고객님의 모든 순간이 특별한 경험이 되도록, 세심하고 품격 높은 서비스를 제공합니다.
       </Typography>
 
       <Grid container spacing={4} alignItems="stretch">
         {services.map((service) => (
-          <Grid 
-            item 
-            xs={12} sm={6} md={4} 
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            md={4}
             key={service.name}
-            sx={{ display: 'flex' }} // 🟡 Grid 셀이 flexbox가 되게
+            sx={{
+              display: 'flex', // Grid 셀 flex 컨테이너
+              width: '100%',
+            }}
           >
-            <Card 
-              sx={{ 
-                flexGrow: 1, // 🟢 가로로 셀 공간 다 채움
-                display: 'flex', 
-                flexDirection: 'column', 
+            <Card
+              sx={{
+                flex: '1 1 auto',
+                display: 'flex',
+                flexDirection: 'column',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                boxShadow: 3,
+                borderRadius: 2,
+                overflow: 'hidden',
+                '&:hover': {
+                  transform: 'scale(1.05)',
+                  boxShadow: 6,
+                },
+                width: '100%',
               }}
             >
               <CardMedia
                 component="img"
                 image={service.image}
-                alt={service.name}
+                alt={`서비스 이미지: ${service.name}`}
                 sx={{
                   height: 250,
-                  objectFit: 'cover'
+                  width: '100%',
+                  objectFit: 'cover',
+                  display: 'block',
+                  borderTopLeftRadius: 8,
+                  borderTopRightRadius: 8,
                 }}
               />
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Typography gutterBottom variant="h5" component="h2">
+              <CardContent sx={{ flexGrow: 1, minHeight: 150 }}>
+                <Typography
+                  gutterBottom
+                  variant="h5"
+                  component="h2"
+                  sx={{
+                    fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.7rem' },
+                    mb: 1,
+                  }}
+                >
                   {service.name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">

@@ -1,12 +1,9 @@
 package kr.or.hotelpms.hotel.repository;
 
-public class RoomRepository {
-    
+import com.hotel.hotelreservation.model.Room;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface RoomRepository extends JpaRepository<Room, Long> {
 }
-
-// 객실 관련 리포지토리 //
-// 필수(중요)로 만들어야 함 //
-// 난이도: 초급 //
-
-// 백앤드 - 리포지토리
-// 객실 데이터 관련 CRUD 처리
