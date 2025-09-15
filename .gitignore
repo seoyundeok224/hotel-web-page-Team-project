@@ -9,6 +9,7 @@ gradle-app.setting
 # Gradle cache and temporary files
 **/build/
 **/.gradle/
+**/.gradle/buildOutputCleanup/
 gradle/wrapper/gradle-wrapper.jar
 
 # Specific files you mentioned
@@ -19,6 +20,8 @@ fileHashes.bin
 fileHashes.lock
 resourceHashesCache.bin
 buildOutputCleanup.lock
+buildOutputCleanup/
+**/buildOutputCleanup/
 subprojects.ser
 
 # IDE files
