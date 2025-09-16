@@ -125,35 +125,38 @@ public class AuthService {
     // 초기 관리자 계정 생성 (애플리케이션 시작 시)
     @Transactional
     public void createInitialAdmin() {
-        if (!userRepository.existsByUsername("admin")) {
-            // ADMIN 권한 생성
-            Role adminRole = roleRepository.findByName("ROLE_ADMIN")
-                    .orElseGet(() -> roleRepository.save(new Role("ROLE_ADMIN")));
-            
-            // USER 권한 생성
-            Role userRole = roleRepository.findByName("ROLE_USER")
-                    .orElseGet(() -> roleRepository.save(new Role("ROLE_USER")));
+        // 필수 역할(Role) 찾아오기 (없으면 생성)
+        Role adminRole = roleRepository.findByName("ROLE_ADMIN")
+                .orElseGet(() -> roleRepository.save(new Role("ROLE_ADMIN")));
+        Role userRole = roleRepository.findByName("ROLE_USER")
+                .orElseGet(() -> roleRepository.save(new Role("ROLE_USER")));
 
-            // 관리자 계정 생성
-            User admin = User.builder()
-                    .username("admin")
-                    .password(passwordEncoder.encode("admin"))
-                    .email("admin@test.com")
-                    .name("관리자")
-                    .enabled(true)
-                    .build();
-
-            admin.addRole(adminRole);
-            admin.addRole(userRole);
-            
-            userRepository.save(admin);
-        }
+        // 'admin' 계정 처리
+        userRepository.findByUsername("admin").ifPresentOrElse(
+            admin -> {
+                // 계정이 존재할 경우: ADMIN 역할이 없으면 추가
+                if (!admin.hasRole("ROLE_ADMIN")) {
+                    admin.addRole(adminRole);
+                    userRepository.save(admin);
+                }
+            },
+            () -> {
+                // 계정이 존재하지 않을 경우: 새로 생성
+                User admin = User.builder()
+                        .username("admin")
+                        .password(passwordEncoder.encode("admin"))
+                        .email("admin@test.com")
+                        .name("관리자")
+                        .enabled(true)
+                        .build();
+                admin.addRole(adminRole);
+                admin.addRole(userRole);
+                userRepository.save(admin);
+            }
+        );
 
         // 테스트 고객 계정 생성
         if (!userRepository.existsByUsername("customer")) {
-            Role userRole = roleRepository.findByName("ROLE_USER")
-                    .orElseGet(() -> roleRepository.save(new Role("ROLE_USER")));
-
             User customer = User.builder()
                     .username("customer")
                     .password(passwordEncoder.encode("password"))
