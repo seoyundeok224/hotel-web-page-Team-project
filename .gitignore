@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Gradle files
 .gradle/
 build/
@@ -52,3 +53,10 @@ logs/
 .Trashes
 ehthumbs.db
 Thumbs.db
+=======
+# Gradle build files
+*.lock
+*.ser
+build/
+reports/
+>>>>>>> 39d2e8a23ee5fb2477a0698452432e35169294fc
