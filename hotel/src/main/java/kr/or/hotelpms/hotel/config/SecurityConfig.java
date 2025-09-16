@@ -62,6 +62,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // 인증 관련 엔드포인트는 누구나 접근 가능
                 .requestMatchers("/api/auth/**").permitAll()
+                // 예약 API는 인증 없이 접근 허용
+                .requestMatchers("/api/bookings").permitAll()
                 // Actuator 엔드포인트 (상태 확인)
                 .requestMatchers("/actuator/**").permitAll()
                 // 정적 리소스

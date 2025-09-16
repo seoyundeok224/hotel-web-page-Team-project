@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Maven 프로젝트 정의 시작 -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <!-- POM 모델 버전 -->
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- 부모 프로젝트 (Spring Boot 스타터) 설정: 기본 의존성/설정 제공 -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.4</version>
+        <relativePath/> <!-- 로컬이 아닌 원격 저장소에서 부모를 찾음 -->
+    </parent>
+
+    <!-- 프로젝트 기본 정보 -->
+    <groupId>com.hotel</groupId> <!-- 조직/도메인 -->
+    <artifactId>hotel-reservation</artifactId> <!-- 프로젝트 이름 -->
+    <version>0.0.1-SNAPSHOT</version> <!-- 개발 중 버전 (배포 전) -->
+    <name>HotelReservation</name> <!-- 프로젝트 표시 이름 -->
+    <description>Hotel Reservation Web Application</description> <!-- 간단 설명 -->
+
+    <!-- Java 버전 정의 -->
+    <properties>
+        <java.version>21</java.version> <!-- 자바 21 사용 -->
+    </properties>
+
+    <!-- 의존성 모음: 필요한 라이브러리 추가 -->
+    <dependencies>
+        <!-- 스프링 부트 기능별 스타터 모듈들 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId> <!-- 상태 모니터링 -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-batch</artifactId> <!-- 배치 작업 -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId> <!-- JPA 기반 DB -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId> <!-- Redis 연동 -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId> <!-- 이메일 전송 -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId> <!-- OAuth2 로그인 -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId> <!-- 보안 -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId> <!-- 입력 검증 -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId> <!-- REST API, MVC -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId> <!-- 실시간 통신 -->
+        </dependency>
+
+        <!-- 개발 편의성 도구 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional> <!-- 개발 중에만 사용 -->
+        </dependency>
+
+        <!-- MySQL 데이터베이스 드라이버 -->
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <scope>runtime</scope> <!-- 런타임 시 로딩 -->
+        </dependency>
+
+        
+
+        <!-- JWT 토큰 처리 -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- 코드 간결화 위한 Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional> <!-- 선택적, 컴파일 타임에만 필요 -->
+        </dependency>
+
+        <!-- 테스트용 의존성 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope> <!-- 테스트 시에만 사용 -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.batch</groupId>
+            <artifactId>spring-batch-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <!-- 빌드 관련 설정 -->
+    <build>
+        <plugins>
+            <!-- 컴파일러 플러그인 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- lombok 애노테이션 프로세서 지정 -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
+            <!-- 스프링 부트 플러그인: 실행 가능한 JAR 생성 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 빌드 시 lombok 제외 -->
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

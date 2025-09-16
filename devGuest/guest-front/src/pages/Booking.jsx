@@ -19,6 +19,7 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { ko } from 'date-fns/locale';
+import hotelService from '../services/hotelService'; // hotelService 임포트
 
 const Booking = () => {
   const [formData, setFormData] = useState({
@@ -96,32 +97,51 @@ const Booking = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (validateForm()) {
-      // 예약 처리 로직
-      console.log('예약 데이터:', formData);
-      setSubmitSuccess(true);
+      // 백엔드 DTO에 맞게 데이터 매핑
+      // checkOutDate는 현재 폼에 없으므로, checkInDate와 동일하게 설정합니다.
+      // 필요에 따라 UI에 check-out 날짜 필드를 추가해야 할 수 있습니다.
+      const bookingData = {
+        guestName: formData.reservationName,
+        roomType: formData.facility,
+        checkInDate: formData.date,
+        checkOutDate: formData.date, 
+        numberOfGuests: formData.adults + formData.children,
+      };
 
-      // 폼 초기화
-      setFormData({
-        facility: '',
-        date: null,
-        startTime: null,
-        endTime: null,
-        adults: 1,
-        children: 0,
-        reservationName: '',
-        phone: '',
-        email: '',
-        specialRequests: ''
-      });
+      try {
+        await hotelService.reservation.createBooking(bookingData);
+        setSubmitSuccess(true);
+        setErrors({}); // 이전 에러 초기화
 
-      // 성공 메시지를 3초 후 숨김
-      setTimeout(() => {
+        // 성공 시 폼 초기화
+        setFormData({
+          facility: '',
+          date: null,
+          startTime: null,
+          endTime: null,
+          adults: 1,
+          children: 0,
+          reservationName: '',
+          phone: '',
+          email: '',
+          specialRequests: ''
+        });
+
+        // 3초 후 성공 메시지 숨김
+        setTimeout(() => {
+          setSubmitSuccess(false);
+        }, 3000);
+
+      } catch (error) {
+        console.error('Booking failed:', error);
         setSubmitSuccess(false);
-      }, 3000);
+        // API 호출 실패 시 에러 메시지 설정
+        setErrors({ submit: '예약에 실패했습니다. 잠시 후 다시 시도해주세요.' });
+      }
     }
   };
 
