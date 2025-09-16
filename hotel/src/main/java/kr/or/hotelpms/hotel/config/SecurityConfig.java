@@ -64,12 +64,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 // Actuator 엔드포인트 (상태 확인)
                 .requestMatchers("/actuator/**").permitAll()
-                // 정적 리소스
-                .requestMatchers("/", "/error", "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
-                // 나머지 API는 인증 필요
+                // API 엔드포인트는 인증 필요
                 .requestMatchers("/api/**").authenticated()
-                // 기타 모든 요청은 인증 필요
-                .anyRequest().authenticated()
+                // 나머지 모든 요청은 허용 (정적 리소스 등)
+                .anyRequest().permitAll()
             )
             .authenticationProvider(authenticationProvider())
             // JWT 필터를 UsernamePasswordAuthenticationFilter 이전에 추가

@@ -7,6 +7,7 @@ import Services from './pages/Services';
 import Booking from './pages/Booking';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import MyPage from './pages/MyPage';
 import Dining from './pages/Dining';
 import Facilities from './pages/Facilities';
 import Directions from './pages/Directions'; // 오시는 길 페이지 추가
@@ -82,6 +83,22 @@ const App = () => {
               <Navbar />
               <Directions />
             </>
+          } />
+          <Route path="/mypage" element={
+            <ProtectedRoute>
+              <>
+                <Navbar />
+                <MyPage />
+              </>
+            </ProtectedRoute>
+          } />
+          <Route path="/mypage" element={
+            <ProtectedRoute>
+              <>
+                <Navbar />
+                <MyPage />
+              </>
+            </ProtectedRoute>
           } />
 
           {/* 관리자 사이트 라우트 */}
