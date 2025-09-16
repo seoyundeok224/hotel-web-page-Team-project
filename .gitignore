@@ -1,43 +1,3 @@
-HELP.md
-.gradle
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
-!build/resources/main/application.properties
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
-.vscode/
-
-
 # Gradle files
 .gradle/
 build/
@@ -49,16 +9,20 @@ gradle-app.setting
 # Gradle cache and temporary files
 **/build/
 **/.gradle/
+**/.gradle/buildOutputCleanup/
 gradle/wrapper/gradle-wrapper.jar
 
 # Specific files you mentioned
 file-system.probe
+**/file-system.probe
 executionHistory.bin
 executionHistory.lock
 fileHashes.bin
 fileHashes.lock
 resourceHashesCache.bin
 buildOutputCleanup.lock
+buildOutputCleanup/
+**/buildOutputCleanup/
 subprojects.ser
 
 # IDE files
@@ -75,7 +39,6 @@ subprojects.ser
 *.ear
 target/
 bin/
-
 
 # Log files
 *.log
