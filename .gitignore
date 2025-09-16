@@ -1,0 +1,5 @@
+# Gradle build files
+*.lock
+*.ser
+build/
+reports/
