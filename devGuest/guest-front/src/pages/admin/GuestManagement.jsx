@@ -355,229 +355,239 @@ const Guests = () => {
         </Grid>
 
         {/* 검색 및 필터 */}
-        <div className="card">
-          <div className="card-header">
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flex: 1, flexWrap: 'wrap' }}>
-              <div style={{ position: 'relative', minWidth: '300px' }}>
-                <SearchIcon size={20} style={{
-                  position: 'absolute',
-                  left: '12px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: '#7f8c8d'
-                }} />
-                <input
-                  type="text"
-                  placeholder="이름, 이메일, 전화번호로 검색..."
-                  className="form-input"
-                  style={{ paddingLeft: '40px' }}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <select
-                className="form-input"
-                style={{ minWidth: '120px' }}
-                value={vipFilter}
-                onChange={(e) => setVipFilter(e.target.value)}
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+              <TextField
+                placeholder="이름, 이메일, 전화번호로 검색..."
+                variant="outlined"
+                size="small"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{ minWidth: 300, flex: 1 }}
+              />
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel>VIP 등급</InputLabel>
+                <Select
+                  value={vipFilter}
+                  label="VIP 등급"
+                  onChange={(e) => setVipFilter(e.target.value)}
+                >
+                  <MenuItem value="all">전체 등급</MenuItem>
+                  <MenuItem value="Platinum">Platinum</MenuItem>
+                  <MenuItem value="Gold">Gold</MenuItem>
+                  <MenuItem value="Silver">Silver</MenuItem>
+                  <MenuItem value="Bronze">Bronze</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel>상태</InputLabel>
+                <Select
+                  value={statusFilter}
+                  label="상태"
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                  <MenuItem value="all">전체 상태</MenuItem>
+                  <MenuItem value="current">현재 투숙</MenuItem>
+                  <MenuItem value="past">과거 고객</MenuItem>
+                </Select>
+              </FormControl>
+              <Button
+                variant="contained"
+                startIcon={<PlusIcon />}
+                sx={{ ml: 'auto' }}
               >
-                <option value="all">전체 등급</option>
-                <option value="Platinum">Platinum</option>
-                <option value="Gold">Gold</option>
-                <option value="Silver">Silver</option>
-                <option value="Bronze">Bronze</option>
-              </select>
-              <select
-                className="form-input"
-                style={{ minWidth: '120px' }}
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-              >
-                <option value="all">전체 상태</option>
-                <option value="current">현재 투숙</option>
-                <option value="past">과거 고객</option>
-              </select>
-            </div>
-            <button className="btn btn-primary">
-              <PlusIcon size={16} />
-              고객 추가
-            </button>
-          </div>
-        </div>
+                고객 추가
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
 
         {/* 고객 목록 */}
-        <div className="card">
-          <div className="card-header">
-            <h2 className="card-title">고객 목록 ({filteredGuests.length}명)</h2>
-          </div>
-          <div className="table-container">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>고객정보</th>
-                  <th>연락처</th>
-                  <th>VIP등급</th>
-                  <th>투숙이력</th>
-                  <th>현재예약</th>
-                  <th>최근방문</th>
-                  <th>액션</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredGuests.map((guest) => (
-                  <tr key={guest.id}>
-                    <td>
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <strong>{guest.name}</strong>
-                          {guest.currentReservation && (
-                            <span style={{
-                              backgroundColor: '#d4edda',
-                              color: '#155724',
-                              padding: '0.25rem 0.5rem',
-                              borderRadius: '12px',
-                              fontSize: '0.75rem'
-                            }}>
-                              투숙중
-                            </span>
-                          )}
-                        </div>
-                        <div style={{ fontSize: '0.9rem', color: '#7f8c8d' }}>
-                          {guest.nationality} • {guest.birthDate}
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div style={{ fontSize: '0.9rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                          <PhoneIcon size={14} />
-                          {guest.phone}
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                          <MailIcon size={14} />
-                          {guest.email}
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <MapPinIcon size={14} />
-                          <span style={{ fontSize: '0.8rem' }}>{guest.address.substring(0, 20)}...</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <span
-                        className="status-badge"
-                        style={{
-                          backgroundColor: getVipLevelColor(guest.vipLevel) + '20',
-                          color: getVipLevelColor(guest.vipLevel),
-                          border: `1px solid ${getVipLevelColor(guest.vipLevel)}40`
-                        }}
-                      >
-                        {guest.vipLevel}
-                      </span>
-                    </td>
-                    <td>
-                      <div style={{ fontSize: '0.9rem' }}>
-                        <div><strong>{guest.totalStays}회</strong> 투숙</div>
-                        <div style={{ color: '#7f8c8d' }}>₩{guest.totalSpent.toLocaleString()}</div>
-                      </div>
-                    </td>
-                    <td>
-                      {guest.currentReservation ? (
-                        <div style={{ fontSize: '0.9rem' }}>
-                          <div><strong>객실 {guest.currentReservation.roomNumber}</strong></div>
-                          <div style={{ color: '#7f8c8d' }}>
-                            {guest.currentReservation.checkIn} ~ {guest.currentReservation.checkOut}
-                          </div>
-                        </div>
-                      ) : (
-                        <span style={{ color: '#7f8c8d' }}>없음</span>
-                      )}
-                    </td>
-                    <td>
-                      <div style={{ fontSize: '0.9rem' }}>
-                        {guest.lastVisit}
-                      </div>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <button
-                          className="btn btn-primary"
-                          style={{ padding: '0.25rem 0.5rem' }}
-                          title="상세보기"
-                        >
-                          <EyeIcon size={14} />
-                        </button>
-                        <button
-                          className="btn btn-warning"
-                          style={{ padding: '0.25rem 0.5rem' }}
-                          title="수정"
-                        >
-                          <EditIcon size={14} />
-                        </button>
-                        <button
-                          className="btn btn-danger"
-                          style={{ padding: '0.25rem 0.5rem' }}
-                          title="삭제"
-                        >
-                          <TrashIcon size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <Card>
+          <CardContent>
+            <Typography variant="h6" component="h2" gutterBottom>
+              고객 목록 ({filteredGuests.length}명)
+            </Typography>
+            <TableContainer component={Paper} sx={{ mt: 2 }}>
+              <Table sx={{ minWidth: 650 }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>고객정보</TableCell>
+                    <TableCell>연락처</TableCell>
+                    <TableCell>VIP등급</TableCell>
+                    <TableCell>투숙이력</TableCell>
+                    <TableCell>현재예약</TableCell>
+                    <TableCell>최근방문</TableCell>
+                    <TableCell align="center">액션</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredGuests.map((guest) => (
+                    <TableRow key={guest.id} hover>
+                      <TableCell>
+                        <Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                              {guest.name}
+                            </Typography>
+                            {guest.currentReservation && (
+                              <Chip
+                                label="투숙중"
+                                size="small"
+                                color="success"
+                                sx={{ fontSize: '0.75rem', height: '20px' }}
+                              />
+                            )}
+                          </Box>
+                          <Typography variant="caption" color="text.secondary">
+                            {guest.nationality} • {guest.birthDate}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ fontSize: '0.9rem' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.25 }}>
+                            <PhoneIcon sx={{ fontSize: 14 }} />
+                            <Typography variant="caption">{guest.phone}</Typography>
+                          </Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.25 }}>
+                            <MailIcon sx={{ fontSize: 14 }} />
+                            <Typography variant="caption">{guest.email}</Typography>
+                          </Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <MapPinIcon sx={{ fontSize: 14 }} />
+                            <Typography variant="caption">
+                              {guest.address.substring(0, 20)}...
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={guest.vipLevel}
+                          size="small"
+                          sx={{
+                            backgroundColor: getVipLevelColor(guest.vipLevel) + '20',
+                            color: getVipLevelColor(guest.vipLevel),
+                            border: `1px solid ${getVipLevelColor(guest.vipLevel)}40`,
+                            fontWeight: 'bold'
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                            {guest.totalStays}회 투숙
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            ₩{guest.totalSpent.toLocaleString()}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        {guest.currentReservation ? (
+                          <Box>
+                            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                              객실 {guest.currentReservation.roomNumber}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {guest.currentReservation.checkIn} ~ {guest.currentReservation.checkOut}
+                            </Typography>
+                          </Box>
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">
+                            없음
+                          </Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {guest.lastVisit}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                          <IconButton size="small" color="primary" title="상세보기">
+                            <EyeIcon />
+                          </IconButton>
+                          <IconButton size="small" color="warning" title="수정">
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton size="small" color="error" title="삭제">
+                            <TrashIcon />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </CardContent>
+        </Card>
 
         {/* VIP 고객 현황 */}
-        <div className="card">
-          <div className="card-header">
-            <h2 className="card-title">VIP 등급별 현황</h2>
-          </div>
-          <div className="table-container">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>VIP 등급</th>
-                  <th>고객 수</th>
-                  <th>총 투숙</th>
-                  <th>총 매출</th>
-                  <th>평균 매출</th>
-                </tr>
-              </thead>
-              <tbody>
-                {['Platinum', 'Gold', 'Silver', 'Bronze'].map(level => {
-                  const levelGuests = guests.filter(g => g.vipLevel === level)
-                  const totalStays = levelGuests.reduce((sum, g) => sum + g.totalStays, 0)
-                  const totalSpent = levelGuests.reduce((sum, g) => sum + g.totalSpent, 0)
-                  const avgSpent = levelGuests.length > 0 ? totalSpent / levelGuests.length : 0
+        <Card>
+          <CardContent>
+            <Typography variant="h6" component="h2" gutterBottom>
+              VIP 등급별 현황
+            </Typography>
+            <TableContainer component={Paper} sx={{ mt: 2 }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>VIP 등급</TableCell>
+                    <TableCell>고객 수</TableCell>
+                    <TableCell>총 투숙</TableCell>
+                    <TableCell>총 매출</TableCell>
+                    <TableCell>평균 매출</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {['Platinum', 'Gold', 'Silver', 'Bronze'].map(level => {
+                    const levelGuests = guests.filter(g => g.vipLevel === level)
+                    const totalStays = levelGuests.reduce((sum, g) => sum + g.totalStays, 0)
+                    const totalSpent = levelGuests.reduce((sum, g) => sum + g.totalSpent, 0)
+                    const avgSpent = levelGuests.length > 0 ? totalSpent / levelGuests.length : 0
 
-                  return (
-                    <tr key={level}>
-                      <td>
-                        <span
-                          className="status-badge"
-                          style={{
-                            backgroundColor: getVipLevelColor(level) + '20',
-                            color: getVipLevelColor(level),
-                            border: `1px solid ${getVipLevelColor(level)}40`
-                          }}
-                        >
-                          {level}
-                        </span>
-                      </td>
-                      <td><strong>{levelGuests.length}명</strong></td>
-                      <td>{totalStays}회</td>
-                      <td>₩{totalSpent.toLocaleString()}</td>
-                      <td>₩{Math.round(avgSpent).toLocaleString()}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                    return (
+                      <TableRow key={level}>
+                        <TableCell>
+                          <Chip
+                            label={level}
+                            size="small"
+                            sx={{
+                              backgroundColor: getVipLevelColor(level) + '20',
+                              color: getVipLevelColor(level),
+                              border: `1px solid ${getVipLevelColor(level)}40`,
+                              fontWeight: 'bold'
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                            {levelGuests.length}명
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{totalStays}회</TableCell>
+                        <TableCell>₩{totalSpent.toLocaleString()}</TableCell>
+                        <TableCell>₩{Math.round(avgSpent).toLocaleString()}</TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </CardContent>
+        </Card>
       </Container>
     </Box>
   )
