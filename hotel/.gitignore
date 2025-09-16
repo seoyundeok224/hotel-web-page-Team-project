@@ -60,6 +60,8 @@ fileHashes.lock
 resourceHashesCache.bin
 buildOutputCleanup.lock
 subprojects.ser
+checksums.lock
+**/checksums/checksums.lock
 
 # IDE files
 .idea/
