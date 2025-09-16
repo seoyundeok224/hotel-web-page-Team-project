@@ -233,7 +233,7 @@ export const authService = {
       });
     } catch (error) {
       console.error('Failed to register user:', error);
-      
+
       // 개발 중에는 더미 응답 반환
       if (process.env.NODE_ENV === 'development') {
         console.log('Using dummy response for registration:', userData);
@@ -264,11 +264,11 @@ export const authService = {
       });
     } catch (error) {
       console.error('Failed to login:', error);
-      
+
       // 개발 중에는 더미 로그인 로직
       if (process.env.NODE_ENV === 'development') {
         console.log('Using dummy response for login:', credentials);
-        
+
         if (credentials.username === 'admin' && credentials.password === 'admin') {
           return {
             data: {
@@ -310,13 +310,13 @@ export const authService = {
       return apiGet(`/auth/check-username?username=${encodeURIComponent(username)}`);
     } catch (error) {
       console.error('Failed to check username:', error);
-      
+
       // 개발 중에는 더미 중복 확인
       if (process.env.NODE_ENV === 'development') {
         console.log('Using dummy response for username check:', username);
         const existingUsernames = ['admin', 'customer', 'test', 'user'];
         const isAvailable = !existingUsernames.includes(username.toLowerCase());
-        
+
         return {
           data: {
             available: isAvailable
@@ -334,19 +334,70 @@ export const authService = {
       return apiGet(`/auth/check-email?email=${encodeURIComponent(email)}`);
     } catch (error) {
       console.error('Failed to check email:', error);
-      
+
       // 개발 중에는 더미 중복 확인
       if (process.env.NODE_ENV === 'development') {
         console.log('Using dummy response for email check:', email);
         const existingEmails = ['admin@test.com', 'customer@test.com'];
         const isAvailable = !existingEmails.includes(email.toLowerCase());
-        
+
         return {
           data: {
             available: isAvailable
           }
         };
       }
+      throw error;
+    }
+  }
+};
+
+// 사용자 관련 서비스
+export const userService = {
+  // 사용자 프로필 조회
+  getProfile: async () => {
+    try {
+      return apiGet('/users/profile');
+    } catch (error) {
+      console.error('Failed to get user profile:', error);
+      throw error;
+    }
+  },
+
+  // 사용자 프로필 수정
+  updateProfile: async (profileData) => {
+    try {
+      return apiPut('/users/profile', {
+        name: profileData.name,
+        email: profileData.email,
+        phone: profileData.phone
+      });
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      throw error;
+    }
+  },
+
+  // 비밀번호 변경
+  changePassword: async (passwordData) => {
+    try {
+      return apiPut('/users/password', {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+        confirmPassword: passwordData.confirmPassword
+      });
+    } catch (error) {
+      console.error('Failed to change password:', error);
+      throw error;
+    }
+  },
+
+  // 회원 탈퇴
+  deleteAccount: async (requestData) => {
+    try {
+      return apiDelete('/users/account', requestData);
+    } catch (error) {
+      console.error('Failed to delete account:', error);
       throw error;
     }
   }
@@ -365,7 +416,7 @@ const generateDummyRooms = () => {
       const roomNumber = `${floor}${room.toString().padStart(2, '0')}`;
       const roomType = roomTypes[Math.floor(Math.random() * roomTypes.length)];
       const status = statuses[Math.floor(Math.random() * statuses.length)];
-      
+
       rooms.push({
         id: parseInt(roomNumber),
         roomNumber,
@@ -387,5 +438,6 @@ export default {
   room: roomService,
   guest: guestService,
   reservation: reservationService,
-  auth: authService
+  auth: authService,
+  user: userService
 };
