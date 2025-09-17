@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -61,11 +62,30 @@ public class AuthService {
 
     // 로그인
     public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findByUsernameAndEnabled(request.getUsername(), true)
+        // 사용자명으로 사용자 찾기 (enabled 상태와 무관하게)
+        User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("아이디 또는 비밀번호가 잘못되었습니다."));
 
+        // 비밀번호 확인
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("아이디 또는 비밀번호가 잘못되었습니다.");
+        }
+
+        // 탈퇴한 사용자인 경우 특별 처리
+        if (!user.getEnabled() && user.getDeletedAt() != null) {
+            // 3일이 지났는지 확인
+            LocalDateTime threeDaysAfterDeletion = user.getDeletedAt().plusDays(3);
+            if (LocalDateTime.now().isAfter(threeDaysAfterDeletion)) {
+                throw new RuntimeException("탈퇴 처리된 계정입니다. 계정이 영구적으로 삭제되었습니다.");
+            } else {
+                // 탈퇴 취소 가능 기간 내
+                throw new RuntimeException("ACCOUNT_DELETED"); // 특별한 메시지로 프론트엔드에서 처리
+            }
+        }
+
+        // 비활성화된 계정 (일반적인 비활성화)
+        if (!user.getEnabled()) {
+            throw new RuntimeException("비활성화된 계정입니다. 관리자에게 문의하세요.");
         }
 
         // 주요 권한 결정 (ADMIN이 있으면 ADMIN, 없으면 USER)

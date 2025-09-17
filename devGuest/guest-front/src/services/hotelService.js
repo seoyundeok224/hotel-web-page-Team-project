@@ -397,6 +397,16 @@ export const userService = {
       console.error('Failed to delete account:', error);
       throw error;
     }
+  },
+
+  // 회원 탈퇴 취소
+  cancelAccountDeletion: async (requestData) => {
+    try {
+      return apiPost('/users/account/cancel-deletion', requestData);
+    } catch (error) {
+      console.error('Failed to cancel account deletion:', error);
+      throw error;
+    }
   }
 };
 

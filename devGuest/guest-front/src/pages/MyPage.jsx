@@ -255,6 +255,27 @@ const MyPage = () => {
         }
     };
 
+    // 탈퇴 취소 처리
+    const handleCancelWithdrawal = async () => {
+        try {
+            setLoading(true);
+            await userService.cancelAccountDeletion(user.username);
+            setMessage('탈퇴가 성공적으로 취소되었습니다. 계정이 복구되었습니다.');
+            setMessageType('success');
+            
+            // 페이지 새로고침하여 사용자 상태 업데이트
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } catch (error) {
+            console.error('탈퇴 취소 실패:', error);
+            setMessage(error.response?.data?.message || '탈퇴 취소에 실패했습니다.');
+            setMessageType('error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // 비밀번호 표시/숨기기 토글
     const togglePasswordVisibility = (field) => {
         setShowPasswords(prev => ({
@@ -474,32 +495,64 @@ const MyPage = () => {
                     <Typography variant="h6" gutterBottom color="error">
                         회원 탈퇴
                     </Typography>
-                    <Alert severity="warning" sx={{ mb: 3 }}>
-                        회원 탈퇴 시 모든 데이터가 삭제되며, 복구할 수 없습니다.
-                        신중하게 결정해 주세요.
-                    </Alert>
+                    
+                    {/* 탈퇴 상태인 경우 탈퇴 취소 UI */}
+                    {user?.enabled === false ? (
+                        <Box>
+                            <Alert severity="warning" sx={{ mb: 3 }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                                    계정이 탈퇴 처리되었습니다
+                                </Typography>
+                                <Typography variant="body2">
+                                    • 현재 계정은 탈퇴 신청이 완료된 상태입니다<br/>
+                                    • 탈퇴 신청 후 3일 이내에는 탈퇴를 취소할 수 있습니다<br/>
+                                    • 3일 후에는 계정이 영구적으로 삭제됩니다
+                                </Typography>
+                            </Alert>
+                            
+                            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleCancelWithdrawal}
+                                    disabled={loading}
+                                    size="large"
+                                >
+                                    {loading ? '처리 중...' : '탈퇴 취소하기'}
+                                </Button>
+                            </Box>
+                        </Box>
+                    ) : (
+                        // 정상 상태인 경우 기존 탈퇴 UI
+                        <Box>
+                            <Alert severity="warning" sx={{ mb: 3 }}>
+                                회원 탈퇴 시 모든 데이터가 삭제되며, 복구할 수 없습니다.
+                                신중하게 결정해 주세요.
+                            </Alert>
 
-                    <Divider sx={{ my: 3 }} />
+                            <Divider sx={{ my: 3 }} />
 
-                    <Typography variant="body1" paragraph>
-                        다음과 같은 정보가 삭제됩니다:
-                    </Typography>
-                    <ul>
-                        <li>개인정보 (이름, 이메일, 전화번호 등)</li>
-                        <li>예약 내역</li>
-                        <li>서비스 이용 기록</li>
-                    </ul>
+                            <Typography variant="body1" paragraph>
+                                다음과 같은 정보가 삭제됩니다:
+                            </Typography>
+                            <ul>
+                                <li>개인정보 (이름, 이메일, 전화번호 등)</li>
+                                <li>예약 내역</li>
+                                <li>서비스 이용 기록</li>
+                            </ul>
 
-                    <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-                        <Button
-                            variant="outlined"
-                            color="error"
-                            onClick={() => setDeleteDialog(true)}
-                            startIcon={<DeleteForever />}
-                        >
-                            회원 탈퇴하기
-                        </Button>
-                    </Box>
+                            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    onClick={() => setDeleteDialog(true)}
+                                    startIcon={<DeleteForever />}
+                                >
+                                    회원 탈퇴하기
+                                </Button>
+                            </Box>
+                        </Box>
+                    )}
                 </TabPanel>
             </Paper>
 
@@ -514,10 +567,31 @@ const MyPage = () => {
                     회원 탈퇴 확인
                 </DialogTitle>
                 <DialogContent>
-                    <DialogContentText>
+                    <DialogContentText sx={{ mb: 2 }}>
                         정말로 회원 탈퇴를 진행하시겠습니까?
-                        이 작업은 되돌릴 수 없습니다.
                     </DialogContentText>
+                    
+                    <Box sx={{ 
+                        p: 2, 
+                        backgroundColor: '#fff3e0', 
+                        borderRadius: 1, 
+                        border: '1px solid #ffb74d',
+                        mb: 2 
+                    }}>
+                        <Typography variant="subtitle2" color="warning.main" sx={{ fontWeight: 'bold', mb: 1 }}>
+                            ⚠️ 중요 안내사항
+                        </Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                            • <strong>즉시 계정 비활성화:</strong> 탈퇴 즉시 로그인이 불가능합니다.
+                        </Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                            • <strong>3일 유예기간:</strong> 탈퇴 후 3일 동안 탈퇴 취소가 가능합니다.
+                        </Typography>
+                        <Typography variant="body2" color="error.main">
+                            • <strong>완전 삭제:</strong> 3일 후 모든 개인정보가 영구적으로 삭제됩니다.
+                        </Typography>
+                    </Box>
+                    
                     <TextField
                         autoFocus
                         margin="dense"

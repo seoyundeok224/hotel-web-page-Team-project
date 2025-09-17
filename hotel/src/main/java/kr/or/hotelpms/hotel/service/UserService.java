@@ -89,6 +89,38 @@ public class UserService {
         userRepository.save(user);
     }
 
+    // 회원 탈퇴 취소
+    public void cancelAccountDeletion(String username, String password) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        // 비밀번호 확인
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 탈퇴 상태가 아닌 경우
+        if (user.getEnabled()) {
+            throw new RuntimeException("탈퇴 상태가 아닙니다.");
+        }
+
+        // 탈퇴일시가 기록되지 않은 경우
+        if (user.getDeletedAt() == null) {
+            throw new RuntimeException("탈퇴일시가 기록되지 않았습니다.");
+        }
+
+        // 3일이 지났는지 확인
+        LocalDateTime threeDaysAfterDeletion = user.getDeletedAt().plusDays(3);
+        if (LocalDateTime.now().isAfter(threeDaysAfterDeletion)) {
+            throw new RuntimeException("탈퇴 취소 기간(3일)이 만료되었습니다.");
+        }
+
+        // 계정 복구: enabled = true, deletedAt = null
+        user.setEnabled(true);
+        user.setDeletedAt(null);
+        userRepository.save(user);
+    }
+
     // ✅ 아이디 찾기 (이메일 + 이름으로 username 조회)
     @Transactional(readOnly = true)
     public String findUsernameByEmailAndName(String email, String name) {
