@@ -23,7 +23,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import kr.or.hotelpms.hotel.security.CustomUserDetailsService;
 import kr.or.hotelpms.hotel.security.JwtAuthenticationFilter;
-
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -61,7 +60,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 // 인증 관련 엔드포인트와 아이디 찾기 엔드포인트를 누구나 접근 가능하도록 설정
-                .requestMatchers("/api/auth/**", "/api/users/find-username").permitAll() // ✅ 이 부분을 수정하세요.
+                .requestMatchers("/api/auth/**", "/api/users/find-username").permitAll() 
                 // Actuator 엔드포인트 (상태 확인)
                 .requestMatchers("/actuator/**").permitAll()
                 // 나머지 모든 API 엔드포인트는 인증 필요
