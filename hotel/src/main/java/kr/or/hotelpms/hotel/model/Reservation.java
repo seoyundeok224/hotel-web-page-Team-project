@@ -10,7 +10,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @Setter
@@ -37,8 +36,8 @@ public class Reservation {
     @Column(name = "check_out", nullable = false)
     private LocalDate checkOut; // 체크아웃 날짜
 
-    @Column(name = "payment_status", columnDefinition = "VARCHAR(20) DEFAULT 'PENDING'")
-    private String paymentStatus; // 결제 상태
+    @Column(name = "payment_status", length = 20, nullable = false)
+    private String paymentStatus = "PENDING"; // 결제 상태 기본값
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
