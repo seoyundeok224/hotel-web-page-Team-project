@@ -32,7 +32,7 @@ const FindUsername = () => {
       const data = await res.json();
 
       if (res.ok) {
-        setResult(`당신의 아이디는: ${data.data}`);
+        setResult(`당신의 아이디는 ${data.data} 입니다.`);
       } else {
         setError(data.message || '입력하신 정보와 일치하는 사용자가 없습니다.');
       }
@@ -70,6 +70,10 @@ const FindUsername = () => {
                 <EmailIcon color="action" />
               </InputAdornment>
             ),
+            // 이메일 입력 상자에 힌트 텍스트 추가
+            inputProps: {
+              placeholder: '이메일을 입력해주세요.'
+            }
           }}
         />
         <TextField
@@ -83,6 +87,10 @@ const FindUsername = () => {
                 <PersonIcon color="action" />
               </InputAdornment>
             ),
+            // 이름 입력 상자에 힌트 텍스트 추가
+            inputProps: {
+              placeholder: '이름을 입력해주세요'
+            }
           }}
         />
         <Button 
@@ -90,7 +98,7 @@ const FindUsername = () => {
           fullWidth 
           onClick={handleSubmit} 
           disabled={loading}
-          sx={{ py: 1.5, mt: 1, bgcolor: '#000000ff', '&:hover': { bgcolor: '#423f3fff' } }}
+          sx={{ py: 1.5, mt: 1, bgcolor: '#000000', '&:hover': { bgcolor: '#423f3f' } }}
         >
           {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : '아이디 찾기'}
         </Button>
