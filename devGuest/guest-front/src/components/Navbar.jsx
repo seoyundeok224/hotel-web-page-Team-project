@@ -54,6 +54,9 @@ const Navbar = () => {
         <Divider />
         {isAuthenticated ? (
           <>
+            <ListItem button component={LinkBehavior} href="/mypage">
+              <ListItemText primary="마이페이지" />
+            </ListItem>
             {isAdmin && (
               <ListItem button component={LinkBehavior} href="/admin">
                 <ListItemText primary="관리자 패널" />
@@ -100,6 +103,14 @@ const Navbar = () => {
 
               {isAuthenticated ? (
                 <>
+                  <Button
+                    color="inherit"
+                    component={LinkBehavior}
+                    href="/mypage"
+                    sx={{ ml: 2, '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}
+                  >
+                    마이페이지
+                  </Button>
                   {isAdmin && (
                     <Button
                       variant="outlined"

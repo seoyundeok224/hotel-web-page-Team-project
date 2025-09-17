@@ -60,19 +60,16 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // 인증 관련 엔드포인트는 누구나 접근 가능
-                .requestMatchers("/api/auth/**").permitAll()
+                // 인증 관련 엔드포인트와 아이디 찾기 엔드포인트를 누구나 접근 가능하도록 설정
+                .requestMatchers("/api/auth/**", "/api/users/find-username").permitAll() // ✅ 이 부분을 수정하세요.
                 // Actuator 엔드포인트 (상태 확인)
                 .requestMatchers("/actuator/**").permitAll()
-                // 정적 리소스
-                .requestMatchers("/", "/error", "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
-                // 나머지 API는 인증 필요
+                // 나머지 모든 API 엔드포인트는 인증 필요
                 .requestMatchers("/api/**").authenticated()
-                // 기타 모든 요청은 인증 필요
-                .anyRequest().authenticated()
+                // 그 외 모든 요청은 허용 (정적 리소스 등)
+                .anyRequest().permitAll()
             )
             .authenticationProvider(authenticationProvider())
-            // JWT 필터를 UsernamePasswordAuthenticationFilter 이전에 추가
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -91,4 +88,3 @@ public class SecurityConfig {
         return source;
     }
 }
-// 프론트엔드 React 앱에서 오는 요청을 허용하기 위한 CORS 설정 매우 중요

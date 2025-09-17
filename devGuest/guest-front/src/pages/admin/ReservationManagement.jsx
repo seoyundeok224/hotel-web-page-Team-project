@@ -12,10 +12,6 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Chip,
   Paper,
   IconButton,
@@ -31,13 +27,11 @@ import {
 import {
   Add as AddIcon,
   Search as SearchIcon,
-  FilterList as FilterIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   Visibility as VisibilityIcon,
   CalendarToday as CalendarTodayIcon,
   Person as PersonIcon,
-  Bed as BedIcon,
   AccessTime as AccessTimeIcon,
   AttachMoney as AttachMoneyIcon
 } from '@mui/icons-material'
@@ -143,191 +137,263 @@ const Reservations = () => {
   }
 
   return (
-    <div className="reservations">
-      <div className="page-header">
-        <h1 className="page-title">예약 관리</h1>
-        <p className="page-subtitle">호텔 예약을 관리하고 추적하세요</p>
-      </div>
+    <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
+          예약 관리
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          호텔 예약을 관리하고 추적하세요
+        </Typography>
+      </Box>
 
       {/* 액션 바 */}
-      <div className="card">
-        <div className="card-header">
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flex: 1 }}>
-            <div style={{ position: 'relative', minWidth: '300px' }}>
-              <SearchIcon size={20} style={{
-                position: 'absolute',
-                left: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#7f8c8d'
-              }} />
-              <input
-                type="text"
-                placeholder="고객명 또는 예약번호로 검색..."
-                className="form-input"
-                style={{ paddingLeft: '40px' }}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <select
-              className="form-input"
-              style={{ minWidth: '150px' }}
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+            <TextField
+              placeholder="고객명 또는 예약번호로 검색..."
+              variant="outlined"
+              size="small"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ minWidth: 300, flex: 1 }}
+            />
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <InputLabel>상태</InputLabel>
+              <Select
+                value={statusFilter}
+                label="상태"
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <MenuItem value="all">전체 상태</MenuItem>
+                <MenuItem value="confirmed">확정</MenuItem>
+                <MenuItem value="pending">대기</MenuItem>
+                <MenuItem value="cancelled">취소</MenuItem>
+                <MenuItem value="checked-in">체크인</MenuItem>
+                <MenuItem value="checked-out">체크아웃</MenuItem>
+              </Select>
+            </FormControl>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleNewReservation}
+              sx={{ ml: 'auto' }}
             >
-              <option value="all">전체 상태</option>
-              <option value="confirmed">확정</option>
-              <option value="pending">대기</option>
-              <option value="cancelled">취소</option>
-              <option value="checked-in">체크인</option>
-              <option value="checked-out">체크아웃</option>
-            </select>
-          </div>
-          <button className="btn btn-primary" onClick={handleNewReservation}>
-            <AddIcon sx={{ fontSize: 16 }} />
-            새 예약
-          </button>
-        </div>
-      </div>
+              새 예약
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
 
       {/* 예약 통계 */}
-      <div className="dashboard-grid" style={{ marginBottom: '2rem' }}>
-        <div className="stat-card">
-          <div className="stat-icon" style={{ backgroundColor: '#3498db' }}>
-            <CalendarTodayIcon sx={{ fontSize: 24 }} />
-          </div>
-          <div className="stat-content">
-            <h3>{reservations.filter(r => r.status === 'confirmed').length}</h3>
-            <p>확정된 예약</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon" style={{ backgroundColor: '#f39c12' }}>
-            <AccessTimeIcon sx={{ fontSize: 24 }} />
-          </div>
-          <div className="stat-content">
-            <h3>{reservations.filter(r => r.status === 'pending').length}</h3>
-            <p>대기 중인 예약</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon" style={{ backgroundColor: '#27ae60' }}>
-            <PersonIcon sx={{ fontSize: 24 }} />
-          </div>
-          <div className="stat-content">
-            <h3>{reservations.reduce((sum, r) => sum + r.guests, 0)}</h3>
-            <p>총 투숙객 수</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon" style={{ backgroundColor: '#9b59b6' }}>
-            <AttachMoneyIcon sx={{ fontSize: 24 }} />
-          </div>
-          <div className="stat-content">
-            <h3>₩{reservations.reduce((sum, r) => sum + r.totalAmount, 0).toLocaleString()}</h3>
-            <p>총 예약 금액</p>
-          </div>
-        </div>
-      </div>
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Avatar sx={{ bgcolor: '#3498db', mr: 2 }}>
+                  <CalendarTodayIcon />
+                </Avatar>
+                <Box>
+                  <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
+                    {reservations.filter(r => r.status === 'confirmed').length}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    확정된 예약
+                  </Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Avatar sx={{ bgcolor: '#f39c12', mr: 2 }}>
+                  <AccessTimeIcon />
+                </Avatar>
+                <Box>
+                  <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
+                    {reservations.filter(r => r.status === 'pending').length}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    대기 중인 예약
+                  </Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Avatar sx={{ bgcolor: '#27ae60', mr: 2 }}>
+                  <PersonIcon />
+                </Avatar>
+                <Box>
+                  <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
+                    {reservations.reduce((sum, r) => sum + r.guests, 0)}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    총 투숙객 수
+                  </Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Avatar sx={{ bgcolor: '#9b59b6', mr: 2 }}>
+                  <AttachMoneyIcon />
+                </Avatar>
+                <Box>
+                  <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
+                    ₩{reservations.reduce((sum, r) => sum + r.totalAmount, 0).toLocaleString()}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    총 예약 금액
+                  </Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
       {/* 예약 목록 */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="card-title">예약 목록 ({filteredReservations.length}건)</h2>
-        </div>
-        <div className="table-container">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>예약번호</th>
-                <th>고객정보</th>
-                <th>객실정보</th>
-                <th>체크인/아웃</th>
-                <th>투숙객/박수</th>
-                <th>금액</th>
-                <th>상태</th>
-                <th>액션</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredReservations.map((reservation) => (
-                <tr key={reservation.id}>
-                  <td>
-                    <strong>{reservation.reservationNumber}</strong>
-                    <br />
-                    <small style={{ color: '#7f8c8d' }}>{reservation.createdAt}</small>
-                  </td>
-                  <td>
-                    <div>
-                      <strong>{reservation.guestName}</strong>
-                      <br />
-                      <small style={{ color: '#7f8c8d' }}>{reservation.guestPhone}</small>
-                    </div>
-                  </td>
-                  <td>
-                    <div>
-                      <strong>객실 {reservation.roomNumber}</strong>
-                      <br />
-                      <small style={{ color: '#7f8c8d' }}>{reservation.roomType}</small>
-                    </div>
-                  </td>
-                  <td>
-                    <div>
-                      <strong>{reservation.checkIn}</strong>
-                      <br />
-                      <small style={{ color: '#7f8c8d' }}>{reservation.checkOut}</small>
-                    </div>
-                  </td>
-                  <td>
-                    <div>
-                      <strong>{reservation.guests}명</strong>
-                      <br />
-                      <small style={{ color: '#7f8c8d' }}>{reservation.nights}박</small>
-                    </div>
-                  </td>
-                  <td>
-                    <strong>₩{reservation.totalAmount.toLocaleString()}</strong>
-                  </td>
-                  <td>
-                    <span className={`status-badge status-${reservation.status}`}>
-                      {getStatusText(reservation.status)}
-                    </span>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button
-                        className="btn btn-primary"
-                        style={{ padding: '0.25rem 0.5rem' }}
-                        title="상세보기"
-                      >
-                        <VisibilityIcon sx={{ fontSize: 14 }} />
-                      </button>
-                      <button
-                        className="btn btn-warning"
-                        style={{ padding: '0.25rem 0.5rem' }}
-                        title="수정"
-                        onClick={() => handleEditReservation(reservation.id)}
-                      >
-                        <EditIcon sx={{ fontSize: 14 }} />
-                      </button>
-                      <button
-                        className="btn btn-danger"
-                        style={{ padding: '0.25rem 0.5rem' }}
-                        title="삭제"
-                        onClick={() => handleDeleteReservation(reservation.id)}
-                      >
-                        <DeleteIcon sx={{ fontSize: 14 }} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+      <Card>
+        <CardContent>
+          <Typography variant="h6" component="h2" gutterBottom>
+            예약 목록 ({filteredReservations.length}건)
+          </Typography>
+          <TableContainer component={Paper} sx={{ mt: 2 }}>
+            <Table sx={{ minWidth: 650 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>예약번호</TableCell>
+                  <TableCell>고객정보</TableCell>
+                  <TableCell>객실정보</TableCell>
+                  <TableCell>체크인/아웃</TableCell>
+                  <TableCell>투숙객/박수</TableCell>
+                  <TableCell>금액</TableCell>
+                  <TableCell>상태</TableCell>
+                  <TableCell align="center">액션</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredReservations.map((reservation) => (
+                  <TableRow key={reservation.id} hover>
+                    <TableCell>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                          {reservation.reservationNumber}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {reservation.createdAt}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                          {reservation.guestName}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {reservation.guestPhone}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                          객실 {reservation.roomNumber}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {reservation.roomType}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                          {reservation.checkIn}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {reservation.checkOut}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                          {reservation.guests}명
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {reservation.nights}박
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                        ₩{reservation.totalAmount.toLocaleString()}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={getStatusText(reservation.status)}
+                        color={
+                          reservation.status === 'confirmed' ? 'success' :
+                          reservation.status === 'pending' ? 'warning' :
+                          reservation.status === 'cancelled' ? 'error' :
+                          'default'
+                        }
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                        <IconButton size="small" color="primary" title="상세보기">
+                          <VisibilityIcon />
+                        </IconButton>
+                        <IconButton 
+                          size="small" 
+                          color="warning" 
+                          title="수정"
+                          onClick={() => handleEditReservation(reservation.id)}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton 
+                          size="small" 
+                          color="error" 
+                          title="삭제"
+                          onClick={() => handleDeleteReservation(reservation.id)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </CardContent>
+      </Card>
+    </Container>
   )
 }
 

@@ -37,14 +37,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             // HTTP 요청에서 JWT 토큰 추출
             String jwt = getJwtFromRequest(request);
+            log.debug("Request URL: {}, JWT Token: {}", request.getRequestURI(), jwt != null ? "present" : "null");
             
             if (StringUtils.hasText(jwt) && jwtUtil.canTokenBeParsed(jwt)) {
                 // 토큰에서 사용자명 추출
                 String username = jwtUtil.getUsernameFromToken(jwt);
+                log.debug("Username from token: {}", username);
                 
                 // 토큰 유효성 검증
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                    log.debug("UserDetails loaded: {}", userDetails.getUsername());
                     
                     if (jwtUtil.validateToken(jwt, username)) {
                         // 인증 객체 생성 및 SecurityContext에 설정
@@ -54,11 +57,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                         log.debug("JWT 토큰으로 사용자 '{}' 인증 완료", username);
+                    } else {
+                        log.debug("Token validation failed for user: {}", username);
                     }
+                } else {
+                    log.debug("Username is null or authentication already exists");
                 }
+            } else {
+                log.debug("JWT token is empty or cannot be parsed");
             }
         } catch (Exception e) {
-            log.error("JWT 토큰 처리 중 오류 발생: {}", e.getMessage());
+            log.error("JWT 토큰 처리 중 오류 발생: {}", e.getMessage(), e);
             // 인증 실패 시 SecurityContext 초기화
             SecurityContextHolder.clearContext();
         }
