@@ -125,6 +125,17 @@ const Login = () => {
                 아이디 찾기
               </Link>
             </Typography>
+
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              비밀번호를 잊으셨나요?{' '}
+              <Link
+                component={RouterLink}
+                to="/find-password"
+                sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+              >
+                비밀번호 찾기
+              </Link>
+            </Typography>
           </Box>
 
           <Box sx={{ mt: 3, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>

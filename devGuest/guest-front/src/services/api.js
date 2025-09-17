@@ -31,9 +31,20 @@ const apiRequest = async (endpoint, options = {}) => {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('API Error Response:', errorText);
-      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      let errorData;
+      try {
+        errorData = await response.json();
+        console.error('API Error Response (JSON):', errorData);
+        // ApiResponse 형태의 에러인 경우
+        const errorMessage = errorData.message || `HTTP error! status: ${response.status}`;
+        const error = new Error(errorMessage);
+        error.response = { data: errorData, status: response.status };
+        throw error;
+      } catch (jsonError) {
+        const errorText = await response.text();
+        console.error('API Error Response (Text):', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      }
     }
 
     return await response.json();

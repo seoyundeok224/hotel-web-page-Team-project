@@ -12,7 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,6 +26,7 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final EmailService emailService;
 
     // 회원가입
     public UserDto register(RegisterRequest request) {
@@ -78,6 +81,26 @@ public class AuthService {
                 .user(userDto)
                 .token(token)
                 .build();
+    }
+
+    // 비밀번호 찾기 (임시 비밀번호 발급)
+    public void findPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("해당 이메일로 가입된 사용자가 없습니다."));
+
+        // 임시 비밀번호 생성
+        String tempPassword = UUID.randomUUID().toString().substring(0, 8);
+        user.setPassword(passwordEncoder.encode(tempPassword));
+        userRepository.save(user);
+
+        // 이메일로 임시 비밀번호 전송
+        try {
+            emailService.sendTemporaryPassword(user.getEmail(), tempPassword);
+        } catch (IOException e) {
+            // 이메일 전송 실패 시 예외 처리 (예: 로깅)
+            e.printStackTrace();
+            throw new RuntimeException("임시 비밀번호 이메일 전송에 실패했습니다.");
+        }
     }
 
     // 사용자명 중복 확인

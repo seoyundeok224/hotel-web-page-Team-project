@@ -349,6 +349,16 @@ export const authService = {
       }
       throw error;
     }
+  },
+
+  // 비밀번호 찾기
+  findPassword: async (email) => {
+    try {
+      return apiPost('/auth/find-password', { email });
+    } catch (error) {
+      console.error('Failed to find password:', error);
+      throw error;
+    }
   }
 };
 
