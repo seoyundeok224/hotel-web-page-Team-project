@@ -30,16 +30,11 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserDto>> getProfile() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            System.out.println("Authentication: " + authentication);
-            System.out.println("Principal: " + authentication.getName());
-            
             String username = authentication.getName();
             
             UserDto user = userService.getUserProfile(username);
             return ResponseEntity.ok(ApiResponse.success(user));
         } catch (Exception e) {
-            System.err.println("Profile load error: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error(e.getMessage()));
         }
@@ -84,6 +79,18 @@ public class UserController {
             
             userService.deleteAccount(username, request.getPassword());
             return ResponseEntity.ok(ApiResponse.success("SUCCESS", "회원 탈퇴가 완료되었습니다."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    // ✅ 아이디 찾기
+    @PostMapping("/find-username")
+    public ResponseEntity<ApiResponse<String>> findUsername(@RequestBody FindUsernameRequest request) {
+        try {
+            String username = userService.findUsernameByEmailAndName(request.getEmail(), request.getName());
+            return ResponseEntity.ok(ApiResponse.success(username, "아이디 찾기 성공"));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error(e.getMessage()));

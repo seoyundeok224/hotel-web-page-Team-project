@@ -1,5 +1,6 @@
 package kr.or.hotelpms.hotel.controller;
 
+import kr.or.hotelpms.hotel.dto.RoomDto;
 import kr.or.hotelpms.hotel.model.Room;
 import kr.or.hotelpms.hotel.model.RoomStatus;
 import kr.or.hotelpms.hotel.service.RoomService;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/rooms")
@@ -20,8 +22,11 @@ public class RoomController {
 
     // 전체 객실 조회
     @GetMapping
-    public ResponseEntity<List<Room>> getAllRooms() {
-        return ResponseEntity.ok(roomService.getAllRooms());
+    public ResponseEntity<List<RoomDto>> getAllRooms() {
+        List<RoomDto> roomDtos = roomService.getAllRooms().stream()
+                .map(RoomDto::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(roomDtos);
     }
 
     // ID로 객실 조회

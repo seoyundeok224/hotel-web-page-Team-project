@@ -28,7 +28,6 @@ const Login = () => {
     setError('');
 
     try {
-      // 실제 API 호출로 변경
       const response = await authService.login({
         username: formData.username,
         password: formData.password
@@ -37,7 +36,6 @@ const Login = () => {
       const { user, token } = response.data;
       login(user, token);
 
-      // 관리자면 관리자 페이지로, 아니면 홈으로
       if (user.role === 'ADMIN') {
         navigate('/admin');
       } else {
@@ -111,14 +109,20 @@ const Login = () => {
               <Link
                 component={RouterLink}
                 to="/register"
-                sx={{
-                  textDecoration: 'none',
-                  '&:hover': {
-                    textDecoration: 'underline'
-                  }
-                }}
+                sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
               >
                 회원가입
+              </Link>
+            </Typography>
+
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              아이디를 잊으셨나요?{' '}
+              <Link
+                component={RouterLink}
+                to="/find-username"
+                sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+              >
+                아이디 찾기
               </Link>
             </Typography>
           </Box>
@@ -134,7 +138,7 @@ const Login = () => {
           </Box>
         </Box>
       </Box>
-    </Container >
+    </Container>
   );
 };
 

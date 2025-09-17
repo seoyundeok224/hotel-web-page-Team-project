@@ -33,6 +33,21 @@ import {
 } from '@mui/icons-material'
 import { roomService } from '../../services/roomService'
 
+const ROOM_TYPES = [
+    { value: 'SINGLE', label: '싱글' },
+    { value: 'DOUBLE', label: '더블' },
+    { value: 'FAMILY', label: '패밀리' },
+    { value: 'DELUXE', label: '디럭스' },
+    { value: 'SUITE', label: '스위트' },
+    { value: 'CONFERENCE', label: '컨퍼런스' },
+];
+
+const getRoomTypeLabel = (type) => {
+    if (typeof type !== 'string') return type;
+    const foundType = ROOM_TYPES.find(t => t.value.toUpperCase() === type.toUpperCase());
+    return foundType ? foundType.label : type;
+};
+
 // 개별 객실 카드
 const RoomCard = ({ room, onStatusChange, onEdit }) => {
     const getStatusInfo = (status) => {
@@ -57,7 +72,10 @@ const RoomCard = ({ room, onStatusChange, onEdit }) => {
         <Card sx={{ height: '100%', backgroundColor: statusInfo.bgColor, border: `2px solid ${statusInfo.color}20`, cursor: 'pointer' }}>
             <CardContent>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                    <Typography variant="h6">{room.roomNumber}</Typography>
+                    <div>
+                        <Typography variant="h6">{room.roomNumber}</Typography>
+                        <Typography variant="body2" color="text.secondary">{getRoomTypeLabel(room.roomType)}</Typography>
+                    </div>
                     <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEdit(room) }}>
                         <EditIcon fontSize="small" />
                     </IconButton>
@@ -121,6 +139,28 @@ const RoomManagement = () => {
         status: 'AVAILABLE',
         description: ''
     })
+
+    useEffect(() => {
+        if (editingRoom) {
+            setFormData({
+                roomNumber: editingRoom.roomNumber || '',
+                roomType: editingRoom.roomType ? editingRoom.roomType.toUpperCase() : 'SINGLE',
+                price: editingRoom.price || '',
+                capacity: editingRoom.capacity || '',
+                status: editingRoom.status || 'AVAILABLE',
+                description: editingRoom.description || ''
+            });
+        } else {
+            setFormData({
+                roomNumber: '',
+                roomType: 'SINGLE',
+                price: '',
+                capacity: '',
+                status: 'AVAILABLE',
+                description: ''
+            });
+        }
+    }, [editingRoom]);
 
     useEffect(() => { loadRooms() }, [])
     useEffect(() => { filterRooms() }, [rooms, searchTerm, statusFilter, typeFilter])
@@ -235,9 +275,9 @@ const RoomManagement = () => {
                         <InputLabel>타입</InputLabel>
                         <Select value={typeFilter} onChange={e=>setTypeFilter(e.target.value)} label="타입">
                             <MenuItem value="ALL">전체</MenuItem>
-                            <MenuItem value="SINGLE">싱글</MenuItem>
-                            <MenuItem value="DOUBLE">더블</MenuItem>
-                            <MenuItem value="SUITE">스위트</MenuItem>
+                            {ROOM_TYPES.map(type => (
+                                <MenuItem key={type.value} value={type.value}>{type.label}</MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                 </Box>
@@ -246,14 +286,14 @@ const RoomManagement = () => {
 
                 <Dialog open={showModal} onClose={()=>{ setShowModal(false); setEditingRoom(null)}} maxWidth="sm" fullWidth>
                     <DialogTitle>{editingRoom ? '객실 수정' : '객실 추가'}</DialogTitle>
-                    <DialogContent sx={{ display:'flex', flexDirection:'column', gap:2 }}>
+                    <DialogContent sx={{ display:'flex', flexDirection:'column', gap: 3, pt: '10px' }}>
                         <TextField label="객실 번호" value={formData.roomNumber} onChange={e=>setFormData({...formData, roomNumber:e.target.value})} />
                         <FormControl>
                             <InputLabel>타입</InputLabel>
                             <Select value={formData.roomType} onChange={e=>setFormData({...formData, roomType:e.target.value})} label="타입">
-                                <MenuItem value="SINGLE">싱글</MenuItem>
-                                <MenuItem value="DOUBLE">더블</MenuItem>
-                                <MenuItem value="SUITE">스위트</MenuItem>
+                                {ROOM_TYPES.map(type => (
+                                    <MenuItem key={type.value} value={type.value}>{type.label}</MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                         <TextField label="가격" type="number" value={formData.price} onChange={e=>setFormData({...formData, price:parseInt(e.target.value)})} />
