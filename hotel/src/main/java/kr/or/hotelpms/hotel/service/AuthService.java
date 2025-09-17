@@ -178,18 +178,7 @@ public class AuthService {
             }
         );
 
-        // 테스트 고객 계정 생성
-        if (!userRepository.existsByUsername("customer")) {
-            User customer = User.builder()
-                    .username("customer")
-                    .password(passwordEncoder.encode("password"))
-                    .email("customer@test.com")
-                    .name("고객")
-                    .enabled(true)
-                    .build();
-
-            customer.addRole(userRole);
-            userRepository.save(customer);
-        }
+        // 역할(Role) 데이터는 유지하되, 테스트 고객 계정은 생성하지 않음
+        // 고객은 회원가입을 통해 계정을 생성해야 함
     }
 }

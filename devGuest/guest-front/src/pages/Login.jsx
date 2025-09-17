@@ -143,8 +143,8 @@ const Login = () => {
               <strong>테스트 계정:</strong>
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              일반 사용자 - 사용자명: customer, 비밀번호: password<br />
-              관리자 - 사용자명: admin, 비밀번호: admin
+              관리자 - 사용자명: admin, 비밀번호: admin<br />
+              일반 사용자는 회원가입을 통해 계정을 생성하세요.
             </Typography>
           </Box>
         </Box>
