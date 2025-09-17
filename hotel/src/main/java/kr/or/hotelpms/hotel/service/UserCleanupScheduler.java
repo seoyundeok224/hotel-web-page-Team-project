@@ -42,11 +42,27 @@ public class UserCleanupScheduler {
             
             log.info("삭제 대상 탈퇴 회원 수: {}", usersToDelete.size());
             
-            // 사용자 정보 삭제
+            // 사용자 정보 삭제 (외래키 제약조건 고려)
             for (User user : usersToDelete) {
                 log.info("사용자 삭제: ID={}, 사용자명={}, 탈퇴일={}", 
                         user.getId(), user.getUsername(), user.getDeletedAt());
-                userRepository.delete(user);
+                
+                try {
+                    // 1. 사용자-역할 관계 먼저 제거 (user_roles 테이블에서 삭제)
+                    user.getRoles().clear();
+                    userRepository.save(user); // 변경사항 저장하여 user_roles에서 관계 제거
+                    
+                    // 2. 사용자 엔티티 삭제 (users 테이블에서 삭제)
+                    // 참고: 예약(reservations) 테이블에 ON DELETE CASCADE가 설정되어 있다면
+                    // 관련 예약 데이터도 자동으로 삭제됩니다.
+                    userRepository.delete(user);
+                    
+                    log.info("사용자 삭제 완료: {}", user.getUsername());
+                } catch (Exception e) {
+                    log.error("사용자 삭제 실패: ID={}, 사용자명={}, 오류={}", 
+                            user.getId(), user.getUsername(), e.getMessage());
+                    // 개별 삭제 실패 시에도 다른 사용자 삭제는 계속 진행
+                }
             }
             
             log.info("탈퇴 회원 정리 작업 완료: {}명 삭제", usersToDelete.size());
@@ -74,7 +90,20 @@ public class UserCleanupScheduler {
             for (User user : usersToDelete) {
                 log.info("[테스트] 사용자 삭제: ID={}, 사용자명={}, 탈퇴일={}", 
                         user.getId(), user.getUsername(), user.getDeletedAt());
-                userRepository.delete(user);
+                
+                try {
+                    // 1. 사용자-역할 관계 먼저 제거 (user_roles 테이블에서 삭제)
+                    user.getRoles().clear();
+                    userRepository.save(user); // 변경사항 저장하여 user_roles에서 관계 제거
+                    
+                    // 2. 사용자 엔티티 삭제 (users 테이블에서 삭제)
+                    userRepository.delete(user);
+                    
+                    log.info("[테스트] 사용자 삭제 완료: {}", user.getUsername());
+                } catch (Exception e) {
+                    log.error("[테스트] 사용자 삭제 실패: ID={}, 사용자명={}, 오류={}", 
+                            user.getId(), user.getUsername(), e.getMessage());
+                }
             }
         }
     }
