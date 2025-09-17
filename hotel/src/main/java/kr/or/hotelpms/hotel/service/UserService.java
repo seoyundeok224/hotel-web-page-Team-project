@@ -87,6 +87,14 @@ public class UserService {
         userRepository.save(user);
     }
 
+    // ✅ 아이디 찾기 (이메일 + 이름으로 username 조회)
+    @Transactional(readOnly = true)
+    public String findUsernameByEmailAndName(String email, String name) {
+        User user = userRepository.findByEmailAndName(email, name)
+                .orElseThrow(() -> new RuntimeException("해당 정보로 가입된 사용자를 찾을 수 없습니다."));
+        return user.getUsername();
+    }
+
     // User 엔티티를 UserDto로 변환
     private UserDto convertToUserDto(User user) {
         UserDto userDto = new UserDto();

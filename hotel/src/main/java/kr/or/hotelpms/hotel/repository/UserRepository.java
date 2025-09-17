@@ -23,4 +23,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     // 활성화된 사용자 찾기
     Optional<User> findByUsernameAndEnabled(String username, Boolean enabled);
+
+    // 이메일 + 이름으로 사용자 찾기 (아이디 찾기용)
+    Optional<User> findByEmailAndName(String email, String name);
 }
