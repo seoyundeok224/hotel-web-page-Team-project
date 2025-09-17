@@ -1,9 +1,13 @@
 package kr.or.hotelpms.hotel.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import kr.or.hotelpms.hotel.model.User;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -26,4 +30,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // 이메일 + 이름으로 사용자 찾기 (아이디 찾기용)
     Optional<User> findByEmailAndName(String email, String name);
+    
+    // 탈퇴 후 3일 지난 사용자 찾기 (삭제 대상)
+    @Query("SELECT u FROM User u WHERE u.enabled = false AND u.deletedAt IS NOT NULL AND u.deletedAt <= :cutoffDate")
+    List<User> findUsersToDelete(@Param("cutoffDate") LocalDateTime cutoffDate);
 }

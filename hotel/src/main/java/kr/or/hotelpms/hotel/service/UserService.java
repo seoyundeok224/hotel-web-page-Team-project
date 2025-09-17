@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -82,8 +83,9 @@ public class UserService {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
-        // 사용자 계정 비활성화 (완전 삭제 대신)
+        // 사용자 계정 비활성화 및 탈퇴일시 기록
         user.setEnabled(false);
+        user.setDeletedAt(LocalDateTime.now());
         userRepository.save(user);
     }
 
