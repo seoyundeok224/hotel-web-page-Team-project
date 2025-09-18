@@ -14,6 +14,10 @@ java {
 	}
 }
 
+compileJava {
+	options.compilerArgs += ['-parameters']
+}
+
 repositories {
 	mavenCentral()
 }
@@ -36,6 +40,12 @@ dependencies {
 
     // MariaDB JDBC 드라이버
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
+    // SendGrid
+    implementation 'com.sendgrid:sendgrid-java:4.10.0'
+
+    // Dotenv
+    implementation 'io.github.cdimascio:dotenv-java:2.2.0'
 
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'

@@ -6,8 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling
 @RequiredArgsConstructor
 public class HotelReservationApplication implements CommandLineRunner {
 
@@ -26,7 +28,7 @@ public class HotelReservationApplication implements CommandLineRunner {
 		roomService.createInitialRooms();
 		System.out.println("=== 초기 데이터 생성 완료 ===");
 		System.out.println("관리자 계정: admin / admin");
-		System.out.println("고객 계정: customer / password");
+		System.out.println("고객은 회원가입을 통해 계정을 생성하세요.");
 		System.out.println("초기 객실 데이터가 성공적으로 생성되었습니다.");
 	}
 }

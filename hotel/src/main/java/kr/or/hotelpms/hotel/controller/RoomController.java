@@ -52,8 +52,8 @@ public class RoomController {
     // 가격 범위 조회
     @GetMapping("/price")
     public ResponseEntity<List<Room>> getRoomsByPriceRange(
-            @RequestParam BigDecimal min,
-            @RequestParam BigDecimal max) {
+            @RequestParam("min") BigDecimal min,
+            @RequestParam("max") BigDecimal max) {
         return ResponseEntity.ok(roomService.getRoomsByPriceRange(min, max));
     }
 
@@ -82,7 +82,7 @@ public class RoomController {
     @PutMapping("/{id}/status")
     public ResponseEntity<Room> updateRoomStatus(
             @PathVariable Long id,
-            @RequestParam RoomStatus status) {
+            @RequestParam("status") RoomStatus status) {
 
         Optional<Room> updatedRoom = roomService.updateRoomStatus(id, status);
         return updatedRoom.map(ResponseEntity::ok)

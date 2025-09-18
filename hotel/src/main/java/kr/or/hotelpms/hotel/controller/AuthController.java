@@ -44,9 +44,22 @@ public class AuthController {
         }
     }
 
+    // 비밀번호 찾기
+    @PostMapping("/find-password")
+    public ResponseEntity<ApiResponse<Void>> findPassword(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            authService.findPassword(email);
+            return ResponseEntity.ok(ApiResponse.success(null, "임시 비밀번호가 이메일로 전송되었습니다."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
     // 사용자명 중복 확인
     @GetMapping("/check-username")
-    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkUsername(@RequestParam String username) {
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkUsername(@RequestParam("username") String username) {
         try {
             boolean available = authService.isUsernameAvailable(username);
             return ResponseEntity.ok(ApiResponse.success(
@@ -60,7 +73,7 @@ public class AuthController {
 
     // 이메일 중복 확인
     @GetMapping("/check-email")
-    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkEmail(@RequestParam String email) {
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkEmail(@RequestParam("email") String email) {
         try {
             boolean available = authService.isEmailAvailable(email);
             return ResponseEntity.ok(ApiResponse.success(
