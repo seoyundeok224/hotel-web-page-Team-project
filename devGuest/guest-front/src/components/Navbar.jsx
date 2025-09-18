@@ -4,6 +4,8 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useAuth } from '../contexts/AuthContext';
 
+
+
 const LinkBehavior = forwardRef((props, ref) => {
   const { href, ...other } = props;
   return <RouterLink ref={ref} to={href} {...other} />;
@@ -49,12 +51,6 @@ const Navbar = () => {
         <ListItem button component={LinkBehavior} href="/booking">
           <ListItemText primary="예약" />
         </ListItem>
-
-        {/* 게시글 메뉴 수정: href를 /reviews로 */}
-        <ListItem button component={LinkBehavior} href="/reviews">
-          <ListItemText primary="게시글" />
-        </ListItem>
-
         <Divider />
         {isAuthenticated ? (
           <>
@@ -97,30 +93,13 @@ const Navbar = () => {
             </IconButton>
           ) : (
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Button color="inherit" component={LinkBehavior} href="/" sx={{ '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>
-                호텔 소개
-              </Button>
-              <Button color="inherit" component={LinkBehavior} href="/rooms" sx={{ ml: 2, '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>
-                객실 소개
-              </Button>
-              <Button color="inherit" component={LinkBehavior} href="/dining" sx={{ ml: 2, '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>
-                다이닝
-              </Button>
-              <Button color="inherit" component={LinkBehavior} href="/facilities" sx={{ ml: 2, '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>
-                부대시설
-              </Button>
-              <Button color="inherit" component={LinkBehavior} href="/services" sx={{ ml: 2, '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>
-                서비스
-              </Button>
-              <Button color="inherit" component={LinkBehavior} href="/reviews" sx={{ ml: 2, '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>
-                게시글
-              </Button>
-              <Button color="inherit" component={LinkBehavior} href="/location" sx={{ ml: 2, '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>
-                오시는 길
-              </Button>
-              <Button variant="contained" component={LinkBehavior} href="/booking" sx={{ ml: 2 }}>
-                예약
-              </Button>
+              <Button color="inherit" component={LinkBehavior} href="/" sx={{ '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>호텔 소개</Button>
+              <Button color="inherit" component={LinkBehavior} href="/rooms" sx={{ '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>객실 소개</Button>
+              <Button color="inherit" component={LinkBehavior} href="/dining" sx={{ '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>다이닝</Button>
+              <Button color="inherit" component={LinkBehavior} href="/facilities" sx={{ '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>부대시설</Button>
+              <Button color="inherit" component={LinkBehavior} href="/services" sx={{ '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>서비스</Button>
+              <Button color="inherit" component={LinkBehavior} href="/location" sx={{ '&:hover': { backgroundColor: 'transparent', color: 'primary.main' } }}>오시는 길</Button>
+              <Button variant="contained" component={LinkBehavior} href="/booking" sx={{ ml: 2 }}>예약</Button>
 
               {isAuthenticated ? (
                 <>
@@ -151,9 +130,7 @@ const Navbar = () => {
                   </Button>
                 </>
               ) : (
-                <Button variant="outlined" component={LinkBehavior} href="/login" sx={{ ml: 2 }}>
-                  로그인
-                </Button>
+                <Button variant="outlined" component={LinkBehavior} href="/login" sx={{ ml: 2 }}>로그인</Button>
               )}
             </Box>
           )}
