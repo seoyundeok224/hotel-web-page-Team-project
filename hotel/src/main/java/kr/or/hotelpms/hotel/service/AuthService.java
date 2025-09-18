@@ -12,7 +12,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,6 +27,7 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final EmailService emailService;
 
     // 회원가입
     public UserDto register(RegisterRequest request) {
@@ -58,11 +62,30 @@ public class AuthService {
 
     // 로그인
     public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findByUsernameAndEnabled(request.getUsername(), true)
+        // 사용자명으로 사용자 찾기 (enabled 상태와 무관하게)
+        User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("아이디 또는 비밀번호가 잘못되었습니다."));
 
+        // 비밀번호 확인
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("아이디 또는 비밀번호가 잘못되었습니다.");
+        }
+
+        // 탈퇴한 사용자인 경우 특별 처리
+        if (!user.getEnabled() && user.getDeletedAt() != null) {
+            // 3일이 지났는지 확인
+            LocalDateTime threeDaysAfterDeletion = user.getDeletedAt().plusDays(3);
+            if (LocalDateTime.now().isAfter(threeDaysAfterDeletion)) {
+                throw new RuntimeException("탈퇴 처리된 계정입니다. 계정이 영구적으로 삭제되었습니다.");
+            } else {
+                // 탈퇴 취소 가능 기간 내
+                throw new RuntimeException("ACCOUNT_DELETED"); // 특별한 메시지로 프론트엔드에서 처리
+            }
+        }
+
+        // 비활성화된 계정 (일반적인 비활성화)
+        if (!user.getEnabled()) {
+            throw new RuntimeException("비활성화된 계정입니다. 관리자에게 문의하세요.");
         }
 
         // 주요 권한 결정 (ADMIN이 있으면 ADMIN, 없으면 USER)
@@ -78,6 +101,26 @@ public class AuthService {
                 .user(userDto)
                 .token(token)
                 .build();
+    }
+
+    // 비밀번호 찾기 (임시 비밀번호 발급)
+    public void findPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("해당 이메일로 가입된 사용자가 없습니다."));
+
+        // 임시 비밀번호 생성
+        String tempPassword = UUID.randomUUID().toString().substring(0, 8);
+        user.setPassword(passwordEncoder.encode(tempPassword));
+        userRepository.save(user);
+
+        // 이메일로 임시 비밀번호 전송
+        try {
+            emailService.sendTemporaryPassword(user.getEmail(), tempPassword);
+        } catch (IOException e) {
+            // 이메일 전송 실패 시 예외 처리 (예: 로깅)
+            e.printStackTrace();
+            throw new RuntimeException("임시 비밀번호 이메일 전송에 실패했습니다.");
+        }
     }
 
     // 사용자명 중복 확인
@@ -155,18 +198,7 @@ public class AuthService {
             }
         );
 
-        // 테스트 고객 계정 생성
-        if (!userRepository.existsByUsername("customer")) {
-            User customer = User.builder()
-                    .username("customer")
-                    .password(passwordEncoder.encode("password"))
-                    .email("customer@test.com")
-                    .name("고객")
-                    .enabled(true)
-                    .build();
-
-            customer.addRole(userRole);
-            userRepository.save(customer);
-        }
+        // 역할(Role) 데이터는 유지하되, 테스트 고객 계정은 생성하지 않음
+        // 고객은 회원가입을 통해 계정을 생성해야 함
     }
 }

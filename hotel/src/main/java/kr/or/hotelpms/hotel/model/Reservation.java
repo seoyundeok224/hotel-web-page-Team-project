@@ -21,30 +21,33 @@ public class Reservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 예약 고유 ID
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user; // 예약자
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
-    private Room room; // 예약한 객실
+    private Room room;
 
     @Column(name = "check_in", nullable = false)
-    private LocalDate checkIn; // 체크인 날짜
+    private LocalDate checkIn;
 
     @Column(name = "check_out", nullable = false)
-    private LocalDate checkOut; // 체크아웃 날짜
+    private LocalDate checkOut;
 
-    @Column(name = "payment_status", columnDefinition = "VARCHAR(20) DEFAULT 'PENDING'")
-    private String paymentStatus; // 결제 상태
+    @Column(name = "people", nullable = false)
+    private int people; // 투숙객 수
+
+    @Column(name = "payment_status", length = 20, nullable = false)
+    private String paymentStatus = "PENDING";
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt; // 예약 생성일
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt; // 예약 수정일
+    private LocalDateTime updatedAt;
 }
