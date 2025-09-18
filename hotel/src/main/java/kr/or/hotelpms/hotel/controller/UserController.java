@@ -85,6 +85,21 @@ public class UserController {
         }
     }
 
+    // 회원 탈퇴 취소
+    @PostMapping("/account/cancel-deletion")
+    public ResponseEntity<ApiResponse<String>> cancelAccountDeletion(@Valid @RequestBody DeleteAccountRequest request) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            
+            userService.cancelAccountDeletion(username, request.getPassword());
+            return ResponseEntity.ok(ApiResponse.success("SUCCESS", "탈퇴 취소가 완료되었습니다."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
     // ✅ 아이디 찾기
     @PostMapping("/find-username")
     public ResponseEntity<ApiResponse<String>> findUsername(@RequestBody FindUsernameRequest request) {

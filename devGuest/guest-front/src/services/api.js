@@ -31,9 +31,32 @@ const apiRequest = async (endpoint, options = {}) => {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('API Error Response:', errorText);
-      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      let errorData = null;
+      
+      try {
+        // response body를 먼저 텍스트로 읽음
+        const responseText = await response.text();
+        console.error('API Error Response Text:', responseText);
+        
+        // JSON 파싱 시도
+        if (responseText) {
+          try {
+            errorData = JSON.parse(responseText);
+            console.error('API Error Response (JSON):', errorData);
+            errorMessage = errorData.message || errorMessage;
+          } catch (parseError) {
+            console.error('Failed to parse error response as JSON:', parseError);
+            errorMessage = responseText || errorMessage;
+          }
+        }
+      } catch (readError) {
+        console.error('Failed to read error response:', readError);
+      }
+      
+      const error = new Error(errorMessage);
+      error.response = { data: errorData, status: response.status };
+      throw error;
     }
 
     return await response.json();

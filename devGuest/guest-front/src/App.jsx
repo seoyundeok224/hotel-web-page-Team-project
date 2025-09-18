@@ -12,6 +12,7 @@ import Dining from './pages/Dining';
 import Facilities from './pages/Facilities';
 import Directions from './pages/Directions'; // 오시는 길 페이지 추가
 import FindUsername from './pages/FindUsername'; // 아이디 찾기 추가
+import FindPassword from './pages/FindPassword'; // 비밀번호 찾기 추가
 
 // 관리자 페이지들
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -91,6 +92,14 @@ const App = () => {
             <>
               <Navbar />
               <FindUsername />
+            </>
+          } />
+
+          {/* 비밀번호 찾기 페이지 라우트 추가 */}
+          <Route path="/find-password" element={
+            <>
+              <Navbar />
+              <FindPassword />
             </>
           } />
 

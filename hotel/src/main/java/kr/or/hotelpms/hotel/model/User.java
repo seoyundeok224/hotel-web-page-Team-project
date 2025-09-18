@@ -49,6 +49,9 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @Column(nullable = false)
     @Builder.Default
     private Boolean enabled = true;

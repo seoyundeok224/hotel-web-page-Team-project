@@ -282,19 +282,6 @@ export const authService = {
               token: 'admin-jwt-token'
             }
           };
-        } else if (credentials.username === 'customer' && credentials.password === 'password') {
-          return {
-            data: {
-              user: {
-                id: 2,
-                username: 'customer',
-                name: '고객',
-                email: 'customer@test.com',
-                role: 'USER'
-              },
-              token: 'customer-jwt-token'
-            }
-          };
         } else {
           throw new Error('아이디 또는 비밀번호가 잘못되었습니다.');
         }
@@ -349,6 +336,16 @@ export const authService = {
       }
       throw error;
     }
+  },
+
+  // 비밀번호 찾기
+  findPassword: async (email) => {
+    try {
+      return apiPost('/auth/find-password', { email });
+    } catch (error) {
+      console.error('Failed to find password:', error);
+      throw error;
+    }
   }
 };
 
@@ -398,6 +395,16 @@ export const userService = {
       return apiDelete('/users/account', requestData);
     } catch (error) {
       console.error('Failed to delete account:', error);
+      throw error;
+    }
+  },
+
+  // 회원 탈퇴 취소
+  cancelAccountDeletion: async (requestData) => {
+    try {
+      return apiPost('/users/account/cancel-deletion', requestData);
+    } catch (error) {
+      console.error('Failed to cancel account deletion:', error);
       throw error;
     }
   }

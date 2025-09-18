@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { Typography, Container, Box, TextField, Button, Alert, Link } from '@mui/material';
+import { 
+  Typography, Container, Box, TextField, Button, Alert, Link, 
+  Dialog, DialogTitle, DialogContent, DialogActions 
+} from '@mui/material';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { authService } from '../services/hotelService';
+import { authService, userService } from '../services/hotelService';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +14,8 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [currentUsername, setCurrentUsername] = useState('');
 
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -42,9 +47,41 @@ const Login = () => {
         navigate('/');
       }
     } catch (error) {
-      setError(error.message || '로그인 중 오류가 발생했습니다.');
+      if (error.message === 'ACCOUNT_DELETED') {
+        setCurrentUsername(formData.username);
+        setCancelDialogOpen(true);
+        setError('');
+      } else {
+        setError(error.message || '로그인 중 오류가 발생했습니다.');
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCancelWithdrawal = async () => {
+    try {
+      await userService.cancelAccountDeletion(currentUsername);
+      setCancelDialogOpen(false);
+      setError('');
+      
+      // 탈퇴 취소 후 다시 로그인 시도
+      const response = await authService.login({
+        username: formData.username,
+        password: formData.password
+      });
+
+      const { user, token } = response.data;
+      login(user, token);
+
+      if (user.role === 'ADMIN') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
+    } catch (error) {
+      setError(error.message || '탈퇴 취소 중 오류가 발생했습니다.');
+      setCancelDialogOpen(false);
     }
   };
 
@@ -125,6 +162,17 @@ const Login = () => {
                 아이디 찾기
               </Link>
             </Typography>
+
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              비밀번호를 잊으셨나요?{' '}
+              <Link
+                component={RouterLink}
+                to="/find-password"
+                sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+              >
+                비밀번호 찾기
+              </Link>
+            </Typography>
           </Box>
 
           <Box sx={{ mt: 3, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
@@ -132,11 +180,52 @@ const Login = () => {
               <strong>테스트 계정:</strong>
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              일반 사용자 - 사용자명: customer, 비밀번호: password<br />
-              관리자 - 사용자명: admin, 비밀번호: admin
+              관리자 - 사용자명: admin, 비밀번호: admin<br />
+              일반 사용자는 회원가입을 통해 계정을 생성하세요.
             </Typography>
           </Box>
         </Box>
+
+        {/* 탈퇴 취소 다이얼로그 */}
+        <Dialog 
+          open={cancelDialogOpen} 
+          onClose={() => setCancelDialogOpen(false)}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle sx={{ fontWeight: 'bold', color: '#d32f2f' }}>
+            탈퇴 신청된 계정
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              이 계정은 탈퇴 신청이 완료된 상태입니다.
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              • 탈퇴 신청 후 3일 이내에는 탈퇴를 취소할 수 있습니다<br/>
+              • 3일 후에는 계정이 영구적으로 삭제됩니다<br/>
+              • 탈퇴를 취소하면 기존 정보가 모두 복구됩니다
+            </Typography>
+            <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+              탈퇴를 취소하시겠습니까?
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ p: 2 }}>
+            <Button 
+              onClick={() => setCancelDialogOpen(false)}
+              color="inherit"
+            >
+              아니오
+            </Button>
+            <Button 
+              onClick={handleCancelWithdrawal}
+              variant="contained"
+              color="primary"
+              sx={{ ml: 1 }}
+            >
+              탈퇴 취소
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Container>
   );
