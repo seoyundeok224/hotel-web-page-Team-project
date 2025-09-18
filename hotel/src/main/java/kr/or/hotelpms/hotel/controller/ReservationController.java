@@ -1,12 +1,12 @@
 package kr.or.hotelpms.hotel.controller;
 
+import kr.or.hotelpms.hotel.dto.ReservationDto;
 import kr.or.hotelpms.hotel.model.Reservation;
 import kr.or.hotelpms.hotel.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -18,19 +18,29 @@ public class ReservationController {
 
     // 예약 등록
     @PostMapping
-    public ResponseEntity<Reservation> createReservation(
-            @RequestParam Long userId,
-            @RequestParam Long roomId,
-            @RequestParam LocalDate checkIn,
-            @RequestParam LocalDate checkOut
+    public ResponseEntity<ReservationDto.ReservationResponse> createReservation(
+            @RequestBody ReservationDto.ReservationRequest request
     ) {
-        Reservation reservation = reservationService.createReservation(userId, roomId, checkIn, checkOut);
-        return ResponseEntity.ok(reservation);
+        Reservation reservation = reservationService.createReservationByUsername(request);
+        return ResponseEntity.ok(new ReservationDto.ReservationResponse(reservation));
     }
 
     // 유저별 예약 조회
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Reservation>> getUserReservations(@PathVariable Long userId) {
+    public ResponseEntity<List<ReservationDto.ReservationResponse>> getUserReservations(@PathVariable Long userId) {
         return ResponseEntity.ok(reservationService.getReservationsByUser(userId));
+    }
+
+    // 모든 예약 조회 (관리자용)
+    @GetMapping("/admin/all")
+    public ResponseEntity<List<ReservationDto.ReservationResponse>> getAllReservations() {
+        return ResponseEntity.ok(reservationService.getAllReservations());
+    }
+
+    // 예약 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
+        reservationService.deleteReservation(id);
+        return ResponseEntity.noContent().build();
     }
 }

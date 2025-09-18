@@ -1,5 +1,6 @@
 package kr.or.hotelpms.hotel.service;
 
+import kr.or.hotelpms.hotel.dto.ReservationDto;
 import kr.or.hotelpms.hotel.model.Reservation;
 import kr.or.hotelpms.hotel.model.Room;
 import kr.or.hotelpms.hotel.model.User;
@@ -10,8 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,39 +22,72 @@ public class ReservationService {
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
 
+    // username → userId
+    public Long getUserIdByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."))
+                .getId();
+    }
+
+    // roomNumber → roomId
+    public Long getRoomIdByRoomNumber(String roomNumber) {
+        return roomRepository.findByRoomNumber(roomNumber)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 객실입니다."))
+                .getId();
+    }
+
     @Transactional
-    public Reservation createReservation(Long userId, Long roomId, LocalDate checkIn, LocalDate checkOut) {
-        // 유저 & 객실 조회
+    public Reservation createReservationByUsername(ReservationDto.ReservationRequest request) {
+        Long userId = getUserIdByUsername(request.getUsername());
+        Long roomId = getRoomIdByRoomNumber(request.getRoomNumber());
+        return createReservation(userId, roomId, request);
+    }
+
+    @Transactional
+    public Reservation createReservation(Long userId, Long roomId, ReservationDto.ReservationRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 객실입니다."));
 
-        // 체크인 < 체크아웃 검증
-        if (!checkIn.isBefore(checkOut)) {
+        if (!request.getCheckIn().isBefore(request.getCheckOut())) {
             throw new IllegalArgumentException("체크인 날짜는 체크아웃 날짜보다 앞서야 합니다.");
         }
 
-        // 예약 가능 여부 확인
-        List<Reservation> overlapping = reservationRepository
-                .findByRoomIdAndCheckOutAfterAndCheckInBefore(roomId, checkIn, checkOut);
-        if (!overlapping.isEmpty()) {
+        boolean overlapExists = reservationRepository
+                .findByRoomIdAndCheckOutAfterAndCheckInBefore(roomId, request.getCheckIn(), request.getCheckOut())
+                .size() > 0;
+        if (overlapExists) {
             throw new IllegalStateException("해당 기간에 이미 예약이 존재합니다.");
         }
 
-        // 예약 생성
         Reservation reservation = new Reservation();
         reservation.setUser(user);
         reservation.setRoom(room);
-        reservation.setCheckIn(checkIn);
-        reservation.setCheckOut(checkOut);
+        reservation.setCheckIn(request.getCheckIn());
+        reservation.setCheckOut(request.getCheckOut());
+        reservation.setPeople(request.getPeople());
         reservation.setPaymentStatus("PENDING");
 
         return reservationRepository.save(reservation);
     }
 
     @Transactional(readOnly = true)
-    public List<Reservation> getReservationsByUser(Long userId) {
-        return reservationRepository.findByUserId(userId);
+    public List<ReservationDto.ReservationResponse> getAllReservations() {
+        return reservationRepository.findAll().stream()
+                .map(ReservationDto.ReservationResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservationDto.ReservationResponse> getReservationsByUser(Long userId) {
+        return reservationRepository.findByUserId(userId).stream()
+                .map(ReservationDto.ReservationResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteReservation(Long reservationId) {
+        reservationRepository.deleteById(reservationId);
     }
 }
