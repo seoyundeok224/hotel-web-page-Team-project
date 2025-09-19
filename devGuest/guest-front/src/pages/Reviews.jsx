@@ -37,20 +37,6 @@ const Reviews = () => {
     fetchReviews();
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!content.trim()) return;
-    try {
-      const res = await reviewService.createReview(content, token);
-      // 신규 후기를 화면에 바로 반영
-      setReviews(prev => [res.data, ...prev].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
-      setContent('');
-    } catch (err) {
-      console.error("후기 작성 실패:", err);
-      alert('후기 작성에 실패했습니다. 로그인 상태를 확인하세요.');
-    }
-  };
-
   // ...existing code (렌더링 부분)...
   return (
     <Box sx={{ maxWidth: 800, margin: 'auto', p: 3 }}>
@@ -71,7 +57,7 @@ const Reviews = () => {
        error ? <Alert severity="error">{error}</Alert> : (
         <List>
           {reviews.map((review) => (
-            <React.Fragment key={review.id}>
+            <React.Fragment key={review.id}> 
               <ListItem alignItems="flex-start">
                 <ListItemText
                   primary={<strong>{review.username}</strong>}
