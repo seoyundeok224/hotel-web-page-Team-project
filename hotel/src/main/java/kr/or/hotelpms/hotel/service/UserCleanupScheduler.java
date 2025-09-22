@@ -30,7 +30,7 @@ public class UserCleanupScheduler {
         log.info("탈퇴 회원 정리 작업 시작");
         
         try {
-            // 1분 전 시점 계산 (현재 시간에서 1분을 뺀 시점) - 테스트용
+            // 1분 전 시점 계산 (현재 시간에서 1분을 뺀 시점) 
             LocalDateTime cutoffDate = LocalDateTime.now().minusMinutes(1);
             
             // 삭제 대상 사용자 조회

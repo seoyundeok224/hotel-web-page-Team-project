@@ -111,7 +111,7 @@ public class UserService {
             throw new RuntimeException("탈퇴일시가 기록되지 않았습니다.");
         }
 
-        // 1분이 지났는지 확인 (테스트용)
+        // 1분이 지났는지 확인
         LocalDateTime oneMinuteAfterDeletion = user.getDeletedAt().plusMinutes(1);
         if (LocalDateTime.now().isAfter(oneMinuteAfterDeletion)) {
             throw new RuntimeException("탈퇴 취소 기간(1분)이 만료되었습니다.");
