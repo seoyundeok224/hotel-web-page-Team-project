@@ -111,10 +111,10 @@ public class UserService {
             throw new RuntimeException("탈퇴일시가 기록되지 않았습니다.");
         }
 
-        // 3일이 지났는지 확인
-        LocalDateTime threeDaysAfterDeletion = user.getDeletedAt().plusDays(3);
-        if (LocalDateTime.now().isAfter(threeDaysAfterDeletion)) {
-            throw new RuntimeException("탈퇴 취소 기간(3일)이 만료되었습니다.");
+        // 1분이 지났는지 확인 (테스트용)
+        LocalDateTime oneMinuteAfterDeletion = user.getDeletedAt().plusMinutes(1);
+        if (LocalDateTime.now().isAfter(oneMinuteAfterDeletion)) {
+            throw new RuntimeException("탈퇴 취소 기간(1분)이 만료되었습니다.");
         }
 
         // 계정 복구: enabled = true, deletedAt = null

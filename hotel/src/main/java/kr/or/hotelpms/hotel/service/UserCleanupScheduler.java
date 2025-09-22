@@ -30,8 +30,8 @@ public class UserCleanupScheduler {
         log.info("탈퇴 회원 정리 작업 시작");
         
         try {
-            // 3일 전 시점 계산 (현재 시간에서 3일을 뺀 시점)
-            LocalDateTime cutoffDate = LocalDateTime.now().minusDays(3);
+            // 1분 전 시점 계산 (현재 시간에서 1분을 뺀 시점) - 테스트용
+            LocalDateTime cutoffDate = LocalDateTime.now().minusMinutes(1);
             
             // 삭제 대상 사용자 조회
             List<User> usersToDelete = userRepository.findUsersToDelete(cutoffDate);
@@ -77,11 +77,11 @@ public class UserCleanupScheduler {
      * 테스트용 메서드 - 개발 시에만 사용 (운영환경에서는 주석처리 필요)
      * 테스트를 위해 3분 전 탈퇴한 사용자를 삭제 대상으로 설정
      */
-    // @Scheduled(fixedRate = 5000) // 5초마다 실행 - 테스트용이므로 주석처리
+    @Scheduled(fixedRate = 30000) // 30초마다 실행 - 테스트용
     @Transactional
     public void deleteExpiredUsersForTesting() {
-        // 테스트를 위해 3분 전으로 설정 (실제로는 위의 메서드를 사용)
-        LocalDateTime cutoffDate = LocalDateTime.now().minusMinutes(3);
+        // 테스트를 위해 1분 전으로 설정 (실제로는 위의 메서드를 사용)
+        LocalDateTime cutoffDate = LocalDateTime.now().minusMinutes(1);
         
         List<User> usersToDelete = userRepository.findUsersToDelete(cutoffDate);
         

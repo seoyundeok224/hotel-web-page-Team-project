@@ -76,9 +76,9 @@ public class AuthService {
 
         // 탈퇴한 사용자인 경우 특별 처리
         if (!user.getEnabled() && user.getDeletedAt() != null) {
-            // 3일이 지났는지 확인
-            LocalDateTime threeDaysAfterDeletion = user.getDeletedAt().plusDays(3);
-            if (LocalDateTime.now().isAfter(threeDaysAfterDeletion)) {
+            // 1분이 지났는지 확인 (테스트용)
+            LocalDateTime oneMinuteAfterDeletion = user.getDeletedAt().plusMinutes(1);
+            if (LocalDateTime.now().isAfter(oneMinuteAfterDeletion)) {
                 throw new RuntimeException("탈퇴 처리된 계정입니다. 계정이 영구적으로 삭제되었습니다.");
             } else {
                 // 탈퇴 취소 가능 기간 내
