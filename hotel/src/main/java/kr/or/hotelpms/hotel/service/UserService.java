@@ -1,17 +1,19 @@
 package kr.or.hotelpms.hotel.service;
 
-import kr.or.hotelpms.hotel.dto.*;
-import kr.or.hotelpms.hotel.model.User;
-import kr.or.hotelpms.hotel.repository.UserRepository;
+import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.time.LocalDateTime;
+import kr.or.hotelpms.hotel.dto.ChangePasswordRequest;
+import kr.or.hotelpms.hotel.dto.UpdateProfileRequest;
+import kr.or.hotelpms.hotel.dto.UserDto;
+import kr.or.hotelpms.hotel.model.User;
+import kr.or.hotelpms.hotel.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -109,10 +111,10 @@ public class UserService {
             throw new RuntimeException("탈퇴일시가 기록되지 않았습니다.");
         }
 
-        // 3일이 지났는지 확인
-        LocalDateTime threeDaysAfterDeletion = user.getDeletedAt().plusDays(3);
-        if (LocalDateTime.now().isAfter(threeDaysAfterDeletion)) {
-            throw new RuntimeException("탈퇴 취소 기간(3일)이 만료되었습니다.");
+        // 1분이 지났는지 확인
+        LocalDateTime oneMinuteAfterDeletion = user.getDeletedAt().plusMinutes(1);
+        if (LocalDateTime.now().isAfter(oneMinuteAfterDeletion)) {
+            throw new RuntimeException("탈퇴 취소 기간(1분)이 만료되었습니다.");
         }
 
         // 계정 복구: enabled = true, deletedAt = null
