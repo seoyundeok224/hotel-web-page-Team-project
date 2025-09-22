@@ -1,15 +1,16 @@
 package kr.or.hotelpms.hotel.service;
 
-import kr.or.hotelpms.hotel.model.User;
-import kr.or.hotelpms.hotel.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import kr.or.hotelpms.hotel.model.User;
+import kr.or.hotelpms.hotel.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -76,7 +77,7 @@ public class UserCleanupScheduler {
      * 테스트용 메서드 - 개발 시에만 사용 (운영환경에서는 주석처리 필요)
      * 테스트를 위해 3분 전 탈퇴한 사용자를 삭제 대상으로 설정
      */
-    // @Scheduled(fixedRate = 60000) // 1분(60초)마다 실행 - 테스트용이므로 주석처리
+    // @Scheduled(fixedRate = 5000) // 5초마다 실행 - 테스트용이므로 주석처리
     @Transactional
     public void deleteExpiredUsersForTesting() {
         // 테스트를 위해 3분 전으로 설정 (실제로는 위의 메서드를 사용)
