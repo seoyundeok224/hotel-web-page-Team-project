@@ -1,22 +1,25 @@
 package kr.or.hotelpms.hotel.service;
 
-import kr.or.hotelpms.hotel.dto.*;
-import kr.or.hotelpms.hotel.model.Role;
-import kr.or.hotelpms.hotel.model.User;
-import kr.or.hotelpms.hotel.repository.RoleRepository;
-import kr.or.hotelpms.hotel.repository.UserRepository;
-import kr.or.hotelpms.hotel.util.JwtUtil;
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import kr.or.hotelpms.hotel.dto.LoginRequest;
+import kr.or.hotelpms.hotel.dto.LoginResponse;
+import kr.or.hotelpms.hotel.dto.RegisterRequest;
+import kr.or.hotelpms.hotel.dto.UserDto;
+import kr.or.hotelpms.hotel.model.Role;
+import kr.or.hotelpms.hotel.model.User;
+import kr.or.hotelpms.hotel.repository.RoleRepository;
+import kr.or.hotelpms.hotel.repository.UserRepository;
+import kr.or.hotelpms.hotel.util.JwtUtil;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -73,9 +76,9 @@ public class AuthService {
 
         // 탈퇴한 사용자인 경우 특별 처리
         if (!user.getEnabled() && user.getDeletedAt() != null) {
-            // 3일이 지났는지 확인
-            LocalDateTime threeDaysAfterDeletion = user.getDeletedAt().plusDays(3);
-            if (LocalDateTime.now().isAfter(threeDaysAfterDeletion)) {
+            // 1분이 지났는지 확인
+            LocalDateTime oneMinuteAfterDeletion = user.getDeletedAt().plusMinutes(1);
+            if (LocalDateTime.now().isAfter(oneMinuteAfterDeletion)) {
                 throw new RuntimeException("탈퇴 처리된 계정입니다. 계정이 영구적으로 삭제되었습니다.");
             } else {
                 // 탈퇴 취소 가능 기간 내
