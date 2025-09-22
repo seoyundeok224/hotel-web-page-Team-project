@@ -1,17 +1,30 @@
-import React, { useState } from 'react';
-import { 
-  Typography, Container, Box, TextField, Button, Alert, Link, 
-  Dialog, DialogTitle, DialogContent, DialogActions 
+import React, { useState, useEffect } from 'react';
+import {
+  Typography,
+  Container,
+  Box,
+  TextField,
+  Button,
+  Alert,
+  Link,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useNavigate, Link as RouterLink, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { authService, userService } from '../services/hotelService';
 
 const Login = () => {
+  const [searchParams] = useSearchParams();
+  const initialUsername = searchParams.get('username') || '';
+
   const [formData, setFormData] = useState({
-    username: '',
-    password: ''
+    username: initialUsername,
+    password: '',
   });
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
@@ -20,10 +33,17 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
+  useEffect(() => {
+    const usernameFromUrl = searchParams.get('username');
+    if (usernameFromUrl) {
+      setFormData((prev) => ({ ...prev, username: usernameFromUrl }));
+    }
+  }, [searchParams]);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -35,7 +55,7 @@ const Login = () => {
     try {
       const response = await authService.login({
         username: formData.username,
-        password: formData.password
+        password: formData.password,
       });
 
       const { user, token } = response.data;
@@ -64,11 +84,10 @@ const Login = () => {
       await userService.cancelAccountDeletion(currentUsername);
       setCancelDialogOpen(false);
       setError('');
-      
-      // 탈퇴 취소 후 다시 로그인 시도
+
       const response = await authService.login({
         username: formData.username,
-        password: formData.password
+        password: formData.password,
       });
 
       const { user, token } = response.data;
@@ -187,12 +206,7 @@ const Login = () => {
         </Box>
 
         {/* 탈퇴 취소 다이얼로그 */}
-        <Dialog 
-          open={cancelDialogOpen} 
-          onClose={() => setCancelDialogOpen(false)}
-          maxWidth="sm"
-          fullWidth
-        >
+        <Dialog open={cancelDialogOpen} onClose={() => setCancelDialogOpen(false)} maxWidth="sm" fullWidth>
           <DialogTitle sx={{ fontWeight: 'bold', color: '#d32f2f' }}>
             탈퇴 신청된 계정
           </DialogTitle>
@@ -201,8 +215,8 @@ const Login = () => {
               이 계정은 탈퇴 신청이 완료된 상태입니다.
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              • 탈퇴 신청 후 3일 이내에는 탈퇴를 취소할 수 있습니다<br/>
-              • 3일 후에는 계정이 영구적으로 삭제됩니다<br/>
+              • 탈퇴 신청 후 3일 이내에는 탈퇴를 취소할 수 있습니다<br />
+              • 3일 후에는 계정이 영구적으로 삭제됩니다<br />
               • 탈퇴를 취소하면 기존 정보가 모두 복구됩니다
             </Typography>
             <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
@@ -210,18 +224,10 @@ const Login = () => {
             </Typography>
           </DialogContent>
           <DialogActions sx={{ p: 2 }}>
-            <Button 
-              onClick={() => setCancelDialogOpen(false)}
-              color="inherit"
-            >
+            <Button onClick={() => setCancelDialogOpen(false)} color="inherit">
               아니오
             </Button>
-            <Button 
-              onClick={handleCancelWithdrawal}
-              variant="contained"
-              color="primary"
-              sx={{ ml: 1 }}
-            >
+            <Button onClick={handleCancelWithdrawal} variant="contained" color="primary" sx={{ ml: 1 }}>
               탈퇴 취소
             </Button>
           </DialogActions>

@@ -1,9 +1,10 @@
 package kr.or.hotelpms.hotel.repository;
 
-public class ReviewRepository {
-    
-}
+import kr.or.hotelpms.hotel.model.Review;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-// 후기 관련 리포지토리 //
-// 선택 사항 (필요 시) 만들어야 함 //
-// 난이도: 중급 //
+@Repository
+public interface ReviewRepository extends JpaRepository<Review, Long> {
+    // 기본 CRUD 제공됨
+}

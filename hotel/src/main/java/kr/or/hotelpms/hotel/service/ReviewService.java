@@ -1,9 +1,25 @@
 package kr.or.hotelpms.hotel.service;
 
-public class ReviewService {
-    
-}
+import kr.or.hotelpms.hotel.model.Review;
+import kr.or.hotelpms.hotel.repository.ReviewRepository;
+import org.springframework.stereotype.Service;
 
-// 후기 관련 로직 //
-// 선택 사항 (필요 시) 만들어야 함 //
-// 난이도: 중급 (후기 처리) //
+import java.util.List;
+
+@Service
+public class ReviewService {
+
+    private final ReviewRepository reviewRepository;
+
+    public ReviewService(ReviewRepository reviewRepository) {
+        this.reviewRepository = reviewRepository;
+    }
+
+    public List<Review> getAllReviews() {
+        return reviewRepository.findAll();
+    }
+
+    public Review saveReview(Review review) {
+        return reviewRepository.save(review);
+    }
+}

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
@@ -19,4 +20,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 
     // 가격 범위 조회
     List<Room> findByPriceBetween(BigDecimal min, BigDecimal max);
+
+     Optional<Room> findByRoomNumber(String roomNumber);
 }
