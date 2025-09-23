@@ -54,10 +54,12 @@ const App = () => {
           <Route path="/register" element={<MainLayout><Register /></MainLayout>} />
           <Route path="/dining" element={<MainLayout><Dining /></MainLayout>} />
           <Route path="/facilities" element={<MainLayout><Facilities /></MainLayout>} />
-          <Route path="/location" element={<MainLayout><Directions /></MainLayout>} />
+          
+          {/* ✅ 이 부분의 경로를 수정했습니다. */}
+          <Route path="/directions" element={<MainLayout><Directions /></MainLayout>} />
+          
           <Route path="/find-username" element={<MainLayout><FindUsername /></MainLayout>} />
           <Route path="/find-password" element={<MainLayout><FindPassword /></MainLayout>} />
-          {/* --- 경로 수정 --- */}
           <Route path="/reviews" element={<MainLayout><Reviews /></MainLayout>} />
           
           <Route 
