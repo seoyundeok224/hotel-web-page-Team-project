@@ -40,6 +40,12 @@ public class Reservation {
     @Column(name = "people", nullable = false)
     private int people; // 투숙객 수
 
+    @Column(name = "guest_name", columnDefinition = "VARCHAR(100) CHARACTER SET utf8mb4")
+    private String guestName;
+
+    @Column(name = "guest_phone", length = 20)
+    private String guestPhone;
+
     @Column(name = "payment_status", length = 20, nullable = false)
     private String paymentStatus = "PENDING";
 

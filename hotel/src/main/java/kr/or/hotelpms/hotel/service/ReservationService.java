@@ -68,6 +68,8 @@ public class ReservationService {
         reservation.setCheckIn(request.getCheckIn());
         reservation.setCheckOut(request.getCheckOut());
         reservation.setPeople(request.getPeople());
+        reservation.setGuestName(request.getGuestName());
+        reservation.setGuestPhone(request.getGuestPhone());
         reservation.setPaymentStatus("PENDING");
 
         return reservationRepository.save(reservation);

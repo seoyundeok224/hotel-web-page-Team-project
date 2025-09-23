@@ -3,9 +3,9 @@ import {
   Box, Container, Typography, Card, CardContent, Table, TableBody,
   TableCell, TableContainer, TableHead, TableRow, Paper, Button,
   IconButton, TextField, Dialog, DialogTitle, DialogContent, DialogActions,
-  FormControl, InputLabel, Select, MenuItem, Avatar, Chip, Grid
+  FormControl, InputLabel, Select, MenuItem
 } from '@mui/material'
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Home as HomeIcon, People as UsersIcon, BarChart as BarChartIcon } from '@mui/icons-material'
+import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material'
 
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -14,22 +14,6 @@ import dayjs from 'dayjs';
 import { getAllReservations, deleteReservation, createReservation, updateReservation } from '../../services/reservationService'
 import { roomService } from '../../services/roomService'
 import { useAuth } from '../../contexts/AuthContext'
-
-const StatCard = ({ title, count, total, color, icon: Icon }) => {
-  const percentage = total > 0 ? Math.round((count / total) * 100) : 0
-  return (
-    <Card sx={{ p: 2 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems:'center' }}>
-        <Box>
-          <Typography variant="body2">{title}</Typography>
-          <Typography variant="h5">{count}</Typography>
-          <Typography variant="caption">{percentage}%</Typography>
-        </Box>
-        <Avatar sx={{ bgcolor: color + '20' }}><Icon sx={{ color }} /></Avatar>
-      </Box>
-    </Card>
-  )
-}
 
 const Reservations = () => {
   const [reservations, setReservations] = useState([])
@@ -64,25 +48,6 @@ const Reservations = () => {
     fetchReservations()
     fetchRooms()
   }, [])
-
-  // 선택된 기간 기준 예약 상태 통계
-  const getRoomStats = () => {
-    const stats = { AVAILABLE: 0, BOOKED: 0, OCCUPIED: 0, MAINTENANCE: 0 }
-    rooms.forEach(r => {
-      const hasReservation = reservations.some(res =>
-        res.room?.id === r.id &&
-        selectedRange.checkIn && selectedRange.checkOut &&
-        (
-          dayjs(selectedRange.checkIn).isBetween(dayjs(res.checkIn), dayjs(res.checkOut), null, '[)') ||
-          dayjs(selectedRange.checkOut).isBetween(dayjs(res.checkIn), dayjs(res.checkOut), null, '(]') ||
-          dayjs(res.checkIn).isBetween(dayjs(selectedRange.checkIn), dayjs(selectedRange.checkOut), null, '[)')
-        )
-      )
-      const status = hasReservation ? 'BOOKED' : r.status
-      stats[status] = (stats[status] || 0) + 1
-    })
-    return stats
-  }
 
   const handleFormChange = (name, value) => {
     setFormData(prev => ({ ...prev, [name]: value }))
@@ -141,6 +106,8 @@ const Reservations = () => {
     try {
         const payload = {
             username: user.username,
+            guestName: formData.guestName,
+            guestPhone: formData.guestPhone,
             roomNumber: selectedRoom.roomNumber,
             checkIn: formData.checkIn,
             checkOut: formData.checkOut,
@@ -180,20 +147,10 @@ const Reservations = () => {
     )
   })
 
-  const stats = getRoomStats()
-
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 'bold' }}>예약 관리</Typography>
-      </Box>
-
-      {/* 예약 통계 */}
-      <Box sx={{ display:'flex', gap:2, mb:4 }}>
-        <StatCard title="이용가능" count={stats['AVAILABLE']} total={rooms.length} color="#2e7d32" icon={HomeIcon} />
-        <StatCard title="예약됨" count={stats['BOOKED']} total={rooms.length} color="#1976d2" icon={UsersIcon} />
-        <StatCard title="투숙중" count={stats['OCCUPIED']} total={rooms.length} color="#d32f2f" icon={UsersIcon} />
-        <StatCard title="정비중" count={stats['MAINTENANCE']} total={rooms.length} color="#ed6c02" icon={BarChartIcon} />
       </Box>
 
       <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenModal()}>새 예약</Button>

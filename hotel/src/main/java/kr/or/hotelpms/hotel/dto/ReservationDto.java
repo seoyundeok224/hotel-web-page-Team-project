@@ -16,6 +16,8 @@ public class ReservationDto {
     @AllArgsConstructor
     public static class ReservationRequest {
         private String username;    // 로그인 아이디
+        private String guestName;   // 고객명
+        private String guestPhone;  // 고객 연락처
         private String roomNumber;  // 객실번호
         private LocalDate checkIn;
         private LocalDate checkOut;
@@ -39,8 +41,8 @@ public class ReservationDto {
         public ReservationResponse(Reservation reservation) {
             this.id = reservation.getId();
             this.reservationNumber = "RSV-" + String.format("%03d", reservation.getId());
-            this.guestName = reservation.getUser().getName();
-            this.guestPhone = reservation.getUser().getPhone();
+            this.guestName = reservation.getGuestName() != null ? reservation.getGuestName() : reservation.getUser().getName();
+            this.guestPhone = reservation.getGuestPhone() != null ? reservation.getGuestPhone() : reservation.getUser().getPhone();
             this.roomNumber = reservation.getRoom().getRoomNumber();
             this.roomType = reservation.getRoom().getRoomType(); // 엔티티에 맞게 수정
             this.checkIn = reservation.getCheckIn();
