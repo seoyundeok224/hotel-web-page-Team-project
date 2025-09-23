@@ -176,6 +176,7 @@ const Reservations = () => {
                 <TableCell>{r.checkIn} ~ {r.checkOut}</TableCell>
                 <TableCell>{r.people}명</TableCell>
                 <TableCell>
+                  <Button variant="contained" size="small" sx={{ mr: 1 }}>체크인</Button>
                   <IconButton color="primary" onClick={() => handleOpenModal(r)}><EditIcon /></IconButton>
                   <IconButton color="error" onClick={() => handleDelete(r.id)}><DeleteIcon /></IconButton>
                 </TableCell>
