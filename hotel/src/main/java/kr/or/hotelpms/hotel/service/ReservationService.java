@@ -94,6 +94,38 @@ public class ReservationService {
         reservationRepository.deleteById(reservationId);
     }
 
+    @Transactional
+    public Reservation updateReservation(Long reservationId, ReservationDto.ReservationRequest request) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+
+        // 방 번호로 방을 찾습니다.
+        Room room = roomRepository.findByRoomNumber(request.getRoomNumber())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 객실입니다."));
+
+        if (!request.getCheckIn().isBefore(request.getCheckOut())) {
+            throw new IllegalArgumentException("체크인 날짜는 체크아웃 날짜보다 앞서야 합니다.");
+        }
+
+        // 현재 예약을 제외하고 겹치는 예약을 확인합니다.
+        boolean overlapExists = reservationRepository
+                .findByRoomIdAndCheckOutAfterAndCheckInBefore(room.getId(), request.getCheckIn(), request.getCheckOut()).stream()
+                .anyMatch(r -> !r.getId().equals(reservationId));
+
+        if (overlapExists) {
+            throw new IllegalStateException("해당 기간에 이미 예약이 존재합니다.");
+        }
+
+        reservation.setRoom(room);
+        reservation.setCheckIn(request.getCheckIn());
+        reservation.setCheckOut(request.getCheckOut());
+        reservation.setPeople(request.getPeople());
+        reservation.setGuestName(request.getGuestName());
+        reservation.setGuestPhone(request.getGuestPhone());
+
+        return reservationRepository.saveAndFlush(reservation);
+    }
+
     @Transactional(readOnly = true)
     public List<ReservationDto.ReservationResponse> getReservationsByDate(LocalDate date) {
         List<Reservation> reservations = reservationRepository.findAll().stream()

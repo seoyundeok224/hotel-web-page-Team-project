@@ -52,4 +52,13 @@ public class ReservationController {
         reservationService.deleteReservation(id);
         return ResponseEntity.noContent().build();
     }
+
+    // 예약 수정
+    @PutMapping("/{id}")
+    public ResponseEntity<ReservationDto.ReservationResponse> updateReservation(
+            @PathVariable Long id,
+            @RequestBody ReservationDto.ReservationRequest request) {
+        Reservation updatedReservation = reservationService.updateReservation(id, request);
+        return ResponseEntity.ok(new ReservationDto.ReservationResponse(updatedReservation));
+    }
 }
