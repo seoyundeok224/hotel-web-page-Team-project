@@ -1,35 +1,14 @@
-// src/pages/admin/RoomManagementFixed.jsx
+// 주요 변경: CLEANING → BOOKED, 버튼/드롭다운/통계 반영
 import { useState, useEffect } from 'react'
 import {
-    Box,
-    Container,
-    Typography,
-    Card,
-    CardContent,
-    Grid,
-    Button,
-    TextField,
-    Select,
-    MenuItem,
-    FormControl,
-    InputLabel,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Chip,
-    Paper,
-    IconButton,
-    InputAdornment,
-    Avatar
+    Box, Container, Typography, Card, CardContent, Grid, Button,
+    TextField, Select, MenuItem, FormControl, InputLabel, Dialog,
+    DialogTitle, DialogContent, DialogActions, Chip, Avatar, IconButton,
+    InputAdornment
 } from '@mui/material'
 import {
-    Add as PlusIcon,
-    Search as SearchIcon,
-    Edit as EditIcon,
-    People as UsersIcon,
-    Home as HomeIcon,
-    BarChart as BarChartIcon
+    Add as PlusIcon, Search as SearchIcon, Edit as EditIcon,
+    People as UsersIcon, Home as HomeIcon, BarChart as BarChartIcon
 } from '@mui/icons-material'
 import { roomService } from '../../services/roomService'
 
@@ -48,14 +27,13 @@ const getRoomTypeLabel = (type) => {
     return foundType ? foundType.label : type;
 };
 
-// 개별 객실 카드
 const RoomCard = ({ room, onStatusChange, onEdit }) => {
     const getStatusInfo = (status) => {
         switch (status) {
             case 'AVAILABLE': return { label: '이용가능', color: '#2e7d32', bgColor: '#e8f5e8' }
-            case 'OCCUPIED': return { label: '투숙중', color: '#d32f2f', bgColor: '#ffebee' }
+            case 'BOOKED':    return { label: '예약됨', color: '#1976d2', bgColor: '#e3f2fd' }
+            case 'OCCUPIED':  return { label: '투숙중', color: '#d32f2f', bgColor: '#ffebee' }
             case 'MAINTENANCE': return { label: '정비중', color: '#ed6c02', bgColor: '#fff3e0' }
-            case 'CLEANING': return { label: '청소중', color: '#1976d2', bgColor: '#e3f2fd' }
             default: return { label: status, color: '#757575', bgColor: '#f5f5f5' }
         }
     }
@@ -63,7 +41,7 @@ const RoomCard = ({ room, onStatusChange, onEdit }) => {
     const statusInfo = getStatusInfo(room.status)
 
     const handleStatusToggle = () => {
-        const statuses = ['AVAILABLE', 'OCCUPIED', 'CLEANING', 'MAINTENANCE']
+        const statuses = ['AVAILABLE', 'BOOKED', 'OCCUPIED', 'MAINTENANCE']
         const nextIndex = (statuses.indexOf(room.status) + 1) % statuses.length
         onStatusChange(room.id, statuses[nextIndex])
     }

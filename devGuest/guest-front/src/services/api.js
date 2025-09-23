@@ -1,5 +1,8 @@
 // API 기본 설정
+//const API_BASE_URL = 'http://ec2-13-209-26-60.ap-northeast-2.compute.amazonaws.com:8080/api';
+//배포용 URL
 const API_BASE_URL = 'http://localhost:8080/api';
+//개발용 URL
 
 // HTTP 요청을 위한 헬퍼 함수
 const apiRequest = async (endpoint, options = {}) => {

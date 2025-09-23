@@ -18,13 +18,11 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
 
-    // 초기 객실 생성
     @Transactional
     public void createInitialRooms() {
         if (roomRepository.count() == 0) {
             List<Room> rooms = new ArrayList<>();
 
-            // 3층 - 싱글 (20)
             for (int i = 1; i <= 20; i++) {
                 Room room = new Room();
                 room.setRoomNumber("3" + String.format("%02d", i));
@@ -34,7 +32,6 @@ public class RoomService {
                 rooms.add(room);
             }
 
-            // 4층 - 더블(10), 패밀리(10)
             for (int i = 1; i <= 10; i++) {
                 Room room = new Room();
                 room.setRoomNumber("4" + String.format("%02d", i));
@@ -43,6 +40,7 @@ public class RoomService {
                 room.setStatus(RoomStatus.AVAILABLE);
                 rooms.add(room);
             }
+
             for (int i = 11; i <= 20; i++) {
                 Room room = new Room();
                 room.setRoomNumber("4" + String.format("%02d", i));
@@ -52,7 +50,6 @@ public class RoomService {
                 rooms.add(room);
             }
 
-            // 5층 - 디럭스(10), 스위트(10)
             for (int i = 1; i <= 10; i++) {
                 Room room = new Room();
                 room.setRoomNumber("5" + String.format("%02d", i));
@@ -61,6 +58,7 @@ public class RoomService {
                 room.setStatus(RoomStatus.AVAILABLE);
                 rooms.add(room);
             }
+
             for (int i = 11; i <= 20; i++) {
                 Room room = new Room();
                 room.setRoomNumber("5" + String.format("%02d", i));
@@ -70,7 +68,6 @@ public class RoomService {
                 rooms.add(room);
             }
 
-            // 6층 - 컨퍼런스(5)
             for (int i = 1; i <= 5; i++) {
                 Room room = new Room();
                 room.setRoomNumber("6" + String.format("%02d", i));
@@ -84,64 +81,52 @@ public class RoomService {
         }
     }
 
-    // 전체 조회
     public List<Room> getAllRooms() {
         return roomRepository.findAll();
     }
 
-    // ID로 조회
     public Optional<Room> getRoomById(Long id) {
         return roomRepository.findById(id);
     }
 
-    // 상태별 조회
     public List<Room> getRoomsByStatus(RoomStatus status) {
         return roomRepository.findAll().stream()
                 .filter(room -> room.getStatus() == status)
                 .toList();
     }
 
-    // 타입별 조회
     public List<Room> getRoomsByType(String type) {
         return roomRepository.findAll().stream()
                 .filter(room -> room.getRoomType().equalsIgnoreCase(type))
                 .toList();
     }
 
-    // 가격 범위 조회
     public List<Room> getRoomsByPriceRange(BigDecimal min, BigDecimal max) {
         return roomRepository.findAll().stream()
                 .filter(room -> room.getPrice().compareTo(min) >= 0 && room.getPrice().compareTo(max) <= 0)
                 .toList();
     }
 
-    // 객실 생성
     @Transactional
     public Room createRoom(Room room) {
         return roomRepository.save(room);
     }
 
-    // 객실 수정
     @Transactional
     public Optional<Room> updateRoom(Long id, Room roomDetails) {
         return roomRepository.findById(id).map(room -> {
-            if (roomDetails.getRoomNumber() != null) {
+            if (roomDetails.getRoomNumber() != null)
                 room.setRoomNumber(roomDetails.getRoomNumber());
-            }
-            if (roomDetails.getRoomType() != null) {
+            if (roomDetails.getRoomType() != null)
                 room.setRoomType(roomDetails.getRoomType());
-            }
-            if (roomDetails.getPrice() != null) {
+            if (roomDetails.getPrice() != null)
                 room.setPrice(roomDetails.getPrice());
-            }
-            if (roomDetails.getStatus() != null) {
+            if (roomDetails.getStatus() != null)
                 room.setStatus(roomDetails.getStatus());
-            }
             return roomRepository.save(room);
         });
     }
 
-    // 객실 삭제
     @Transactional
     public boolean deleteRoom(Long id) {
         return roomRepository.findById(id).map(room -> {
@@ -150,7 +135,6 @@ public class RoomService {
         }).orElse(false);
     }
 
-    // ✅ 객실 상태만 업데이트
     @Transactional
     public Optional<Room> updateRoomStatus(Long roomId, RoomStatus status) {
         return roomRepository.findById(roomId).map(room -> {
