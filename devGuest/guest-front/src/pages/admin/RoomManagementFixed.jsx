@@ -1,4 +1,4 @@
-// 주요 변경: CLEANING → BOOKED, 버튼/드롭다운/통계 반영
+// 주요 변경: CLEANING → BOOKED, 순서 고정 (AVAILABLE → BOOKED → OCCUPIED → MAINTENANCE)
 import { useState, useEffect } from 'react'
 import {
     Box, Container, Typography, Card, CardContent, Grid, Button,
@@ -27,6 +27,9 @@ const getRoomTypeLabel = (type) => {
     return foundType ? foundType.label : type;
 };
 
+// ✅ 상태 순서 정의
+const STATUS_ORDER = ['AVAILABLE', 'BOOKED', 'OCCUPIED', 'MAINTENANCE'];
+
 const RoomCard = ({ room, onStatusChange, onEdit }) => {
     const getStatusInfo = (status) => {
         switch (status) {
@@ -41,9 +44,9 @@ const RoomCard = ({ room, onStatusChange, onEdit }) => {
     const statusInfo = getStatusInfo(room.status)
 
     const handleStatusToggle = () => {
-        const statuses = ['AVAILABLE', 'BOOKED', 'OCCUPIED', 'MAINTENANCE']
-        const nextIndex = (statuses.indexOf(room.status) + 1) % statuses.length
-        onStatusChange(room.id, statuses[nextIndex])
+        const currentIndex = STATUS_ORDER.indexOf(room.status)
+        const nextIndex = (currentIndex + 1) % STATUS_ORDER.length
+        onStatusChange(room.id, STATUS_ORDER[nextIndex])
     }
 
     return (
@@ -174,7 +177,7 @@ const RoomManagement = () => {
 
     const generateDummyRooms = () => {
         const rooms = []
-        const statuses = ['AVAILABLE', 'OCCUPIED', 'CLEANING', 'MAINTENANCE']
+        const statuses = STATUS_ORDER // ✅ 더 이상 CLEANING 없음
         const randomStatus = () => statuses[Math.floor(Math.random() * statuses.length)]
         for (let f = 3; f <= 6; f++) {
             let count = f === 6 ? 5 : 20
@@ -227,8 +230,8 @@ const RoomManagement = () => {
 
                 <Box sx={{ display:'flex', gap:2, mb:4 }}>
                     <StatCard title="이용가능" count={stats['AVAILABLE'] || 0} total={filteredRooms.length} color="#2e7d32" icon={HomeIcon} />
+                    <StatCard title="예약됨" count={stats['BOOKED'] || 0} total={filteredRooms.length} color="#1976d2" icon={BarChartIcon} />
                     <StatCard title="투숙중" count={stats['OCCUPIED'] || 0} total={filteredRooms.length} color="#d32f2f" icon={UsersIcon} />
-                    <StatCard title="청소중" count={stats['CLEANING'] || 0} total={filteredRooms.length} color="#1976d2" icon={BarChartIcon} />
                     <StatCard title="정비중" count={stats['MAINTENANCE'] || 0} total={filteredRooms.length} color="#ed6c02" icon={BarChartIcon} />
                 </Box>
 
@@ -244,8 +247,8 @@ const RoomManagement = () => {
                         <Select value={statusFilter} onChange={e=>setStatusFilter(e.target.value)} label="상태">
                             <MenuItem value="ALL">전체</MenuItem>
                             <MenuItem value="AVAILABLE">이용가능</MenuItem>
+                            <MenuItem value="BOOKED">예약됨</MenuItem>
                             <MenuItem value="OCCUPIED">투숙중</MenuItem>
-                            <MenuItem value="CLEANING">청소중</MenuItem>
                             <MenuItem value="MAINTENANCE">정비중</MenuItem>
                         </Select>
                     </FormControl>
@@ -280,8 +283,8 @@ const RoomManagement = () => {
                             <InputLabel>상태</InputLabel>
                             <Select value={formData.status} onChange={e=>setFormData({...formData, status:e.target.value})} label="상태">
                                 <MenuItem value="AVAILABLE">이용가능</MenuItem>
+                                <MenuItem value="BOOKED">예약됨</MenuItem>
                                 <MenuItem value="OCCUPIED">투숙중</MenuItem>
-                                <MenuItem value="CLEANING">청소중</MenuItem>
                                 <MenuItem value="MAINTENANCE">정비중</MenuItem>
                             </Select>
                         </FormControl>
