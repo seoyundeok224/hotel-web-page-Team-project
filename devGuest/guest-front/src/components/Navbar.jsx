@@ -7,6 +7,7 @@ import {
 } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { NavLink as RouterNavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext'; // ✨ 1. 이 줄이 추가되었습니다.
 
 // Icons
 import MenuIcon from '@mui/icons-material/Menu';
@@ -21,13 +22,7 @@ import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import HotelIcon from '@mui/icons-material/Hotel';
 
-// Mock Auth Hook
-const useAuth = () => ({
-    isAuthenticated: false,
-    isAdmin: false,
-    user: { name: 'Guest' },
-    logout: () => console.log('logout'),
-});
+// ✨ 2. 아래의 가짜(Mock) useAuth 훅이 삭제되었습니다.
 
 // ✅ [수정 가능] 호텔 전체의 브랜드 색상과 글꼴을 여기서 변경할 수 있습니다.
 const hotelTheme = createTheme({
@@ -65,7 +60,7 @@ const NavbarComponent = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
     const navigate = useNavigate();
-    const { isAuthenticated, isAdmin, user, logout } = useAuth();
+    const { isAuthenticated, isAdmin, user, logout } = useAuth(); // 이제 진짜 useAuth를 사용합니다.
 
     const trigger = useScrollTrigger({
         disableHysteresis: true,
