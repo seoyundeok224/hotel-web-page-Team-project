@@ -62,6 +62,10 @@ const apiRequest = async (endpoint, options = {}) => {
       throw error;
     }
 
+    if (response.status === 204) {
+      return null; // 204 No Content 응답은 내용이 없으므로 null 반환
+    }
+
     return await response.json();
   } catch (error) {
     console.error('API request failed:', error);
