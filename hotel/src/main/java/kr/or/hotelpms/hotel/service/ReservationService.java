@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -89,5 +90,15 @@ public class ReservationService {
     @Transactional
     public void deleteReservation(Long reservationId) {
         reservationRepository.deleteById(reservationId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservationDto.ReservationResponse> getReservationsByDate(LocalDate date) {
+        List<Reservation> reservations = reservationRepository.findAll().stream()
+                .filter(r -> !date.isBefore(r.getCheckIn()) && date.isBefore(r.getCheckOut()))
+                .toList();
+        return reservations.stream()
+                .map(ReservationDto.ReservationResponse::new)
+                .collect(Collectors.toList());
     }
 }

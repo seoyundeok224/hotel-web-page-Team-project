@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -19,8 +20,7 @@ public class ReservationController {
     // 예약 등록
     @PostMapping
     public ResponseEntity<ReservationDto.ReservationResponse> createReservation(
-            @RequestBody ReservationDto.ReservationRequest request
-    ) {
+            @RequestBody ReservationDto.ReservationRequest request) {
         Reservation reservation = reservationService.createReservationByUsername(request);
         return ResponseEntity.ok(new ReservationDto.ReservationResponse(reservation));
     }
@@ -35,6 +35,15 @@ public class ReservationController {
     @GetMapping("/admin/all")
     public ResponseEntity<List<ReservationDto.ReservationResponse>> getAllReservations() {
         return ResponseEntity.ok(reservationService.getAllReservations());
+    }
+
+    // 날짜별 예약 조회 (프론트 달력용)
+    @GetMapping("/date")
+    public ResponseEntity<List<ReservationDto.ReservationResponse>> getReservationsByDate(
+            @RequestParam("date") String dateStr) {
+        LocalDate date = LocalDate.parse(dateStr); // yyyy-MM-dd 형식
+        List<ReservationDto.ReservationResponse> reservations = reservationService.getReservationsByDate(date);
+        return ResponseEntity.ok(reservations);
     }
 
     // 예약 삭제

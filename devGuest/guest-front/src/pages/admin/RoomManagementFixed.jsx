@@ -1,4 +1,3 @@
-// 주요 변경: CLEANING → BOOKED, 순서 고정 (AVAILABLE → BOOKED → OCCUPIED → MAINTENANCE)
 import { useState, useEffect } from 'react'
 import {
     Box, Container, Typography, Card, CardContent, Grid, Button,
@@ -10,6 +9,10 @@ import {
     Add as PlusIcon, Search as SearchIcon, Edit as EditIcon,
     People as UsersIcon, Home as HomeIcon, BarChart as BarChartIcon
 } from '@mui/icons-material'
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import axios from 'axios';
 import { roomService } from '../../services/roomService'
 
 const ROOM_TYPES = [
@@ -27,11 +30,11 @@ const getRoomTypeLabel = (type) => {
     return foundType ? foundType.label : type;
 };
 
-// ✅ 상태 순서 정의
-const STATUS_ORDER = ['AVAILABLE', 'BOOKED', 'OCCUPIED', 'MAINTENANCE'];
+const RoomCard = ({ room, reservationsByDate, onStatusChange, onEdit }) => {
+    const getStatusInfo = (room) => {
+        const hasReservation = reservationsByDate?.some(r => r.room.id === room.id)
+        const status = hasReservation ? 'BOOKED' : room.status
 
-const RoomCard = ({ room, onStatusChange, onEdit }) => {
-    const getStatusInfo = (status) => {
         switch (status) {
             case 'AVAILABLE': return { label: '이용가능', color: '#2e7d32', bgColor: '#e8f5e8' }
             case 'BOOKED':    return { label: '예약됨', color: '#1976d2', bgColor: '#e3f2fd' }
@@ -41,12 +44,13 @@ const RoomCard = ({ room, onStatusChange, onEdit }) => {
         }
     }
 
-    const statusInfo = getStatusInfo(room.status)
+    const statusInfo = getStatusInfo(room)
 
     const handleStatusToggle = () => {
-        const currentIndex = STATUS_ORDER.indexOf(room.status)
-        const nextIndex = (currentIndex + 1) % STATUS_ORDER.length
-        onStatusChange(room.id, STATUS_ORDER[nextIndex])
+        const statuses = ['AVAILABLE', 'BOOKED', 'OCCUPIED', 'MAINTENANCE']
+        const currentIndex = statuses.indexOf(room.status)
+        const nextIndex = (currentIndex + 1) % statuses.length
+        onStatusChange(room.id, statuses[nextIndex])
     }
 
     return (
@@ -72,8 +76,7 @@ const RoomCard = ({ room, onStatusChange, onEdit }) => {
     )
 }
 
-// 층별 그룹
-const FloorSection = ({ floor, rooms, onStatusChange, onEdit }) => (
+const FloorSection = ({ floor, rooms, reservationsByDate, onStatusChange, onEdit }) => (
     <Box sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, borderBottom: '1px solid #e0e0e0' }}>
             <HomeIcon />
@@ -81,12 +84,15 @@ const FloorSection = ({ floor, rooms, onStatusChange, onEdit }) => (
             <Chip label={`${rooms.length}개 객실`} size="small" />
         </Box>
         <Grid container spacing={2}>
-            {rooms.map(room => <Grid xs={12} sm={6} md={4} lg={3} key={room.id}><RoomCard room={room} onStatusChange={onStatusChange} onEdit={onEdit} /></Grid>)}
+            {rooms.map(room => (
+                <Grid xs={12} sm={6} md={4} lg={3} key={room.id}>
+                    <RoomCard room={room} reservationsByDate={reservationsByDate} onStatusChange={onStatusChange} onEdit={onEdit} />
+                </Grid>
+            ))}
         </Grid>
     </Box>
 )
 
-// 통계 카드
 const StatCard = ({ title, count, total, color, icon: Icon }) => {
     const percentage = total > 0 ? Math.round((count / total) * 100) : 0
     return (
@@ -120,6 +126,8 @@ const RoomManagement = () => {
         status: 'AVAILABLE',
         description: ''
     })
+    const [selectedDate, setSelectedDate] = useState(dayjs())
+    const [reservationsByDate, setReservationsByDate] = useState([])
 
     useEffect(() => {
         if (editingRoom) {
@@ -146,6 +154,20 @@ const RoomManagement = () => {
     useEffect(() => { loadRooms() }, [])
     useEffect(() => { filterRooms() }, [rooms, searchTerm, statusFilter, typeFilter])
 
+    useEffect(() => {
+        if (!selectedDate) return;
+        const fetchReservations = async () => {
+            try {
+                const res = await axios.get(`/api/reservations/date?date=${selectedDate.format('YYYY-MM-DD')}`)
+                setReservationsByDate(res.data)
+            } catch (err) {
+                console.error('날짜별 예약 조회 실패', err)
+                setReservationsByDate([])
+            }
+        }
+        fetchReservations()
+    }, [selectedDate])
+
     const loadRooms = async () => {
         try {
             setLoading(true);
@@ -169,7 +191,7 @@ const RoomManagement = () => {
 
         } catch (error) {
             console.error("Error in loadRooms, falling back to dummy data", error);
-            setRooms(generateDummyRooms()); // Keep dummy data as a fallback on catastrophic failure
+            setRooms(generateDummyRooms());
         } finally {
             setLoading(false);
         }
@@ -177,7 +199,7 @@ const RoomManagement = () => {
 
     const generateDummyRooms = () => {
         const rooms = []
-        const statuses = STATUS_ORDER // ✅ 더 이상 CLEANING 없음
+        const statuses = ['AVAILABLE', 'OCCUPIED', 'MAINTENANCE']
         const randomStatus = () => statuses[Math.floor(Math.random() * statuses.length)]
         for (let f = 3; f <= 6; f++) {
             let count = f === 6 ? 5 : 20
@@ -216,25 +238,40 @@ const RoomManagement = () => {
 
     const floorGroups = groupRoomsByFloor(filteredRooms)
     const stats = filteredRooms.reduce((acc, r) => {
-        acc[r.status] = (acc[r.status] || 0) + 1
+        const hasReservation = reservationsByDate?.some(res => res.room.id === r.id)
+        const status = hasReservation ? 'BOOKED' : r.status
+        acc[status] = (acc[status] || 0) + 1
         return acc
     }, {})
 
     return (
         <Box sx={{ minHeight:'100vh', py:4, backgroundColor:'#f5f5f5' }}>
             <Container maxWidth="xl">
-                <Box sx={{ display:'flex', justifyContent:'space-between', mb:4 }}>
+                <Box sx={{ display:'flex', justifyContent:'space-between', mb:4, flexWrap:'wrap', gap:2 }}>
                     <Typography variant="h3">객실 관리</Typography>
                     <Button variant="contained" startIcon={<PlusIcon />} onClick={() => setShowModal(true)}>객실 추가</Button>
                 </Box>
 
-                <Box sx={{ display:'flex', gap:2, mb:4 }}>
-                    <StatCard title="이용가능" count={stats['AVAILABLE'] || 0} total={filteredRooms.length} color="#2e7d32" icon={HomeIcon} />
-                    <StatCard title="예약됨" count={stats['BOOKED'] || 0} total={filteredRooms.length} color="#1976d2" icon={BarChartIcon} />
-                    <StatCard title="투숙중" count={stats['OCCUPIED'] || 0} total={filteredRooms.length} color="#d32f2f" icon={UsersIcon} />
-                    <StatCard title="정비중" count={stats['MAINTENANCE'] || 0} total={filteredRooms.length} color="#ed6c02" icon={BarChartIcon} />
+                {/* 상단: 달력 + 통계 카드 */}
+                <Box sx={{ display:'flex', alignItems:'center', justifyContent:'space-between', mb:4, flexWrap:'wrap', gap:2 }}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker
+                            label="날짜 선택"
+                            value={selectedDate}
+                            onChange={(newValue) => setSelectedDate(newValue)}
+                            renderInput={(params) => <TextField {...params} size="small" />}
+                        />
+                    </LocalizationProvider>
+
+                    <Box sx={{ display:'flex', gap:2, flexWrap:'wrap' }}>
+                        <StatCard title="이용가능" count={stats['AVAILABLE'] || 0} total={filteredRooms.length} color="#2e7d32" icon={HomeIcon} />
+                        <StatCard title="예약됨" count={stats['BOOKED'] || 0} total={filteredRooms.length} color="#1976d2" icon={UsersIcon} />
+                        <StatCard title="투숙중" count={stats['OCCUPIED'] || 0} total={filteredRooms.length} color="#d32f2f" icon={UsersIcon} />
+                        <StatCard title="정비중" count={stats['MAINTENANCE'] || 0} total={filteredRooms.length} color="#ed6c02" icon={BarChartIcon} />
+                    </Box>
                 </Box>
 
+                {/* 검색 & 필터 */}
                 <Box sx={{ display:'flex', gap:2, mb:4 }}>
                     <TextField
                         label="검색"
@@ -263,8 +300,10 @@ const RoomManagement = () => {
                     </FormControl>
                 </Box>
 
-                {floorGroups.map(group => <FloorSection key={group.floor} floor={group.floor} rooms={group.rooms} onStatusChange={handleStatusChange} onEdit={(room)=>{ setEditingRoom(room); setShowModal(true)}} />)}
+                {/* 객실 그룹 */}
+                {floorGroups.map(group => <FloorSection key={group.floor} floor={group.floor} rooms={group.rooms} reservationsByDate={reservationsByDate} onStatusChange={handleStatusChange} onEdit={(room)=>{ setEditingRoom(room); setShowModal(true)}} />)}
 
+                {/* 모달 */}
                 <Dialog open={showModal} onClose={()=>{ setShowModal(false); setEditingRoom(null)}} maxWidth="sm" fullWidth>
                     <DialogTitle>{editingRoom ? '객실 수정' : '객실 추가'}</DialogTitle>
                     <DialogContent sx={{ display:'flex', flexDirection:'column', gap: 3, pt: '10px' }}>
