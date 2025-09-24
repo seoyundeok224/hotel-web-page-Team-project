@@ -10,6 +10,8 @@ import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/ico
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+dayjs.extend(isBetween);
 
 import { getAllReservations, deleteReservation, createReservation, updateReservation } from '../../services/reservationService'
 import { roomService } from '../../services/roomService'
@@ -59,7 +61,7 @@ const Reservations = () => {
       setFormData({
         guestName: reservation.guestName,
         guestPhone: reservation.guestPhone,
-        roomId: reservation.room?.id || '',
+        roomId: reservation.roomId || '',
         checkIn: dayjs(reservation.checkIn),
         checkOut: dayjs(reservation.checkOut),
         people: reservation.people
@@ -84,7 +86,7 @@ const Reservations = () => {
 
     // 예약 겹침 체크
     const overlap = reservations.some(r =>
-      r.room?.id === formData.roomId &&
+      r.roomId === formData.roomId &&
       (
         dayjs(formData.checkIn).isBetween(dayjs(r.checkIn), dayjs(r.checkOut), null, '[)') ||
         dayjs(formData.checkOut).isBetween(dayjs(r.checkIn), dayjs(r.checkOut), null, '(]') ||
@@ -137,7 +139,7 @@ const Reservations = () => {
   const availableRooms = rooms.filter(r => {
     if (!formData.checkIn || !formData.checkOut) return true
     return !reservations.some(res =>
-      res.room?.id === r.id &&
+      res.roomId === r.id &&
       (
         dayjs(formData.checkIn).isBetween(dayjs(res.checkIn), dayjs(res.checkOut), null, '[)') ||
         dayjs(formData.checkOut).isBetween(dayjs(res.checkIn), dayjs(res.checkOut), null, '(]') ||
@@ -172,7 +174,7 @@ const Reservations = () => {
               <TableRow key={r.id}>
                 <TableCell>{r.reservationNumber}</TableCell>
                 <TableCell>{r.guestName}</TableCell>
-                <TableCell>{r.room?.roomNumber} ({r.room?.roomType})</TableCell>
+                <TableCell>{r.roomNumber} ({r.roomType})</TableCell>
                 <TableCell>{r.checkIn} ~ {r.checkOut}</TableCell>
                 <TableCell>{r.people}명</TableCell>
                 <TableCell>

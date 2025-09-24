@@ -31,6 +31,7 @@ public class ReservationDto {
         private String reservationNumber;
         private String guestName;
         private String guestPhone;
+        private Long roomId;
         private String roomNumber;
         private String roomType;
         private LocalDate checkIn;
@@ -43,6 +44,7 @@ public class ReservationDto {
             this.reservationNumber = "RSV-" + String.format("%03d", reservation.getId());
             this.guestName = reservation.getGuestName() != null ? reservation.getGuestName() : reservation.getUser().getName();
             this.guestPhone = reservation.getGuestPhone() != null ? reservation.getGuestPhone() : reservation.getUser().getPhone();
+            this.roomId = reservation.getRoom().getId();
             this.roomNumber = reservation.getRoom().getRoomNumber();
             this.roomType = reservation.getRoom().getRoomType(); // 엔티티에 맞게 수정
             this.checkIn = reservation.getCheckIn();
