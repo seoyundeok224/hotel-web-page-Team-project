@@ -1,6 +1,5 @@
 package kr.or.hotelpms.hotel.service;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -119,7 +118,7 @@ public class AuthService {
         // 이메일로 임시 비밀번호 전송
         try {
             emailService.sendTemporaryPassword(user.getEmail(), tempPassword);
-        } catch (IOException e) {
+        } catch (Exception e) {
             // 이메일 전송 실패 시 예외 처리 (예: 로깅)
             e.printStackTrace();
             throw new RuntimeException("임시 비밀번호 이메일 전송에 실패했습니다.");
