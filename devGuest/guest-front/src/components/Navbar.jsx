@@ -38,10 +38,8 @@ const hotelTheme = createTheme({
     },
 });
 
-/** [데이터] 네비게이션 바 메뉴의 내용과 구조를 정의합니다. */
 const menuData = {
     '호텔 소개': [
-        // [복원] 각 메뉴 항목에 desc (설명) 속성을 다시 추가했습니다.
         { text: '객실 소개', to: '/rooms', icon: <RoomServiceIcon />, desc: '편안하고 아늑한 객실을 만나보세요.' },
         { text: '다이닝', to: '/dining', icon: <RestaurantMenuIcon />, desc: '최고의 셰프가 선사하는 미식의 향연.' },
     ],
@@ -217,17 +215,22 @@ const NavbarComponent = () => {
                         Dev Hotel
                     </Typography>
                     
-                    <Box
-                        ref={menuBoxRef}
-                        onMouseEnter={handlePopoverOpen}
-                        onMouseLeave={handlePopoverClose}
-                        sx={{ flexGrow: 1, display: { xs: 'none', lg: 'flex' }, justifyContent: 'center' }}
-                    >
-                        {Object.keys(menuData).map(category => (
-                            <Button key={category} color="inherit" sx={commonButtonSx}>
-                                {category}
-                            </Button>
-                        ))}
+                    {/* [수정] Box 구조를 이중으로 변경 */}
+                    {/* 1. 바깥 Box: 레이아웃과 중앙 정렬 담당 */}
+                    <Box sx={{ flexGrow: 1, display: { xs: 'none', lg: 'flex' }, justifyContent: 'center' }}>
+                        {/* 2. 안쪽 Box: 실제 버튼들을 감싸고, 마우스 이벤트와 ref를 담당 */}
+                        <Box
+                            ref={menuBoxRef}
+                            onMouseEnter={handlePopoverOpen}
+                            onMouseLeave={handlePopoverClose}
+                            sx={{ display: 'flex' }}
+                        >
+                            {Object.keys(menuData).map(category => (
+                                <Button key={category} color="inherit" sx={commonButtonSx}>
+                                    {category}
+                                </Button>
+                            ))}
+                        </Box>
                     </Box>
 
                     <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center' }}>
@@ -326,7 +329,6 @@ const NavbarComponent = () => {
                                             </ListItemIcon>
                                             <ListItemText
                                                 primary={item.text}
-                                                // [복원] item.desc를 secondary 텍스트로 다시 연결했습니다.
                                                 secondary={item.desc}
                                                 primaryTypographyProps={{ fontWeight: 500 }}
                                                 secondaryTypographyProps={{ fontSize: '0.8rem', whiteSpace: 'normal', color: 'text.secondary', transition: 'color 0.2s' }}
