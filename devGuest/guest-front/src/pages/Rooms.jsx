@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Container, Typography, Box, IconButton, useMediaQuery, Paper, Divider, Chip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -14,8 +15,6 @@ import BusinessIcon from '@mui/icons-material/Business';
 
 // RoomCard Component
 const RoomCard = ({ room }) => {
-    // ✅ [수정 가능] 객실 특징(features) 텍스트와 매칭되는 아이콘입니다.
-    // 새로운 특징을 추가하거나 아이콘을 변경할 수 있습니다.
     const featureIcons = {
         "더블/트윈 베드": <KingBedIcon fontSize="small" />,
         "킹/트윈 베드": <KingBedIcon fontSize="small" />,
@@ -76,9 +75,7 @@ const RoomCard = ({ room }) => {
     );
 };
 
-
-// ✅ [수정 가능] 페이지에 표시될 객실 정보 목록입니다.
-// 이 배열에 객체를 추가하거나, 기존 객체의 내용을 수정하여 원하는 객실 정보를 표시할 수 있습니다.
+// 페이지에 표시될 객실 정보 목록
 const rooms = [
     { name: "슈페리어 룸", image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop", desc: "비즈니스와 여행의 여유를 동시에 만족시키는 메인 타워의 기본 객실입니다.", features: ["메인 타워", "35㎡", "더블/트윈 베드", "무료 Wi-Fi"] },
     { name: "그랜드 디럭스 룸", image: "https://images.pexels.com/photos/1743231/pexels-photo-1743231.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", desc: "럭셔리한 경험에 초점을 맞춘 이그제큐티브 타워의 기본 객실입니다.", features: ["이그제큐티브 타워", "40㎡", "킹/트윈 베드", "르 살롱 라운지"] },
@@ -93,8 +90,8 @@ function Rooms() {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
 
-    // ✅ [수정 가능] 캐러셀(슬라이더)의 동작을 제어하는 설정입니다.
-    const AUTOPLAY_INTERVAL = 4000; // 자동 슬라이드 간격 (4000ms = 4초)
+    // [수정] 자동 슬라이드 간격을 2.5초로 변경
+    const AUTOPLAY_INTERVAL = 2500; // 자동 슬라이드 간격 (2500ms = 2.5초)
     const TRANSITION_DURATION = '0.7s'; // 슬라이드 애니메이션 속도 (0.7초)
 
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -123,7 +120,7 @@ function Rooms() {
         }, AUTOPLAY_INTERVAL);
 
         return () => clearInterval(timer);
-    }, [isPaused, extendedRooms.length]);
+    }, [isPaused, extendedRooms.length, currentSlide]); // currentSlide를 의존성 배열에 추가하여 매번 타이머를 재설정
 
     const handlePrev = () => {
         if (isTransitioning) return;
@@ -165,8 +162,9 @@ function Rooms() {
     const sliderOffset = -currentSlide * cardWidthWithGap;
 
     const totalPages = Math.ceil(rooms.length / cardsToShow);
-    const effectiveCurrentPage = Math.floor(currentSlide - cardsToShow);
-    const currentPage = Math.ceil(effectiveCurrentPage / cardsToShow) % totalPages;
+    const effectiveCurrentPage = Math.floor((currentSlide - cardsToShow) / cardsToShow);
+    const currentPage = (effectiveCurrentPage % totalPages + totalPages) % totalPages;
+    
     const goToPage = (pageIndex) => {
         if (isTransitioning) return;
         setIsTransitioning(true);
@@ -178,11 +176,9 @@ function Rooms() {
             <Container maxWidth="lg">
                 <Paper elevation={0} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 4 }}>
                     <Typography variant="h3" component="h1" gutterBottom align="center" fontWeight="bold" fontFamily="'Playfair Display', serif">
-                        {/* ✅ [수정 가능] 페이지의 메인 제목입니다. */}
                         Our Rooms
                     </Typography>
                     <Typography align="center" color="text.secondary" sx={{ mb: 2, maxWidth: '700px', mx: 'auto' }}>
-                        {/* ✅ [수정 가능] 페이지의 설명 문구입니다. */}
                         Dev hotel은 비즈니스를 위한 메인 타워와 럭셔리한 휴식을 위한 이그제큐티브 타워로 나뉘어 운영됩니다.
                         고객님의 필요에 맞는 최적의 객실을 선택하여 최고의 경험을 누려보세요.
                     </Typography>
