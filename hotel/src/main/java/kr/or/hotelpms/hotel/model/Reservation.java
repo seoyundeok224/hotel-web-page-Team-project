@@ -38,7 +38,7 @@ public class Reservation {
     private LocalDate checkOut;
 
     @Column(name = "people", nullable = false)
-    private int people; // 투숙객 수
+    private int people;
 
     @Column(name = "guest_name", columnDefinition = "VARCHAR(100) CHARACTER SET utf8mb4")
     private String guestName;
@@ -48,6 +48,9 @@ public class Reservation {
 
     @Column(name = "payment_status", length = 20, nullable = false)
     private String paymentStatus = "PENDING";
+
+    @Column(name = "status", length = 20, nullable = false)
+    private String status = "RESERVED"; // RESERVED, CHECKED_IN, CHECKED_OUT, CANCELLED
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

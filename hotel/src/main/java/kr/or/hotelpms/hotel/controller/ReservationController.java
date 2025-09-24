@@ -17,7 +17,6 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
-    // 예약 등록
     @PostMapping
     public ResponseEntity<ReservationDto.ReservationResponse> createReservation(
             @RequestBody ReservationDto.ReservationRequest request) {
@@ -25,40 +24,42 @@ public class ReservationController {
         return ResponseEntity.ok(new ReservationDto.ReservationResponse(reservation));
     }
 
-    // 유저별 예약 조회
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<ReservationDto.ReservationResponse>> getUserReservations(@PathVariable Long userId) {
         return ResponseEntity.ok(reservationService.getReservationsByUser(userId));
     }
 
-    // 모든 예약 조회 (관리자용)
     @GetMapping("/admin/all")
     public ResponseEntity<List<ReservationDto.ReservationResponse>> getAllReservations() {
         return ResponseEntity.ok(reservationService.getAllReservations());
     }
 
-    // 날짜별 예약 조회 (프론트 달력용)
     @GetMapping("/date")
     public ResponseEntity<List<ReservationDto.ReservationResponse>> getReservationsByDate(
             @RequestParam("date") String dateStr) {
-        LocalDate date = LocalDate.parse(dateStr); // yyyy-MM-dd 형식
-        List<ReservationDto.ReservationResponse> reservations = reservationService.getReservationsByDate(date);
-        return ResponseEntity.ok(reservations);
+        LocalDate date = LocalDate.parse(dateStr);
+        return ResponseEntity.ok(reservationService.getReservationsByDate(date));
     }
 
-    // 예약 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
-        reservationService.deleteReservation(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    // 예약 수정
-    @PutMapping("/{id}")
+    @PutMapping("/{reservationId}")
     public ResponseEntity<ReservationDto.ReservationResponse> updateReservation(
-            @PathVariable Long id,
+            @PathVariable Long reservationId,
             @RequestBody ReservationDto.ReservationRequest request) {
-        Reservation updatedReservation = reservationService.updateReservation(id, request);
-        return ResponseEntity.ok(new ReservationDto.ReservationResponse(updatedReservation));
+        Reservation updated = reservationService.updateReservation(reservationId, request);
+        return ResponseEntity.ok(new ReservationDto.ReservationResponse(updated));
+    }
+
+    @PutMapping("/{reservationId}/status")
+    public ResponseEntity<ReservationDto.ReservationResponse> updateStatus(
+            @PathVariable Long reservationId,
+            @RequestParam String status) {
+        Reservation updated = reservationService.updateStatus(reservationId, status);
+        return ResponseEntity.ok(new ReservationDto.ReservationResponse(updated));
+    }
+
+    @DeleteMapping("/{reservationId}")
+    public ResponseEntity<Void> deleteReservation(@PathVariable Long reservationId) {
+        reservationService.deleteReservation(reservationId);
+        return ResponseEntity.ok().build();
     }
 }

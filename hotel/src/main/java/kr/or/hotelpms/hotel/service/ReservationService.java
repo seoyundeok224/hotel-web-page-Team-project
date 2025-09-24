@@ -23,14 +23,12 @@ public class ReservationService {
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
 
-    // username → userId
     public Long getUserIdByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."))
                 .getId();
     }
 
-    // roomNumber → roomId
     public Long getRoomIdByRoomNumber(String roomNumber) {
         return roomRepository.findByRoomNumber(roomNumber)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 객실입니다."))
@@ -71,6 +69,7 @@ public class ReservationService {
         reservation.setGuestName(request.getGuestName());
         reservation.setGuestPhone(request.getGuestPhone());
         reservation.setPaymentStatus("PENDING");
+        reservation.setStatus("RESERVED");
 
         return reservationRepository.save(reservation);
     }
@@ -99,7 +98,6 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
 
-        // 방 번호로 방을 찾습니다.
         Room room = roomRepository.findByRoomNumber(request.getRoomNumber())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 객실입니다."));
 
@@ -107,11 +105,10 @@ public class ReservationService {
             throw new IllegalArgumentException("체크인 날짜는 체크아웃 날짜보다 앞서야 합니다.");
         }
 
-        // 현재 예약을 제외하고 겹치는 예약을 확인합니다.
         boolean overlapExists = reservationRepository
-                .findByRoomIdAndCheckOutAfterAndCheckInBefore(room.getId(), request.getCheckIn(), request.getCheckOut()).stream()
+                .findByRoomIdAndCheckOutAfterAndCheckInBefore(room.getId(), request.getCheckIn(), request.getCheckOut())
+                .stream()
                 .anyMatch(r -> !r.getId().equals(reservationId));
-
         if (overlapExists) {
             throw new IllegalStateException("해당 기간에 이미 예약이 존재합니다.");
         }
@@ -128,11 +125,17 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public List<ReservationDto.ReservationResponse> getReservationsByDate(LocalDate date) {
-        List<Reservation> reservations = reservationRepository.findAll().stream()
+        return reservationRepository.findAll().stream()
                 .filter(r -> !date.isBefore(r.getCheckIn()) && date.isBefore(r.getCheckOut()))
-                .toList();
-        return reservations.stream()
                 .map(ReservationDto.ReservationResponse::new)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public Reservation updateStatus(Long reservationId, String status) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+        reservation.setStatus(status);
+        return reservationRepository.save(reservation);
     }
 }
