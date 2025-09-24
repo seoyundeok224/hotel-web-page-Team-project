@@ -109,8 +109,8 @@ const Reservations = () => {
             guestName: formData.guestName,
             guestPhone: formData.guestPhone,
             roomNumber: selectedRoom.roomNumber,
-            checkIn: formData.checkIn,
-            checkOut: formData.checkOut,
+            checkIn: formData.checkIn.format('YYYY-MM-DD'),
+            checkOut: formData.checkOut.format('YYYY-MM-DD'),
             people: formData.people
         };
 
