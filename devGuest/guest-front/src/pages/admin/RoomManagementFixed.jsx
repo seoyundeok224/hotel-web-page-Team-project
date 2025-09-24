@@ -12,7 +12,7 @@ import {
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import axios from 'axios';
+import { apiGet } from '../../services/api';
 import { roomService } from '../../services/roomService'
 
 const ROOM_TYPES = [
@@ -32,7 +32,7 @@ const getRoomTypeLabel = (type) => {
 
 const RoomCard = ({ room, reservationsByDate, onStatusChange, onEdit }) => {
     const getStatusInfo = (room) => {
-        const hasReservation = reservationsByDate?.some(r => r.room.id === room.id)
+        const hasReservation = reservationsByDate?.some(r => r.roomId === room.id)
         const status = hasReservation ? 'BOOKED' : room.status
 
         switch (status) {
@@ -158,14 +158,14 @@ const RoomManagement = () => {
         if (!selectedDate) return;
         const fetchReservations = async () => {
             try {
-                const res = await axios.get(`/api/reservations/date?date=${selectedDate.format('YYYY-MM-DD')}`)
-                setReservationsByDate(res.data)
+                const data = await apiGet(`/reservations/date?date=${selectedDate.format('YYYY-MM-DD')}`);
+                setReservationsByDate(data || []);
             } catch (err) {
-                console.error('날짜별 예약 조회 실패', err)
-                setReservationsByDate([])
+                console.error('날짜별 예약 조회 실패', err);
+                setReservationsByDate([]);
             }
         }
-        fetchReservations()
+        fetchReservations();
     }, [selectedDate])
 
     const loadRooms = async () => {
@@ -238,7 +238,7 @@ const RoomManagement = () => {
 
     const floorGroups = groupRoomsByFloor(filteredRooms)
     const stats = filteredRooms.reduce((acc, r) => {
-        const hasReservation = reservationsByDate?.some(res => res.room.id === r.id)
+        const hasReservation = reservationsByDate?.some(res => res.roomId === r.id)
         const status = hasReservation ? 'BOOKED' : r.status
         acc[status] = (acc[status] || 0) + 1
         return acc

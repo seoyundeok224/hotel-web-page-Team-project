@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 import {
   Box, Container, Typography, Table, TableBody,
   TableCell, TableContainer, TableHead, TableRow, Paper,
   Button, IconButton, TextField, Dialog, DialogTitle,
   DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem
-} from '@mui/material'
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material'
+} from '@mui/material';
+import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -13,35 +13,50 @@ import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 dayjs.extend(isBetween);
 
-import { getAllReservations, createReservation, updateReservation, deleteReservation, updateReservationStatus } from '../../services/reservationService'
-import { roomService } from '../../services/roomService'
-import { useAuth } from '../../contexts/AuthContext'
+import { getAllReservations, createReservation, updateReservation, deleteReservation, updateReservationStatus } from '../../services/reservationService';
+import { roomService } from '../../services/roomService';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Reservations = () => {
-  const [reservations, setReservations] = useState([])
-  const [rooms, setRooms] = useState([])
-  const [openModal, setOpenModal] = useState(false)
-  const [editingReservation, setEditingReservation] = useState(null)
-  const [formData, setFormData] = useState({ guestName: '', guestPhone: '', roomId: '', checkIn: null, checkOut: null, people: 1 })
-  const { user } = useAuth()
+  const [reservations, setReservations] = useState([]);
+  const [rooms, setRooms] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [editingReservation, setEditingReservation] = useState(null);
+  const [formData, setFormData] = useState({ guestName: '', guestPhone: '', roomId: '', checkIn: null, checkOut: null, people: 1 });
+  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const { user } = useAuth();
 
   const fetchReservations = async () => {
-    try { setReservations(await getAllReservations()) }
-    catch (e) { console.error('예약 불러오기 실패', e) }
-  }
+    try {
+      const data = await getAllReservations();
+      setReservations(data);
+    } catch (e) {
+      console.error('예약 불러오기 실패', e);
+    }
+  };
 
   const fetchRooms = async () => {
-    try { setRooms(await roomService.getAllRoomsList()) }
-    catch (e) { console.error('객실 불러오기 실패', e); setRooms([]) }
-  }
+    try {
+      const data = await roomService.getAllRoomsList();
+      setRooms(data);
+    } catch (e) {
+      console.error('객실 불러오기 실패', e);
+      setRooms([]);
+    }
+  };
 
-  useEffect(() => { fetchReservations(); fetchRooms() }, [])
+  useEffect(() => {
+    fetchReservations();
+    fetchRooms();
+  }, []);
 
-  const handleFormChange = (name, value) => setFormData(prev => ({ ...prev, [name]: value }))
+  const handleFormChange = (name, value) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleOpenModal = (reservation = null) => {
     if (reservation) {
-      setEditingReservation(reservation)
+      setEditingReservation(reservation);
       setFormData({
         guestName: reservation.guestName,
         guestPhone: reservation.guestPhone,
@@ -49,17 +64,23 @@ const Reservations = () => {
         checkIn: dayjs(reservation.checkIn),
         checkOut: dayjs(reservation.checkOut),
         people: reservation.people
-      })
+      });
     } else {
-      setEditingReservation(null)
-      setFormData({ guestName: '', guestPhone: '', roomId: '', checkIn: null, checkOut: null, people: 1 })
+      setEditingReservation(null);
+      setFormData({ guestName: '', guestPhone: '', roomId: '', checkIn: null, checkOut: null, people: 1 });
     }
-    setOpenModal(true)
-  }
+    setOpenModal(true);
+  };
 
   const handleSubmit = async () => {
-    if (!formData.roomId || !formData.checkIn || !formData.checkOut) { alert('객실, 체크인/체크아웃을 선택해주세요.'); return }
-    if (dayjs(formData.checkIn).isAfter(dayjs(formData.checkOut))) { alert('체크인 날짜가 체크아웃 이후일 수 없습니다.'); return }
+    if (!formData.roomId || !formData.checkIn || !formData.checkOut) {
+      alert('객실, 체크인/체크아웃을 선택해주세요.');
+      return;
+    }
+    if (dayjs(formData.checkIn).isAfter(dayjs(formData.checkOut))) {
+      alert('체크인 날짜가 체크아웃 이후일 수 없습니다.');
+      return;
+    }
 
     const overlap = reservations.some(r =>
       r.roomId === formData.roomId &&
@@ -69,11 +90,17 @@ const Reservations = () => {
         dayjs(r.checkIn).isBetween(dayjs(formData.checkIn), dayjs(formData.checkOut), null, '[)')
       ) &&
       (!editingReservation || r.id !== editingReservation.id)
-    )
-    if (overlap) { alert('선택한 객실은 해당 기간에 이미 예약이 있습니다.'); return }
+    );
+    if (overlap) {
+      alert('선택한 객실은 해당 기간에 이미 예약이 있습니다.');
+      return;
+    }
 
-    const selectedRoom = rooms.find(r => r.id === formData.roomId)
-    if (!selectedRoom) { alert('객실을 선택해주세요.'); return }
+    const selectedRoom = rooms.find(r => r.id === formData.roomId);
+    if (!selectedRoom) {
+      alert('객실을 선택해주세요.');
+      return;
+    }
 
     try {
       const payload = {
@@ -84,21 +111,47 @@ const Reservations = () => {
         checkIn: formData.checkIn.format('YYYY-MM-DD'),
         checkOut: formData.checkOut.format('YYYY-MM-DD'),
         people: formData.people
+      };
+
+      if (editingReservation) {
+        await updateReservation(editingReservation.id, payload);
+      } else {
+        await createReservation(payload);
       }
 
-      if (editingReservation) await updateReservation(editingReservation.id, payload)
-      else await createReservation(payload)
+      fetchReservations();
+      setOpenModal(false);
+    } catch (e) {
+      alert('예약 저장 실패: ' + e.message);
+    }
+  };
 
-      fetchReservations(); setOpenModal(false)
-    } catch (e) { alert('예약 저장 실패: ' + e.message) }
-  }
+  const handleDelete = async id => {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    await deleteReservation(id);
+    fetchReservations();
+  };
 
-  const handleDelete = async id => { if (!confirm('정말 삭제하시겠습니까?')) return; await deleteReservation(id); fetchReservations() }
-  const handleCheckIn = async id => { try { await updateReservationStatus(id, 'CHECKIN'); fetchReservations() } catch (e) { alert('체크인 실패: ' + e.message) } }
-  const handleCheckOut = async id => { try { await updateReservationStatus(id, 'CHECKOUT'); fetchReservations() } catch (e) { alert('체크아웃 실패: ' + e.message) } }
+  const handleCheckIn = async id => {
+    try {
+      await updateReservationStatus(id, 'CHECKIN');
+      fetchReservations();
+    } catch (e) {
+      alert('체크인 실패: ' + e.message);
+    }
+  };
+
+  const handleCheckOut = async id => {
+    try {
+      await updateReservationStatus(id, 'CHECKOUT');
+      fetchReservations();
+    } catch (e) {
+      alert('체크아웃 실패: ' + e.message);
+    }
+  };
 
   const availableRooms = rooms.filter(r => {
-    if (!formData.checkIn || !formData.checkOut) return true
+    if (!formData.checkIn || !formData.checkOut) return true;
     return !reservations.some(res =>
       res.roomId === r.id &&
       (
@@ -107,12 +160,26 @@ const Reservations = () => {
         dayjs(res.checkIn).isBetween(dayjs(formData.checkIn), dayjs(formData.checkOut), null, '[)')
       ) &&
       (!editingReservation || res.id !== editingReservation.id)
-    )
-  })
+    );
+  });
+
+  const filteredReservations = reservations.filter(r =>
+    dayjs(selectedDate).isBetween(dayjs(r.checkIn), dayjs(r.checkOut), 'day', '[]')
+  );
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Box sx={{ mb: 4 }}><Typography variant="h4" sx={{ fontWeight: 'bold' }}>예약 관리</Typography></Box>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>예약 관리</Typography>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            label="날짜 선택"
+            value={selectedDate}
+            onChange={(newValue) => setSelectedDate(newValue)}
+            renderInput={(params) => <TextField {...params} />}
+          />
+        </LocalizationProvider>
+      </Box>
       <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenModal()}>새 예약</Button>
 
       <TableContainer component={Paper} sx={{ mt: 3 }}>
@@ -129,7 +196,7 @@ const Reservations = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {reservations.map(r => (
+            {filteredReservations.map(r => (
               <TableRow key={r.id}>
                 <TableCell>{r.reservationNumber}</TableCell>
                 <TableCell>{r.guestName}</TableCell>
@@ -172,7 +239,7 @@ const Reservations = () => {
         </DialogActions>
       </Dialog>
     </Container>
-  )
-}
+  );
+};
 
-export default Reservations
+export default Reservations;
