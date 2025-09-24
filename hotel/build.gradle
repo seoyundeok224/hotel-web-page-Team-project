@@ -41,10 +41,7 @@ dependencies {
     // MariaDB JDBC 드라이버
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
-    // SendGrid
-    implementation 'com.sendgrid:sendgrid-java:4.10.0'
-
-    // Dotenv
+    // Dotenv (환경변수 관리용)
     implementation 'io.github.cdimascio:dotenv-java:2.2.0'
 
     // JWT
