@@ -152,7 +152,7 @@ const RoomManagement = () => {
     }, [editingRoom]);
 
     useEffect(() => { loadRooms() }, [])
-    useEffect(() => { filterRooms() }, [rooms, searchTerm, statusFilter, typeFilter])
+    useEffect(() => { filterRooms() }, [rooms, searchTerm, statusFilter, typeFilter, reservationsByDate])
 
     useEffect(() => {
         if (!selectedDate) return;
@@ -211,12 +211,22 @@ const RoomManagement = () => {
     }
 
     const filterRooms = () => {
-        let filtered = rooms
-        if (searchTerm) filtered = filtered.filter(r => r.roomNumber.toLowerCase().includes(searchTerm.toLowerCase()))
-        if (statusFilter !== 'ALL') filtered = filtered.filter(r => r.status === statusFilter)
-        if (typeFilter !== 'ALL') filtered = filtered.filter(r => r.roomType === typeFilter)
-        setFilteredRooms(filtered)
-    }
+        let filtered = rooms;
+        if (searchTerm) {
+            filtered = filtered.filter(r => r.roomNumber.toLowerCase().includes(searchTerm.toLowerCase()));
+        }
+        if (statusFilter !== 'ALL') {
+            filtered = filtered.filter(r => {
+                const hasReservation = reservationsByDate?.some(res => res.roomId === r.id);
+                const currentStatus = hasReservation ? 'BOOKED' : r.status;
+                return currentStatus === statusFilter;
+            });
+        }
+        if (typeFilter !== 'ALL') {
+            filtered = filtered.filter(r => r.roomType === typeFilter);
+        }
+        setFilteredRooms(filtered);
+    };
 
     const handleStatusChange = async (roomId, newStatus) => {
         try {
