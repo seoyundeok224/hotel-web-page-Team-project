@@ -117,6 +117,14 @@ const Booking = () => {
     if (validateForm()) {
       setIsLoading(true); // 로딩 시작
       try {
+        // 시간대 문제 해결을 위해 날짜를 YYYY-MM-DD 형식으로 직접 포맷하는 함수
+        const formatDateToYYYYMMDD = (date) => {
+          if (!date) return null;
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+        };
 
         // 백엔드 API에 맞는 예약 데이터 구성
         const reservationData = {
@@ -124,8 +132,9 @@ const Booking = () => {
           guestName: formData.guestName,
           guestPhone: formData.guestPhone,
           roomType: formData.roomType, // 이것은 백엔드에서 방을 찾는데 사용됩니다
-          checkIn: formData.checkInDate?.toISOString().split('T')[0], // YYYY-MM-DD 형식
-          checkOut: formData.checkOutDate?.toISOString().split('T')[0],
+          // 시간대 변환 없이 사용자가 선택한 날짜를 그대로 사용
+          checkIn: formatDateToYYYYMMDD(formData.checkInDate),
+          checkOut: formatDateToYYYYMMDD(formData.checkOutDate),
           people: formData.adults + formData.children,
           message: formData.specialRequests // 요청 사항을 'message' 필드로 전달
         };
