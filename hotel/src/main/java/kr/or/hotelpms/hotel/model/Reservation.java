@@ -52,6 +52,9 @@ public class Reservation {
     @Column(name = "status", length = 20, nullable = false)
     private String status = "RESERVED"; // RESERVED, CHECKED_IN, CHECKED_OUT, CANCELLED
 
+    @Column(name = "message", columnDefinition = "TEXT")
+    private String message; // 고객 요청사항
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
