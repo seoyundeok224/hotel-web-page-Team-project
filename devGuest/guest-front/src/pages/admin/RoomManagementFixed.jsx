@@ -121,14 +121,21 @@ const RoomManagement = () => {
     const [reservationsByDate, setReservationsByDate] = useState([])
 
     const getRoomStatus = (room) => {
-        const hasReservation = reservationsByDate?.some(res => res.roomId === room.id);
-        if (hasReservation) {
-            return 'BOOKED';
+        // 선택된 날짜에 해당 객실의 예약 정보를 찾습니다.
+        const reservation = reservationsByDate?.find(res => res.roomId === room.id);
+
+        if (reservation) {
+            // 예약 상태가 'CHECKIN'이면 '투숙중'으로 표시합니다.
+            if (reservation.status === 'CHECKIN') {
+                return 'OCCUPIED';
+            }
+            // 예약 상태가 'CHECKOUT'이 아니면 (예: 'RESERVED') '예약됨'으로 표시합니다.
+            if (reservation.status !== 'CHECKOUT') {
+                return 'BOOKED';
+            }
         }
-        if (room.status === 'MAINTENANCE' || room.status === 'OCCUPIED') {
-            return room.status;
-        }
-        return 'AVAILABLE';
+        // 예약이 없거나, 체크아웃 되었거나, 객실 자체의 상태가 'MAINTENANCE'가 아니면 '이용가능'으로 간주합니다.
+        return room.status === 'MAINTENANCE' ? 'MAINTENANCE' : 'AVAILABLE';
     };
 
     useEffect(() => {

@@ -21,8 +21,8 @@ const Reservations = () => {
   const [reservations, setReservations] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [editingReservation, setEditingReservation] = useState(null);
-  const [formData, setFormData] = useState({ guestName: '', guestPhone: '', roomId: '', checkIn: null, checkOut: null, people: 1 });
+  const [editingReservation, setEditingReservation] = useState(null); // This holds the full reservation object for editing
+  const [formData, setFormData] = useState({ guestName: '', guestPhone: '', roomNumber: '', checkIn: null, checkOut: null, people: 1 });
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const { user } = useAuth();
 
@@ -60,20 +60,22 @@ const Reservations = () => {
       setFormData({
         guestName: reservation.guestName,
         guestPhone: reservation.guestPhone,
-        roomId: reservation.roomId || '',
+        roomNumber: reservation.roomNumber || '',
         checkIn: dayjs(reservation.checkIn),
         checkOut: dayjs(reservation.checkOut),
         people: reservation.people
       });
     } else {
       setEditingReservation(null);
-      setFormData({ guestName: '', guestPhone: '', roomId: '', checkIn: null, checkOut: null, people: 1 });
+      // Reset form for new reservation
+      setFormData({ guestName: '', guestPhone: '', roomNumber: '', checkIn: null, checkOut: null, people: 1 });
     }
     setOpenModal(true);
   };
 
-  const handleSubmit = async () => {
-    if (!formData.roomId || !formData.checkIn || !formData.checkOut) {
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!formData.roomNumber || !formData.checkIn || !formData.checkOut) {
       alert('객실, 체크인/체크아웃을 선택해주세요.');
       return;
     }
@@ -83,7 +85,7 @@ const Reservations = () => {
     }
 
     const overlap = reservations.some(r =>
-      r.roomId === formData.roomId &&
+      r.roomNumber === formData.roomNumber &&
       (
         dayjs(formData.checkIn).isBetween(dayjs(r.checkIn), dayjs(r.checkOut), null, '[)') ||
         dayjs(formData.checkOut).isBetween(dayjs(r.checkIn), dayjs(r.checkOut), null, '(]') ||
@@ -96,7 +98,7 @@ const Reservations = () => {
       return;
     }
 
-    const selectedRoom = rooms.find(r => r.id === formData.roomId);
+    const selectedRoom = rooms.find(r => r.roomNumber === formData.roomNumber);
     if (!selectedRoom) {
       alert('객실을 선택해주세요.');
       return;
@@ -108,6 +110,7 @@ const Reservations = () => {
         guestName: formData.guestName,
         guestPhone: formData.guestPhone,
         roomNumber: selectedRoom.roomNumber,
+        roomType: selectedRoom.roomType, // roomType 추가
         checkIn: formData.checkIn.format('YYYY-MM-DD'),
         checkOut: formData.checkOut.format('YYYY-MM-DD'),
         people: formData.people
@@ -152,15 +155,16 @@ const Reservations = () => {
 
   const availableRooms = rooms.filter(r => {
     if (!formData.checkIn || !formData.checkOut) return true;
-    return !reservations.some(res =>
-      res.roomId === r.id &&
+    const isRoomBooked = reservations.some(res =>
+      res.roomNumber === r.roomNumber &&
       (
         dayjs(formData.checkIn).isBetween(dayjs(res.checkIn), dayjs(res.checkOut), null, '[)') ||
         dayjs(formData.checkOut).isBetween(dayjs(res.checkIn), dayjs(res.checkOut), null, '(]') ||
         dayjs(res.checkIn).isBetween(dayjs(formData.checkIn), dayjs(formData.checkOut), null, '[)')
-      ) &&
+      ) && // Exclude the current reservation being edited from the check
       (!editingReservation || res.id !== editingReservation.id)
     );
+    return !isRoomBooked;
   });
 
   const getStatusText = (status) => {
@@ -253,16 +257,16 @@ const Reservations = () => {
           <TextField label="고객명" value={formData.guestName} onChange={e => handleFormChange('guestName', e.target.value)} />
           <TextField label="연락처" value={formData.guestPhone} onChange={e => handleFormChange('guestPhone', e.target.value)} />
           <FormControl>
-            <InputLabel>객실</InputLabel>
-            <Select value={formData.roomId} onChange={e => handleFormChange('roomId', e.target.value)} label="객실">
-              {availableRooms.map(room => (<MenuItem key={room.id} value={room.id}>{room.roomNumber} ({room.roomType})</MenuItem>))}
+            <InputLabel id="room-select-label">객실</InputLabel>
+            <Select labelId="room-select-label" value={formData.roomNumber} onChange={e => handleFormChange('roomNumber', e.target.value)} label="객실">
+              {availableRooms.map(room => (<MenuItem key={room.id} value={room.roomNumber}>{room.roomNumber} ({room.roomType})</MenuItem>))}
             </Select>
           </FormControl>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker label="체크인" value={formData.checkIn} onChange={newValue => handleFormChange('checkIn', newValue)} renderInput={(params) => <TextField {...params} />} />
             <DatePicker label="체크아웃" value={formData.checkOut} onChange={newValue => handleFormChange('checkOut', newValue)} renderInput={(params) => <TextField {...params} />} />
           </LocalizationProvider>
-          <TextField label="투숙객 수" type="number" value={formData.people} onChange={e => handleFormChange('people', parseInt(e.target.value))} />
+          <TextField label="투숙객 수" type="number" value={formData.people} onChange={e => handleFormChange('people', parseInt(e.target.value, 10) || 1)} InputProps={{ inputProps: { min: 1 } }} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenModal(false)}>취소</Button>
