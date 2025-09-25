@@ -339,9 +339,11 @@ export const authService = {
   },
 
   // 비밀번호 찾기
-  findPassword: async (email) => {
+  findPassword: async (data) => {
     try {
-      return apiPost('/auth/find-password', { email });
+      // data가 객체인 경우 ({ email, name })와 이전 방식 (email만) 모두 지원
+      const requestData = typeof data === 'string' ? { email: data } : data;
+      return apiPost('/auth/find-password', requestData);
     } catch (error) {
       console.error('Failed to find password:', error);
       throw error;

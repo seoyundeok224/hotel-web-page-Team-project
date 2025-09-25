@@ -125,6 +125,31 @@ public class AuthService {
         }
     }
 
+    // 비밀번호 찾기 (이메일과 이름으로 검증)
+    public void findPasswordWithName(String email, String name) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("입력하신 정보와 일치하는 사용자가 없습니다."));
+
+        // 이름도 함께 검증
+        if (!user.getName().equals(name)) {
+            throw new RuntimeException("입력하신 정보와 일치하는 사용자가 없습니다.");
+        }
+
+        // 임시 비밀번호 생성
+        String tempPassword = UUID.randomUUID().toString().substring(0, 8);
+        user.setPassword(passwordEncoder.encode(tempPassword));
+        userRepository.save(user);
+
+        // 이메일로 임시 비밀번호 전송
+        try {
+            emailService.sendTemporaryPassword(user.getEmail(), tempPassword);
+        } catch (Exception e) {
+            // 이메일 전송 실패 시 예외 처리 (예: 로깅)
+            e.printStackTrace();
+            throw new RuntimeException("임시 비밀번호 이메일 전송에 실패했습니다.");
+        }
+    }
+
     // 사용자명 중복 확인
     @Transactional(readOnly = true)
     public boolean isUsernameAvailable(String username) {

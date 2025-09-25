@@ -49,7 +49,15 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> findPassword(@RequestBody Map<String, String> request) {
         try {
             String email = request.get("email");
-            authService.findPassword(email);
+            String name = request.get("name");
+            
+            // 이름이 제공된 경우 이메일과 이름을 모두 검증, 없으면 이메일만 검증 (하위 호환성)
+            if (name != null && !name.trim().isEmpty()) {
+                authService.findPasswordWithName(email, name);
+            } else {
+                authService.findPassword(email);
+            }
+            
             return ResponseEntity.ok(ApiResponse.success(null, "임시 비밀번호가 이메일로 전송되었습니다."));
         } catch (Exception e) {
             return ResponseEntity.badRequest()

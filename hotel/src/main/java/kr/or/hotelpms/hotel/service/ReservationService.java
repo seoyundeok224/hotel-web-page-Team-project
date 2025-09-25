@@ -29,17 +29,51 @@ public class ReservationService {
                 .getId();
     }
 
-    public Long getRoomIdByRoomNumber(String roomNumber) {
-        return roomRepository.findByRoomNumber(roomNumber)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 객실입니다."))
-                .getId();
-    }
-
     @Transactional
     public Reservation createReservationByUsername(ReservationDto.ReservationRequest request) {
         Long userId = getUserIdByUsername(request.getUsername());
-        Long roomId = getRoomIdByRoomNumber(request.getRoomNumber());
+        
+        // 방 타입을 기반으로 사용 가능한 방 자동 배정
+        if (request.getRoomType() == null || request.getRoomType().isEmpty()) {
+            throw new IllegalArgumentException("방타입이 필요합니다.");
+        }
+        
+        Long roomId = findAvailableRoomByType(request.getRoomType(), request.getCheckIn(), request.getCheckOut());
+        
         return createReservation(userId, roomId, request);
+    }
+    
+    // 방 타입을 기반으로 사용 가능한 방 찾기 (가장 작은 호수부터 우선 배정)
+    private Long findAvailableRoomByType(String roomType, LocalDate checkIn, LocalDate checkOut) {
+        List<Room> roomsOfType = roomRepository.findByRoomTypeIgnoreCase(roomType).stream()
+                .sorted((room1, room2) -> {
+                    // 방번호를 숫자로 변환하여 정렬
+                    try {
+                        Integer roomNum1 = Integer.parseInt(room1.getRoomNumber());
+                        Integer roomNum2 = Integer.parseInt(room2.getRoomNumber());
+                        return roomNum1.compareTo(roomNum2);
+                    } catch (NumberFormatException e) {
+                        // 숫자가 아닌 경우 문자열로 정렬
+                        return room1.getRoomNumber().compareTo(room2.getRoomNumber());
+                    }
+                })
+                .toList();
+                
+        if (roomsOfType.isEmpty()) {
+            throw new IllegalArgumentException("해당 타입의 방이 없습니다: " + roomType);
+        }
+        
+        // 예약 가능한 방 찾기 (가장 작은 호수부터)
+        for (Room room : roomsOfType) {
+            boolean isAvailable = reservationRepository
+                    .findByRoomIdAndCheckOutAfterAndCheckInBefore(room.getId(), checkIn, checkOut)
+                    .isEmpty();
+            if (isAvailable) {
+                return room.getId();
+            }
+        }
+        
+        throw new IllegalStateException("해당 기간에 " + roomType + " 타입의 예약 가능한 방이 없습니다.");
     }
 
     @Transactional
