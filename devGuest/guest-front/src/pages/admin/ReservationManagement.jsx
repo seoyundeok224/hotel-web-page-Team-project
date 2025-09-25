@@ -205,8 +205,8 @@ const Reservations = () => {
                 <TableCell>{r.people}명</TableCell>
                 <TableCell>{r.status || '예약됨'}</TableCell>
                 <TableCell>
-                  <Button variant="contained" size="small" sx={{ mr: 1 }} disabled={r.status !== '예약됨'} onClick={() => handleCheckIn(r.id)}>체크인</Button>
-                  <Button variant="contained" size="small" color="secondary" sx={{ mr: 1 }} disabled={r.status !== '투숙중'} onClick={() => handleCheckOut(r.id)}>체크아웃</Button>
+                  <Button variant="contained" size="small" color="success" sx={{ mr: 1 }} onClick={() => {}}>체크인</Button>
+                  <Button variant="contained" size="small" color="error" sx={{ mr: 1 }} onClick={() => {}}>체크아웃</Button>
                   <IconButton color="primary" onClick={() => handleOpenModal(r)}><EditIcon /></IconButton>
                   <IconButton color="error" onClick={() => handleDelete(r.id)}><DeleteIcon /></IconButton>
                 </TableCell>
