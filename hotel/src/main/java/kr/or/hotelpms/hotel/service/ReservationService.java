@@ -159,8 +159,8 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public List<ReservationDto.ReservationResponse> getReservationsByDate(LocalDate date) {
-        return reservationRepository.findAll().stream()
-                .filter(r -> !date.isBefore(r.getCheckIn()) && date.isBefore(r.getCheckOut()))
+        // DB에서 직접 필터링하여 성능 개선
+        return reservationRepository.findByCheckInLessThanEqualAndCheckOutAfter(date, date).stream()
                 .map(ReservationDto.ReservationResponse::new)
                 .collect(Collectors.toList());
     }
