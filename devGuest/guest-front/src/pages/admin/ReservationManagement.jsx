@@ -163,6 +163,19 @@ const Reservations = () => {
     );
   });
 
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'RESERVED':
+        return '예약됨';
+      case 'CHECKIN':
+        return '투숙중';
+      case 'CHECKOUT':
+        return '체크아웃됨';
+      default:
+        return status || '예약됨';
+    }
+  };
+
   const filteredReservations = reservations.filter(r =>
     dayjs(selectedDate).isBetween(dayjs(r.checkIn), dayjs(r.checkOut), 'day', '[]')
   );
@@ -203,10 +216,28 @@ const Reservations = () => {
                 <TableCell>{r.roomNumber} ({r.roomType})</TableCell>
                 <TableCell>{r.checkIn} ~ {r.checkOut}</TableCell>
                 <TableCell>{r.people}명</TableCell>
-                <TableCell>{r.status || '예약됨'}</TableCell>
+                <TableCell>{getStatusText(r.status)}</TableCell>
                 <TableCell>
-                  <Button variant="contained" size="small" color="success" sx={{ mr: 1 }} onClick={() => {}}>체크인</Button>
-                  <Button variant="contained" size="small" color="error" sx={{ mr: 1 }} onClick={() => {}}>체크아웃</Button>
+                  <Button 
+                    variant="contained" 
+                    size="small" 
+                    color="success" 
+                    sx={{ mr: 1 }} 
+                    onClick={() => handleCheckIn(r.id)}
+                    disabled={r.status === 'CHECKIN' || r.status === 'CHECKOUT'}
+                  >
+                    체크인
+                  </Button>
+                  <Button 
+                    variant="contained" 
+                    size="small" 
+                    color="error" 
+                    sx={{ mr: 1 }} 
+                    onClick={() => handleCheckOut(r.id)}
+                    disabled={r.status !== 'CHECKIN'}
+                  >
+                    체크아웃
+                  </Button>
                   <IconButton color="primary" onClick={() => handleOpenModal(r)}><EditIcon /></IconButton>
                   <IconButton color="error" onClick={() => handleDelete(r.id)}><DeleteIcon /></IconButton>
                 </TableCell>

@@ -37,7 +37,7 @@ public class ReservationDto {
         public String getSpecialRequests() { return specialRequests; }
     }
 
-    @Getter
+        @Getter
     @Setter
     public static class ReservationResponse {
         private Long id;
@@ -51,6 +51,7 @@ public class ReservationDto {
         private LocalDate checkOut;
         private int people;
         private String paymentStatus;
+        private String status;
 
         public ReservationResponse(Reservation reservation) {
             this.id = reservation.getId();
@@ -64,6 +65,7 @@ public class ReservationDto {
             this.checkOut = reservation.getCheckOut();
             this.people = reservation.getPeople();
             this.paymentStatus = reservation.getPaymentStatus();
+            this.status = reservation.getStatus();
         }
     }
 }
