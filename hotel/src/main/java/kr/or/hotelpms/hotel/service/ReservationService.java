@@ -102,6 +102,7 @@ public class ReservationService {
         reservation.setPeople(request.getPeople());
         reservation.setGuestName(request.getGuestName());
         reservation.setGuestPhone(request.getGuestPhone());
+        reservation.setMessage(request.getMessage()); // 요청사항 추가 (getSpecialRequests() -> getMessage())
         reservation.setPaymentStatus("PENDING");
         reservation.setStatus("RESERVED");
 
@@ -153,6 +154,7 @@ public class ReservationService {
         reservation.setPeople(request.getPeople());
         reservation.setGuestName(request.getGuestName());
         reservation.setGuestPhone(request.getGuestPhone());
+        reservation.setMessage(request.getMessage()); // 요청사항 추가 (getSpecialRequests() -> getMessage())
 
         return reservationRepository.saveAndFlush(reservation);
     }
