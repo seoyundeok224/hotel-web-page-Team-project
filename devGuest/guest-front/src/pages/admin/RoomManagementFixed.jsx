@@ -30,7 +30,7 @@ const getRoomTypeLabel = (type) => {
     return foundType ? foundType.label : type;
 };
 
-const RoomCard = ({ room, onStatusChange, onEdit, getStatus }) => {
+const RoomCard = ({ room, onEdit, getStatus }) => {
     const getStatusInfo = (room) => {
         const status = getStatus(room);
         switch (status) {
@@ -44,13 +44,6 @@ const RoomCard = ({ room, onStatusChange, onEdit, getStatus }) => {
 
     const statusInfo = getStatusInfo(room)
 
-    const handleStatusToggle = () => {
-        const statuses = ['AVAILABLE', 'BOOKED', 'OCCUPIED', 'MAINTENANCE']
-        const currentIndex = statuses.indexOf(room.status)
-        const nextIndex = (currentIndex + 1) % statuses.length
-        onStatusChange(room.id, statuses[nextIndex])
-    }
-
     return (
         <Card sx={{ height: '100%', backgroundColor: statusInfo.bgColor, border: `2px solid ${statusInfo.color}20`, cursor: 'pointer' }}>
             <CardContent>
@@ -63,7 +56,7 @@ const RoomCard = ({ room, onStatusChange, onEdit, getStatus }) => {
                         <EditIcon fontSize="small" />
                     </IconButton>
                 </Box>
-                <Button fullWidth variant="contained" sx={{ backgroundColor: statusInfo.color }} onClick={(e) => { e.stopPropagation(); handleStatusToggle() }}>
+                <Button fullWidth variant="contained" sx={{ backgroundColor: statusInfo.color }}>
                     {statusInfo.label}
                 </Button>
                 <Box sx={{ mt: 1 }}>
@@ -74,7 +67,7 @@ const RoomCard = ({ room, onStatusChange, onEdit, getStatus }) => {
     )
 }
 
-const FloorSection = ({ floor, rooms, onStatusChange, onEdit, getStatus }) => (
+const FloorSection = ({ floor, rooms, onEdit, getStatus }) => (
     <Box sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, borderBottom: '1px solid #e0e0e0' }}>
             <HomeIcon />
@@ -84,7 +77,7 @@ const FloorSection = ({ floor, rooms, onStatusChange, onEdit, getStatus }) => (
         <Grid container spacing={2}>
             {rooms.map(room => (
                 <Grid xs={12} sm={6} md={4} lg={3} key={room.id}>
-                    <RoomCard room={room} onStatusChange={onStatusChange} onEdit={onEdit} getStatus={getStatus} />
+                    <RoomCard room={room} onEdit={onEdit} getStatus={getStatus} />
                 </Grid>
             ))}
         </Grid>
@@ -233,12 +226,7 @@ const RoomManagement = () => {
         setFilteredRooms(filtered);
     };
 
-    const handleStatusChange = async (roomId, newStatus) => {
-        try {
-            await roomService.updateRoomStatus(roomId, newStatus)
-            setRooms(prev => prev.map(r => r.id === roomId ? { ...r, status: newStatus } : r))
-        } catch { alert('상태 변경 실패') }
-    }
+    
 
     const groupRoomsByFloor = (roomsArray) => {
         const grouped = {}
@@ -315,7 +303,7 @@ const RoomManagement = () => {
                 </Box>
 
                 {/* 객실 그룹 */}
-                {floorGroups.map(group => <FloorSection key={group.floor} floor={group.floor} rooms={group.rooms} onStatusChange={handleStatusChange} onEdit={(room)=>{ setEditingRoom(room); setShowModal(true)}} getStatus={getRoomStatus} />)}
+                {floorGroups.map(group => <FloorSection key={group.floor} floor={group.floor} rooms={group.rooms} onEdit={(room)=>{ setEditingRoom(room); setShowModal(true)}} getStatus={getRoomStatus} />)}
 
                 {/* 모달 */}
                 <Dialog open={showModal} onClose={()=>{ setShowModal(false); setEditingRoom(null)}} maxWidth="sm" fullWidth>
