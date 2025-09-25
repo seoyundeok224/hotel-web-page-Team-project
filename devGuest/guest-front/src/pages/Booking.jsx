@@ -113,7 +113,7 @@ const Booking = () => {
           checkIn: formData.checkInDate?.toISOString().split('T')[0], // YYYY-MM-DD 형식
           checkOut: formData.checkOutDate?.toISOString().split('T')[0],
           people: formData.adults + formData.children,
-          specialRequests: formData.specialRequests
+          message: formData.specialRequests // 요청 사항을 'message' 필드로 전달
         };
 
         console.log('예약 요청 데이터:', reservationData);
