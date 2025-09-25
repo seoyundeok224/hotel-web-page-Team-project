@@ -30,11 +30,9 @@ const getRoomTypeLabel = (type) => {
     return foundType ? foundType.label : type;
 };
 
-const RoomCard = ({ room, reservationsByDate, onStatusChange, onEdit }) => {
+const RoomCard = ({ room, onStatusChange, onEdit, getStatus }) => {
     const getStatusInfo = (room) => {
-        const hasReservation = reservationsByDate?.some(r => r.roomId === room.id)
-        const status = hasReservation ? 'BOOKED' : room.status
-
+        const status = getStatus(room);
         switch (status) {
             case 'AVAILABLE': return { label: '이용가능', color: '#2e7d32', bgColor: '#e8f5e8' }
             case 'BOOKED':    return { label: '예약됨', color: '#1976d2', bgColor: '#e3f2fd' }
@@ -76,7 +74,7 @@ const RoomCard = ({ room, reservationsByDate, onStatusChange, onEdit }) => {
     )
 }
 
-const FloorSection = ({ floor, rooms, reservationsByDate, onStatusChange, onEdit }) => (
+const FloorSection = ({ floor, rooms, onStatusChange, onEdit, getStatus }) => (
     <Box sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, borderBottom: '1px solid #e0e0e0' }}>
             <HomeIcon />
@@ -86,7 +84,7 @@ const FloorSection = ({ floor, rooms, reservationsByDate, onStatusChange, onEdit
         <Grid container spacing={2}>
             {rooms.map(room => (
                 <Grid xs={12} sm={6} md={4} lg={3} key={room.id}>
-                    <RoomCard room={room} reservationsByDate={reservationsByDate} onStatusChange={onStatusChange} onEdit={onEdit} />
+                    <RoomCard room={room} onStatusChange={onStatusChange} onEdit={onEdit} getStatus={getStatus} />
                 </Grid>
             ))}
         </Grid>
@@ -128,6 +126,17 @@ const RoomManagement = () => {
     })
     const [selectedDate, setSelectedDate] = useState(dayjs())
     const [reservationsByDate, setReservationsByDate] = useState([])
+
+    const getRoomStatus = (room) => {
+        const hasReservation = reservationsByDate?.some(res => res.roomId === room.id);
+        if (hasReservation) {
+            return 'BOOKED';
+        }
+        if (room.status === 'MAINTENANCE' || room.status === 'OCCUPIED') {
+            return room.status;
+        }
+        return 'AVAILABLE';
+    };
 
     useEffect(() => {
         if (editingRoom) {
@@ -216,11 +225,7 @@ const RoomManagement = () => {
             filtered = filtered.filter(r => r.roomNumber.toLowerCase().includes(searchTerm.toLowerCase()));
         }
         if (statusFilter !== 'ALL') {
-            filtered = filtered.filter(r => {
-                const hasReservation = reservationsByDate?.some(res => res.roomId === r.id);
-                const currentStatus = hasReservation ? 'BOOKED' : r.status;
-                return currentStatus === statusFilter;
-            });
+            filtered = filtered.filter(r => getRoomStatus(r) === statusFilter);
         }
         if (typeFilter !== 'ALL') {
             filtered = filtered.filter(r => r.roomType === typeFilter);
@@ -248,8 +253,7 @@ const RoomManagement = () => {
 
     const floorGroups = groupRoomsByFloor(filteredRooms)
     const stats = filteredRooms.reduce((acc, r) => {
-        const hasReservation = reservationsByDate?.some(res => res.roomId === r.id)
-        const status = hasReservation ? 'BOOKED' : r.status
+        const status = getRoomStatus(r);
         acc[status] = (acc[status] || 0) + 1
         return acc
     }, {})
@@ -311,7 +315,7 @@ const RoomManagement = () => {
                 </Box>
 
                 {/* 객실 그룹 */}
-                {floorGroups.map(group => <FloorSection key={group.floor} floor={group.floor} rooms={group.rooms} reservationsByDate={reservationsByDate} onStatusChange={handleStatusChange} onEdit={(room)=>{ setEditingRoom(room); setShowModal(true)}} />)}
+                {floorGroups.map(group => <FloorSection key={group.floor} floor={group.floor} rooms={group.rooms} onStatusChange={handleStatusChange} onEdit={(room)=>{ setEditingRoom(room); setShowModal(true)}} getStatus={getRoomStatus} />)}
 
                 {/* 모달 */}
                 <Dialog open={showModal} onClose={()=>{ setShowModal(false); setEditingRoom(null)}} maxWidth="sm" fullWidth>
