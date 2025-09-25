@@ -18,10 +18,23 @@ public class ReservationDto {
         private String username;    // 로그인 아이디
         private String guestName;   // 고객명
         private String guestPhone;  // 고객 연락처
-        private String roomNumber;  // 객실번호
+        private String roomNumber;  // 객실번호 (선택사항)
+        private String roomType;    // 객실 타입 (SINGLE, DOUBLE, 등)
         private LocalDate checkIn;
         private LocalDate checkOut;
         private int people;         // 투숙객 수
+        private String specialRequests; // 특별 요청사항
+
+        // Getter 메소드들 (Lombok이 작동하지 않을 경우를 대비)
+        public String getUsername() { return username; }
+        public String getGuestName() { return guestName; }
+        public String getGuestPhone() { return guestPhone; }
+        public String getRoomNumber() { return roomNumber; }
+        public String getRoomType() { return roomType; }
+        public LocalDate getCheckIn() { return checkIn; }
+        public LocalDate getCheckOut() { return checkOut; }
+        public int getPeople() { return people; }
+        public String getSpecialRequests() { return specialRequests; }
     }
 
     @Getter

@@ -19,33 +19,36 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { ko } from 'date-fns/locale';
+import { createReservation } from '../services/reservationService';
+import { useAuth } from '../contexts/AuthContext';
 
 const Booking = () => {
+  const { user } = useAuth(); // 로그인한 사용자 정보
+
   const [formData, setFormData] = useState({
-    facility: '',
-    date: null,
-    startTime: null,
-    endTime: null,
+    roomType: '',
+    checkInDate: null,
+    checkOutDate: null,
+    checkInTime: null,
+    checkOutTime: null,
     adults: 1,
     children: 0,
-    reservationName: '',
-    phone: '',
+    guestName: '',
+    guestPhone: '',
     email: '',
     specialRequests: ''
   });
   const [errors, setErrors] = useState({});
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  // 이용 시설 옵션들
+  // 호텔 객실 타입 옵션들 (백엔드와 일치)
   const facilities = [
-    { value: 'deluxe-room', label: '디럭스룸' },
-    { value: 'suite-room', label: '스위트룸' },
-    { value: 'family-room', label: '패밀리룸' },
-    { value: 'conference-room', label: '컨퍼런스룸' },
-    { value: 'restaurant', label: '레스토랑' },
-    { value: 'spa', label: '스파' },
-    { value: 'fitness', label: '피트니스센터' },
-    { value: 'pool', label: '수영장' }
+    { value: 'SINGLE', label: '싱글룸', description: '1인용 객실', price: '150,000원/박' },
+    { value: 'DOUBLE', label: '더블룸', description: '2인용 객실', price: '200,000원/박' },
+    { value: 'FAMILY', label: '패밀리룸', description: '가족용 객실 (4인)', price: '250,000원/박' },
+    { value: 'DELUXE', label: '디럭스룸', description: '고급 객실 (2인)', price: '250,000원/박' },
+    { value: 'SUITE', label: '스위트룸', description: '최고급 스위트 (2인)', price: '300,000원/박' },
+    { value: 'CONFERENCE', label: '컨퍼런스룸', description: '회의실 겸용 객실', price: '400,000원/박' }
   ];
 
   const handleInputChange = (field, value) => {
@@ -65,12 +68,13 @@ const Booking = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.facility) newErrors.facility = '이용시설을 선택해주세요.';
-    if (!formData.date) newErrors.date = '이용일자를 선택해주세요.';
-    if (!formData.startTime) newErrors.startTime = '시작 시간을 선택해주세요.';
-    if (!formData.endTime) newErrors.endTime = '종료 시간을 선택해주세요.';
-    if (!formData.reservationName.trim()) newErrors.reservationName = '예약자명을 입력해주세요.';
-    if (!formData.phone.trim()) newErrors.phone = '휴대폰번호를 입력해주세요.';
+    if (!formData.roomType) newErrors.roomType = '객실 타입을 선택해주세요.';
+    if (!formData.checkInDate) newErrors.checkInDate = '체크인 날짜를 선택해주세요.';
+    if (!formData.checkOutDate) newErrors.checkOutDate = '체크아웃 날짜를 선택해주세요.';
+    if (!formData.checkInTime) newErrors.checkInTime = '체크인 시간을 선택해주세요.';
+    if (!formData.checkOutTime) newErrors.checkOutTime = '체크아웃 시간을 선택해주세요.';
+    if (!formData.guestName.trim()) newErrors.guestName = '투숙객 이름을 입력해주세요.';
+    if (!formData.guestPhone.trim()) newErrors.guestPhone = '연락처를 입력해주세요.';
     if (!formData.email.trim()) newErrors.email = '이메일을 입력해주세요.';
 
     // 이메일 형식 검증
@@ -79,49 +83,72 @@ const Booking = () => {
       newErrors.email = '올바른 이메일 형식을 입력해주세요.';
     }
 
-    // 휴대폰번호 형식 검증
-    const phoneRegex = /^[0-9]{3}-[0-9]{4}-[0-9]{4}$/;
-    if (formData.phone && !phoneRegex.test(formData.phone)) {
-      newErrors.phone = '휴대폰번호는 000-0000-0000 형식으로 입력해주세요.';
+    // 체크인/체크아웃 날짜 검증
+    if (formData.checkInDate && formData.checkOutDate) {
+      if (formData.checkInDate >= formData.checkOutDate) {
+        newErrors.checkOutDate = '체크아웃 날짜는 체크인 날짜보다 늦어야 합니다.';
+      }
     }
 
-    // 시간 검증
-    if (formData.startTime && formData.endTime) {
-      if (formData.startTime >= formData.endTime) {
-        newErrors.endTime = '종료 시간은 시작 시간보다 늦어야 합니다.';
-      }
+    // 로그인 상태 검사
+    if (!user) {
+      newErrors.auth = '예약을 위해서는 로그인이 필요합니다.';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (validateForm()) {
-      // 예약 처리 로직
-      console.log('예약 데이터:', formData);
-      setSubmitSuccess(true);
+      try {
+        // 백엔드 API에 맞는 예약 데이터 구성
+        const reservationData = {
+          username: user.username, // 로그인한 사용자
+          guestName: formData.guestName,
+          guestPhone: formData.guestPhone,
+          roomType: formData.roomType, // 이것은 백엔드에서 방을 찾는데 사용됩니다
+          checkIn: formData.checkInDate?.toISOString().split('T')[0], // YYYY-MM-DD 형식
+          checkOut: formData.checkOutDate?.toISOString().split('T')[0],
+          people: formData.adults + formData.children,
+          specialRequests: formData.specialRequests
+        };
 
-      // 폼 초기화
-      setFormData({
-        facility: '',
-        date: null,
-        startTime: null,
-        endTime: null,
-        adults: 1,
-        children: 0,
-        reservationName: '',
-        phone: '',
-        email: '',
-        specialRequests: ''
-      });
+        console.log('예약 요청 데이터:', reservationData);
 
-      // 성공 메시지를 3초 후 숨김
-      setTimeout(() => {
-        setSubmitSuccess(false);
-      }, 3000);
+        const response = await createReservation(reservationData);
+        console.log('예약 성공:', response);
+
+        setSubmitSuccess(true);
+
+        // 폼 초기화
+        setFormData({
+          roomType: '',
+          checkInDate: null,
+          checkOutDate: null,
+          checkInTime: null,
+          checkOutTime: null,
+          adults: 1,
+          children: 0,
+          guestName: '',
+          guestPhone: '',
+          email: '',
+          specialRequests: ''
+        });
+
+        // 성공 메시지를 3초 후 숨김
+        setTimeout(() => {
+          setSubmitSuccess(false);
+        }, 5000);
+
+      } catch (error) {
+        console.error('예약 실패:', error);
+        setErrors({
+          submit: '예약 처리 중 오류가 발생했습니다. 다시 시도해주세요.'
+        });
+      }
     }
   };
 
@@ -142,14 +169,14 @@ const Booking = () => {
           <CardContent sx={{ p: 4 }}>
             <form onSubmit={handleSubmit}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                {/* 이용시설 선택 */}
+                {/* 객실 타입 선택 */}
                 <Box>
-                  <FormControl fullWidth error={!!errors.facility}>
-                    <InputLabel>이용시설</InputLabel>
+                  <FormControl fullWidth error={!!errors.roomType}>
+                    <InputLabel>객실 타입</InputLabel>
                     <Select
-                      value={formData.facility}
-                      label="이용시설"
-                      onChange={(e) => handleInputChange('facility', e.target.value)}
+                      value={formData.roomType}
+                      label="객실 타입"
+                      onChange={(e) => handleInputChange('roomType', e.target.value)}
                     >
                       {facilities.map((facility) => (
                         <MenuItem key={facility.value} value={facility.value}>
@@ -157,60 +184,94 @@ const Booking = () => {
                         </MenuItem>
                       ))}
                     </Select>
-                    {errors.facility && (
+                    {errors.roomType && (
                       <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
-                        {errors.facility}
+                        {errors.roomType}
                       </Typography>
                     )}
                   </FormControl>
                 </Box>
 
-                {/* 이용일자 및 시간 */}
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
-                  <Box sx={{ flex: 2 }}>
-                    <DatePicker
-                      label="이용일자"
-                      value={formData.date}
-                      onChange={(newValue) => handleInputChange('date', newValue)}
-                      minDate={new Date()}
-                      slotProps={{
-                        textField: {
-                          fullWidth: true,
-                          error: !!errors.date,
-                          helperText: errors.date
-                        }
-                      }}
-                    />
+                {/* 체크인/체크아웃 날짜 및 시간 */}
+                <Box>
+                  <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+                    숙박 기간 및 시간
+                  </Typography>
+
+                  {/* 체크인 날짜 및 시간 */}
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="subtitle1" gutterBottom sx={{ mb: 2, fontWeight: 'medium' }}>
+                      체크인
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
+                      <Box sx={{ flex: 2 }}>
+                        <DatePicker
+                          label="체크인 날짜"
+                          value={formData.checkInDate}
+                          onChange={(newValue) => handleInputChange('checkInDate', newValue)}
+                          minDate={new Date()}
+                          slotProps={{
+                            textField: {
+                              fullWidth: true,
+                              error: !!errors.checkInDate,
+                              helperText: errors.checkInDate
+                            }
+                          }}
+                        />
+                      </Box>
+                      <Box sx={{ flex: 1 }}>
+                        <TimePicker
+                          label="체크인 시간"
+                          value={formData.checkInTime}
+                          onChange={(newValue) => handleInputChange('checkInTime', newValue)}
+                          slotProps={{
+                            textField: {
+                              fullWidth: true,
+                              error: !!errors.checkInTime,
+                              helperText: errors.checkInTime
+                            }
+                          }}
+                        />
+                      </Box>
+                    </Box>
                   </Box>
 
-                  <Box sx={{ flex: 1 }}>
-                    <TimePicker
-                      label="시작 시간"
-                      value={formData.startTime}
-                      onChange={(newValue) => handleInputChange('startTime', newValue)}
-                      slotProps={{
-                        textField: {
-                          fullWidth: true,
-                          error: !!errors.startTime,
-                          helperText: errors.startTime
-                        }
-                      }}
-                    />
-                  </Box>
-
-                  <Box sx={{ flex: 1 }}>
-                    <TimePicker
-                      label="종료 시간"
-                      value={formData.endTime}
-                      onChange={(newValue) => handleInputChange('endTime', newValue)}
-                      slotProps={{
-                        textField: {
-                          fullWidth: true,
-                          error: !!errors.endTime,
-                          helperText: errors.endTime
-                        }
-                      }}
-                    />
+                  {/* 체크아웃 날짜 및 시간 */}
+                  <Box>
+                    <Typography variant="subtitle1" gutterBottom sx={{ mb: 2, fontWeight: 'medium' }}>
+                      체크아웃
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
+                      <Box sx={{ flex: 2 }}>
+                        <DatePicker
+                          label="체크아웃 날짜"
+                          value={formData.checkOutDate}
+                          onChange={(newValue) => handleInputChange('checkOutDate', newValue)}
+                          minDate={formData.checkInDate ? new Date(formData.checkInDate.getTime() + 24 * 60 * 60 * 1000) : new Date()}
+                          slotProps={{
+                            textField: {
+                              fullWidth: true,
+                              error: !!errors.checkOutDate,
+                              helperText: errors.checkOutDate
+                            }
+                          }}
+                        />
+                      </Box>
+                      <Box sx={{ flex: 1 }}>
+                        <TimePicker
+                          label="체크아웃 시간"
+                          value={formData.checkOutTime}
+                          onChange={(newValue) => handleInputChange('checkOutTime', newValue)}
+                          slotProps={{
+                            textField: {
+                              fullWidth: true,
+                              error: !!errors.checkOutTime,
+                              helperText: errors.checkOutTime
+                            }
+                          }}
+                        />
+                      </Box>
+                    </Box>
                   </Box>
                 </Box>
 
@@ -255,10 +316,10 @@ const Booking = () => {
                         <TextField
                           fullWidth
                           label="예약자명"
-                          value={formData.reservationName}
-                          onChange={(e) => handleInputChange('reservationName', e.target.value)}
-                          error={!!errors.reservationName}
-                          helperText={errors.reservationName}
+                          value={formData.guestName}
+                          onChange={(e) => handleInputChange('guestName', e.target.value)}
+                          error={!!errors.guestName}
+                          helperText={errors.guestName}
                           required
                         />
                       </Box>
@@ -267,10 +328,10 @@ const Booking = () => {
                           fullWidth
                           label="휴대폰번호"
                           placeholder="010-0000-0000"
-                          value={formData.phone}
-                          onChange={(e) => handleInputChange('phone', e.target.value)}
-                          error={!!errors.phone}
-                          helperText={errors.phone}
+                          value={formData.guestPhone}
+                          onChange={(e) => handleInputChange('guestPhone', e.target.value)}
+                          error={!!errors.guestPhone}
+                          helperText={errors.guestPhone}
                           required
                         />
                       </Box>
@@ -313,21 +374,26 @@ const Booking = () => {
                   </Typography>
                   <Box sx={{ p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
                     <Typography variant="body2" paragraph>
-                      <strong>이용시설:</strong> {formData.facility ? facilities.find(f => f.value === formData.facility)?.label : '선택되지 않음'}
+                      <strong>객실 타입:</strong> {formData.roomType ? facilities.find(f => f.value === formData.roomType)?.label : '선택되지 않음'}
                     </Typography>
                     <Typography variant="body2" paragraph>
-                      <strong>이용일자:</strong> {formData.date ? formData.date.toLocaleDateString('ko-KR') : '선택되지 않음'}
+                      <strong>체크인:</strong> {formData.checkInDate ? formData.checkInDate.toLocaleDateString('ko-KR') : '선택되지 않음'}
+                      {formData.checkInTime && ` ${formData.checkInTime.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}`}
                     </Typography>
                     <Typography variant="body2" paragraph>
-                      <strong>이용시간:</strong> {formData.startTime && formData.endTime
-                        ? `${formData.startTime.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} - ${formData.endTime.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}`
+                      <strong>체크아웃:</strong> {formData.checkOutDate ? formData.checkOutDate.toLocaleDateString('ko-KR') : '선택되지 않음'}
+                      {formData.checkOutTime && ` ${formData.checkOutTime.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}`}
+                    </Typography>
+                    <Typography variant="body2" paragraph>
+                      <strong>숙박 기간:</strong> {formData.checkInDate && formData.checkOutDate
+                        ? `${Math.ceil((formData.checkOutDate - formData.checkInDate) / (1000 * 60 * 60 * 24))}박 ${Math.ceil((formData.checkOutDate - formData.checkInDate) / (1000 * 60 * 60 * 24)) + 1}일`
                         : '선택되지 않음'}
                     </Typography>
                     <Typography variant="body2" paragraph>
                       <strong>인원:</strong> 성인 {formData.adults}명, 어린이 {formData.children}명
                     </Typography>
                     <Typography variant="body2">
-                      <strong>예약자:</strong> {formData.reservationName || '입력되지 않음'}
+                      <strong>예약자:</strong> {formData.guestName || '입력되지 않음'}
                     </Typography>
                   </Box>
                 </Box>
