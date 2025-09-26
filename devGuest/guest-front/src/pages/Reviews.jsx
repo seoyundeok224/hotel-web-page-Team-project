@@ -1,52 +1,33 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Box, Typography, Paper, CircularProgress, Alert, Pagination, Snackbar, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Typography, Paper, Alert, Pagination, Snackbar, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import { useAuth } from '../contexts/AuthContext';
-import reviewService from '../services/reviewService';
 import ReviewForm from '../components/reviews/ReviewForm';
 import ReviewList from '../components/reviews/ReviewList';
+import { useReviews } from '../hooks/useReviews';
+import ReviewCardSkeleton from '../components/reviews/ReviewCardSkeleton';
 
 const Reviews = () => {
-  const { user, isAuthenticated } = useAuth(); // 'user'가 로그인 정보입니다.
+  const { user, isAuthenticated } = useAuth();
   const token = localStorage.getItem('token');
-  const [reviews, setReviews] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [sort, setSort] = useState('createdAt,desc');
+  
+  const { reviews, setReviews, loading, error, page, totalPages, sort, setPage, setSort, fetchReviews } = useReviews();
+
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  const fetchReviews = useCallback(async (currentPage, currentSort) => {
-    setLoading(true);
-    try {
-      const res = await reviewService.getAllReviews(currentPage - 1, 10, currentSort);
-      setReviews(res.data.content);
-      setTotalPages(res.data.totalPages);
-      setError(null);
-    } catch (err) {
-      setError('후기를 불러오는 데 실패했습니다.');
-      setReviews([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchReviews(page, sort);
-  }, [page, sort, fetchReviews]);
-  
   const handleSortChange = (event) => {
     setSort(event.target.value);
     setPage(1);
   };
 
-  const refreshReviews = () => fetchReviews(page, sort);
+  const handleReviewAction = () => {
+    fetchReviews(page, sort);
+  };
 
   const handleCreateReview = (newReview) => {
     setSort('createdAt,desc');
-    setPage(1); // 새 글 작성 후 첫 페이지로 이동하며 새로고침
-    fetchReviews(1, 'createdAt,desc');
+    setPage(1);
+    setReviews(prevReviews => [newReview, ...prevReviews]);
   };
 
   const handleSnackbarClose = (event, reason) => {
@@ -70,23 +51,22 @@ const Reviews = () => {
         </FormControl>
       </Box>
 
-      {loading ? ( <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}><CircularProgress /></Box> ) 
-        : error ? ( <Alert severity="error">{error}</Alert> ) 
+      {loading ? (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <ReviewCardSkeleton />
+            <ReviewCardSkeleton />
+            <ReviewCardSkeleton />
+        </Box>
+      ) : error ? ( <Alert severity="error">{error}</Alert> ) 
         : reviews.length === 0 ? ( 
-        <Paper sx={{ p: 4, textAlign: 'center', mt: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+        <Paper sx={{ p: 4, textAlign: 'center', mt: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, bgcolor: 'grey.50' }}>
           <RateReviewOutlinedIcon sx={{ fontSize: 48, color: 'grey.500' }} />
           <Typography variant="h6">아직 작성된 후기가 없습니다.</Typography>
           {isAuthenticated && <Typography color="text.secondary">첫 후기를 남겨주세요!</Typography>}
         </Paper>
         ) : (
         <>
-          <ReviewList 
-            reviews={reviews} 
-            currentUser={user} // [수정] ReviewList로 currentUser={user} prop 추가
-            token={token} 
-            onAction={refreshReviews} 
-            setSnackbar={setSnackbar}
-          />
+          <ReviewList reviews={reviews} currentUser={user} token={token} onAction={handleReviewAction} setSnackbar={setSnackbar}/>
           {totalPages > 1 && (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
               <Pagination count={totalPages} page={page} onChange={(event, value) => setPage(value)} color="primary"/>
