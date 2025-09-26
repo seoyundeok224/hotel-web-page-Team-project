@@ -3,7 +3,6 @@ import { Box } from '@mui/material';
 import { motion } from 'framer-motion';
 import ReviewCard from './ReviewCard';
 
-// [수정] props 목록에 currentUser 추가
 const ReviewList = ({ reviews, currentUser, token, onAction, setSnackbar }) => {
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -29,11 +28,11 @@ const ReviewList = ({ reviews, currentUser, token, onAction, setSnackbar }) => {
       sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
     >
       {reviews.map((review) => (
-        <motion.div key={review.id} variants={itemVariants}>
+        <motion.div key={review?.id || Math.random()} variants={itemVariants}>
           <ReviewCard
             review={review}
             isOwner={currentUser && currentUser.username === review.username}
-            currentUser={currentUser} // [수정] ReviewCard로 currentUser prop 전달
+            currentUser={currentUser}
             token={token}
             onAction={onAction}
             setSnackbar={setSnackbar}
