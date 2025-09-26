@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Box, Typography, Paper, CircularProgress, Alert, Pagination, Snackbar, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import { useAuth } from '../contexts/AuthContext';
@@ -7,7 +7,7 @@ import ReviewForm from '../components/reviews/ReviewForm';
 import ReviewList from '../components/reviews/ReviewList';
 
 const Reviews = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth(); // 'user'가 로그인 정보입니다.
   const token = localStorage.getItem('token');
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -45,10 +45,8 @@ const Reviews = () => {
 
   const handleCreateReview = (newReview) => {
     setSort('createdAt,desc');
-    setReviews(prevReviews => [newReview, ...prevReviews]);
-    if (reviews.length + 1 > 10) {
-        fetchReviews(1, 'createdAt,desc');
-    }
+    setPage(1); // 새 글 작성 후 첫 페이지로 이동하며 새로고침
+    fetchReviews(1, 'createdAt,desc');
   };
 
   const handleSnackbarClose = (event, reason) => {
@@ -82,7 +80,13 @@ const Reviews = () => {
         </Paper>
         ) : (
         <>
-          <ReviewList reviews={reviews} currentUser={user} token={token} onAction={refreshReviews} setSnackbar={setSnackbar}/>
+          <ReviewList 
+            reviews={reviews} 
+            currentUser={user} // [수정] ReviewList로 currentUser={user} prop 추가
+            token={token} 
+            onAction={refreshReviews} 
+            setSnackbar={setSnackbar}
+          />
           {totalPages > 1 && (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
               <Pagination count={totalPages} page={page} onChange={(event, value) => setPage(value)} color="primary"/>

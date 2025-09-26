@@ -69,7 +69,6 @@ public class ReviewController {
         return ResponseEntity.ok().build();
     }
 
-    // [수정] '좋아요' 엔드포인트 로직 수정
     @PostMapping("/{id}/like")
     public ResponseEntity<?> likeReview(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {

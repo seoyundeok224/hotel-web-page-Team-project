@@ -2,24 +2,22 @@ package kr.or.hotelpms.hotel.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import kr.or.hotelpms.hotel.model.Review;
-import kr.or.hotelpms.hotel.model.ReviewLike; // 추가
-import kr.or.hotelpms.hotel.repository.ReviewLikeRepository; // 추가
+import kr.or.hotelpms.hotel.model.ReviewLike;
+import kr.or.hotelpms.hotel.repository.ReviewLikeRepository;
 import kr.or.hotelpms.hotel.repository.ReviewRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional; // 추가
+import java.util.Optional;
 
 @Service
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final ReviewLikeRepository reviewLikeRepository; // 추가
+    private final ReviewLikeRepository reviewLikeRepository;
     private static final int MAX_REVIEWS = 100;
 
-    // [수정] 생성자에서 ReviewLikeRepository 주입
     public ReviewService(ReviewRepository reviewRepository, ReviewLikeRepository reviewLikeRepository) {
         this.reviewRepository = reviewRepository;
         this.reviewLikeRepository = reviewLikeRepository;
@@ -56,7 +54,6 @@ public class ReviewService {
         reviewRepository.deleteById(id);
     }
 
-    // [수정] '좋아요' 로직 전체 변경
     @Transactional
     public Review toggleLike(Long reviewId, String username) {
         Review review = reviewRepository.findById(reviewId)
