@@ -25,32 +25,34 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<Comment> getCommentsByReviewId(Long reviewId) {
-        // 1. 특정 후기에 달린 모든 댓글을 가져온다.
         List<Comment> allComments = commentRepository.findByReviewIdOrderByCreatedAtAsc(reviewId);
-        
-        // 2. 계층 구조로 조립한다.
         Map<Long, Comment> commentMap = new HashMap<>();
-        List<Comment> rootComments = new ArrayList<>();
-
+        
         allComments.forEach(comment -> {
-            comment.setChildren(new ArrayList<>()); // 자식 리스트 초기화
+            comment.setChildren(new ArrayList<>());
             commentMap.put(comment.getId(), comment);
         });
 
         allComments.forEach(comment -> {
             if (comment.getParent() != null) {
                 Comment parent = commentMap.get(comment.getParent().getId());
+                // [수정] 고아 데이터 방지를 위한 null 체크
                 if (parent != null) {
                     parent.getChildren().add(comment);
                 }
-            } else {
+            }
+        });
+        
+        List<Comment> rootComments = new ArrayList<>();
+        allComments.forEach(comment -> {
+            if(comment.getParent() == null) {
                 rootComments.add(comment);
             }
         });
 
         return rootComments;
     }
-
+    
     @Transactional
     public Comment createComment(Long reviewId, Long parentId, String content, String username) {
         Review review = reviewRepository.findById(reviewId)

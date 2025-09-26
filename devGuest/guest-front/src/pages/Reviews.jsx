@@ -9,15 +9,12 @@ import ReviewList from '../components/reviews/ReviewList';
 const Reviews = () => {
   const { user, isAuthenticated } = useAuth();
   const token = localStorage.getItem('token');
-
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [sort, setSort] = useState('createdAt,desc'); // [수정] 정렬 상태 추가
-
+  const [sort, setSort] = useState('createdAt,desc');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   const fetchReviews = useCallback(async (currentPage, currentSort) => {
@@ -28,7 +25,7 @@ const Reviews = () => {
       setTotalPages(res.data.totalPages);
       setError(null);
     } catch (err) {
-      setError('후기를 불러오는 데 실패했습니다. 서버 상태를 확인해주세요.');
+      setError('후기를 불러오는 데 실패했습니다.');
       setReviews([]);
     } finally {
       setLoading(false);
@@ -45,10 +42,13 @@ const Reviews = () => {
   };
 
   const refreshReviews = () => fetchReviews(page, sort);
-  const handleCreateReview = () => {
+
+  const handleCreateReview = (newReview) => {
     setSort('createdAt,desc');
-    if (page !== 1) setPage(1);
-    else fetchReviews(1, 'createdAt,desc');
+    setReviews(prevReviews => [newReview, ...prevReviews]);
+    if (reviews.length + 1 > 10) {
+        fetchReviews(1, 'createdAt,desc');
+    }
   };
 
   const handleSnackbarClose = (event, reason) => {
@@ -59,10 +59,8 @@ const Reviews = () => {
   return (
     <Box sx={{ maxWidth: 800, margin: 'auto', p: 3 }}>
       <Typography variant="h4" gutterBottom>고객 후기</Typography>
-
       {isAuthenticated && <ReviewForm token={token} onReviewSubmit={handleCreateReview} setSnackbar={setSnackbar} />}
-
-      {/* [신규] 정렬 UI 추가 */}
+      
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
         <FormControl size="small" sx={{ minWidth: 120 }}>
           <InputLabel>정렬</InputLabel>
@@ -75,14 +73,14 @@ const Reviews = () => {
       </Box>
 
       {loading ? ( <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}><CircularProgress /></Box> ) 
-       : error ? ( <Alert severity="error">{error}</Alert> ) 
-       : reviews.length === 0 ? ( 
+        : error ? ( <Alert severity="error">{error}</Alert> ) 
+        : reviews.length === 0 ? ( 
         <Paper sx={{ p: 4, textAlign: 'center', mt: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
           <RateReviewOutlinedIcon sx={{ fontSize: 48, color: 'grey.500' }} />
           <Typography variant="h6">아직 작성된 후기가 없습니다.</Typography>
           {isAuthenticated && <Typography color="text.secondary">첫 후기를 남겨주세요!</Typography>}
         </Paper>
-       ) : (
+        ) : (
         <>
           <ReviewList reviews={reviews} currentUser={user} token={token} onAction={refreshReviews} setSnackbar={setSnackbar}/>
           {totalPages > 1 && (

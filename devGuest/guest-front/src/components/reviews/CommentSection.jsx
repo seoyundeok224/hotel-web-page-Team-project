@@ -13,43 +13,51 @@ const CommentSection = ({ reviewId, token, setSnackbar, onCommentAction }) => {
     try {
       const res = await reviewService.getComments(reviewId);
       setComments(res.data);
-      
-      // 재귀적으로 총 댓글 수를 계산
-      const countTotalComments = (commentList) => {
-        let count = 0;
-        for (const comment of commentList) {
-          count++;
-          if (comment.children && comment.children.length > 0) {
-            count += countTotalComments(comment.children);
-          }
-        }
-        return count;
-      };
-      const totalComments = countTotalComments(res.data);
-      onCommentAction(totalComments);
-
     } catch (error) {
-      setSnackbar({ open: true, message: '댓글 로딩에 실패했습니다.', severity: 'error' });
+      setSnackbar({ open: true, message: '댓글을 불러오는 중 오류가 발생했습니다.', severity: 'error' });
+      setComments([]);
     } finally {
       setLoading(false);
     }
-  }, [reviewId, setSnackbar, onCommentAction]);
+  }, [reviewId, setSnackbar]);
 
   useEffect(() => {
     fetchComments();
   }, [fetchComments]);
 
+  const handleCommentCreation = () => {
+    if (onCommentAction) {
+      onCommentAction();
+    }
+  };
+
   return (
     <Box sx={{ p: 2, pt: 0, bgcolor: 'grey.50' }}>
       <Divider sx={{ my: 2 }} />
       <Typography variant="subtitle1" gutterBottom>댓글</Typography>
-      {loading ? (<CircularProgress size={24} />) : (
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+          <CircularProgress size={24} />
+        </Box>
+      ) : (
         comments.map((comment) => (
-          <Comment key={comment.id} comment={comment} reviewId={reviewId} token={token} onCommentCreated={fetchComments} setSnackbar={setSnackbar}/>
+          <Comment
+            key={comment.id}
+            comment={comment}
+            reviewId={reviewId}
+            token={token}
+            onCommentCreated={handleCommentCreation}
+            setSnackbar={setSnackbar}
+          />
         ))
       )}
       <Box sx={{ mt: 2 }}>
-        <CommentForm reviewId={reviewId} token={token} onCommentCreated={fetchComments} setSnackbar={setSnackbar}/>
+        <CommentForm
+          reviewId={reviewId}
+          token={token}
+          onCommentCreated={handleCommentCreation}
+          setSnackbar={setSnackbar}
+        />
       </Box>
     </Box>
   );
