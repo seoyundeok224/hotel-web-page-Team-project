@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Typography,
   Container,
@@ -35,6 +36,7 @@ const facilities = [
 
 const Booking = () => {
   const { user } = useAuth(); // 로그인한 사용자 정보
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     roomType: '',
@@ -143,33 +145,62 @@ const Booking = () => {
 
         const response = await createReservation(reservationData);
         console.log('예약 성공:', response);
+        console.log('예약 응답 데이터 전체:', JSON.stringify(response, null, 2));
+        console.log('응답 데이터 타입:', typeof response);
+        console.log('응답 구조 확인:');
+        console.log('  - response:', response);
+        console.log('  - response.data:', response?.data);
+        console.log('  - response.id:', response?.id);
+        console.log('  - response.data?.id:', response?.data?.id);
 
-        setSubmitSuccess(true);
+        // 예약 ID 추출 (다양한 응답 구조에 대응)
+        let reservationId = null;
+        if (response?.data?.id) {
+          reservationId = response.data.id;
+        } else if (response?.id) {
+          reservationId = response.id;
+        } else if (typeof response === 'object' && response !== null) {
+          // 응답이 ReservationResponse 객체인 경우
+          reservationId = response.id || response.reservationId;
+        }
 
-        // 폼 초기화
-        setFormData({
-          roomType: '',
-          checkInDate: null,
-          checkOutDate: null,
-          checkInTime: null,
-          checkOutTime: null,
-          adults: 1,
-          children: 0,
-          guestName: '',
-          guestPhone: '',
-          email: '',
-          specialRequests: ''
+        console.log('최종 추출된 예약 ID:', reservationId);
+
+        if (!reservationId) {
+          throw new Error('예약 ID를 추출할 수 없습니다. 응답 구조를 확인해주세요.');
+        }
+
+        // 결제 페이지로 이동 (예약 데이터 전달)
+        console.log('결제 페이지로 이동 시작...');
+        navigate('/payment', {
+          state: {
+            bookingData: {
+              ...formData,
+              reservationId: reservationId // 예약 ID도 함께 전달
+            }
+          }
         });
-
-        // 성공 메시지를 3초 후 숨김
-        setTimeout(() => {
-          setSubmitSuccess(false);
-        }, 5000);
+        console.log('결제 페이지 navigate 완료');
 
       } catch (error) {
         console.error('예약 실패:', error);
+        console.error('예약 실패 상세:', {
+          message: error.message,
+          response: error.response,
+          status: error.response?.status,
+          data: error.response?.data
+        });
+
+        let errorMessage = '예약 처리 중 오류가 발생했습니다. 다시 시도해주세요.';
+
+        if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
         setErrors({
-          submit: '예약 처리 중 오류가 발생했습니다. 다시 시도해주세요.'
+          submit: errorMessage
         });
       } finally {
         setIsLoading(false); // 로딩 종료 (성공/실패 무관)

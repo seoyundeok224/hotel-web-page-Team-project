@@ -174,4 +174,54 @@ public class ReservationService {
         reservation.setStatus(status);
         return reservationRepository.save(reservation);
     }
+    
+    /**
+     * 결제 완료로 예약 상태 변경
+     */
+    @Transactional
+    public Reservation updateReservationToPaid(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+        
+        if (!"PENDING".equals(reservation.getStatus()) && !"CONFIRMED".equals(reservation.getStatus())) {
+            throw new IllegalStateException("결제할 수 없는 예약 상태입니다: " + reservation.getStatus());
+        }
+        
+        reservation.setStatus("PAID");
+        return reservationRepository.save(reservation);
+    }
+    
+    /**
+     * 결제 실패로 예약 취소
+     */
+    @Transactional
+    public Reservation cancelReservationDueToPaymentFailure(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+        
+        reservation.setStatus("CANCELLED");
+        return reservationRepository.save(reservation);
+    }
+    
+    /**
+     * 예약 상태 확인
+     */
+    @Transactional(readOnly = true)
+    public String getReservationStatus(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+        return reservation.getStatus();
+    }
+    
+    /**
+     * 결제 가능한 예약인지 확인
+     */
+    @Transactional(readOnly = true)
+    public boolean isPayableReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+        
+        String status = reservation.getStatus();
+        return "PENDING".equals(status) || "CONFIRMED".equals(status);
+    }
 }

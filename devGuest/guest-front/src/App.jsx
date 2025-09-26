@@ -21,6 +21,7 @@ import Directions from './pages/Directions';
 import FindUsername from './pages/FindUsername';
 import FindPassword from './pages/FindPassword';
 import Reviews from './pages/Reviews'; // 고객 후기 페이지 import
+import Payment from './pages/Payment';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -54,39 +55,40 @@ const App = () => {
           <Route path="/register" element={<MainLayout><Register /></MainLayout>} />
           <Route path="/dining" element={<MainLayout><Dining /></MainLayout>} />
           <Route path="/facilities" element={<MainLayout><Facilities /></MainLayout>} />
-          
+
           {/* ✅ 이 부분의 경로를 수정했습니다. */}
           <Route path="/directions" element={<MainLayout><Directions /></MainLayout>} />
-          
+
           <Route path="/find-username" element={<MainLayout><FindUsername /></MainLayout>} />
           <Route path="/find-password" element={<MainLayout><FindPassword /></MainLayout>} />
           <Route path="/reviews" element={<MainLayout><Reviews /></MainLayout>} />
-          
-          <Route 
-            path="/mypage" 
-            element={<ProtectedRoute><MainLayout><MyPage /></MainLayout></ProtectedRoute>} 
+          <Route path="/payment" element={<MainLayout><Payment /></MainLayout>} />
+
+          <Route
+            path="/mypage"
+            element={<ProtectedRoute><MainLayout><MyPage /></MainLayout></ProtectedRoute>}
           />
 
           {/* 관리자 사이트 라우트 */}
-          <Route 
-            path="/admin" 
-            element={<ProtectedRoute requireAdmin={true}><AdminLayout><AdminDashboard /></AdminLayout></ProtectedRoute>} 
+          <Route
+            path="/admin"
+            element={<ProtectedRoute requireAdmin={true}><AdminLayout><AdminDashboard /></AdminLayout></ProtectedRoute>}
           />
-          <Route 
-            path="/admin/rooms" 
-            element={<ProtectedRoute requireAdmin={true}><AdminLayout><RoomManagement /></AdminLayout></ProtectedRoute>} 
+          <Route
+            path="/admin/rooms"
+            element={<ProtectedRoute requireAdmin={true}><AdminLayout><RoomManagement /></AdminLayout></ProtectedRoute>}
           />
-          <Route 
-            path="/admin/guests" 
-            element={<ProtectedRoute requireAdmin={true}><AdminLayout><GuestManagement /></AdminLayout></ProtectedRoute>} 
+          <Route
+            path="/admin/guests"
+            element={<ProtectedRoute requireAdmin={true}><AdminLayout><GuestManagement /></AdminLayout></ProtectedRoute>}
           />
-          <Route 
-            path="/admin/reservations" 
-            element={<ProtectedRoute requireAdmin={true}><AdminLayout><ReservationManagement /></AdminLayout></ProtectedRoute>} 
+          <Route
+            path="/admin/reservations"
+            element={<ProtectedRoute requireAdmin={true}><AdminLayout><ReservationManagement /></AdminLayout></ProtectedRoute>}
           />
-          <Route 
-            path="/admin/reports" 
-            element={<ProtectedRoute requireAdmin={true}><AdminLayout><ReportsAnalytics /></AdminLayout></ProtectedRoute>} 
+          <Route
+            path="/admin/reports"
+            element={<ProtectedRoute requireAdmin={true}><AdminLayout><ReportsAnalytics /></AdminLayout></ProtectedRoute>}
           />
         </Routes>
       </Router>
