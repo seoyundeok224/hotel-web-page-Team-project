@@ -16,11 +16,11 @@ const ReviewForm = ({ token, onReviewSubmit, setSnackbar }) => {
     
     setIsSubmitting(true);
     try {
-      await reviewService.createReview({ content, rating }, token);
+      const res = await reviewService.createReview({ content, rating }, token);
       setSnackbar({ open: true, message: '소중한 후기가 등록되었습니다!', severity: 'success' });
       setContent('');
       setRating(5);
-      onReviewSubmit();
+      onReviewSubmit(res.data);
     } catch (err) {
       const message = err.response?.data || '후기 작성에 실패했습니다.';
       setSnackbar({ open: true, message: message, severity: 'error' });
@@ -30,7 +30,7 @@ const ReviewForm = ({ token, onReviewSubmit, setSnackbar }) => {
   };
 
   return (
-    <Paper component="form" onSubmit={handleSubmit} sx={{ p: 2, mb: 4 }}>
+    <Paper component="form" onSubmit={handleSubmit} sx={{ p: 2, mb: 4, boxShadow: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
         <Typography component="legend">별점:</Typography>
         <Rating
@@ -42,6 +42,7 @@ const ReviewForm = ({ token, onReviewSubmit, setSnackbar }) => {
         />
       </Box>
       <TextField
+        variant="outlined"
         fullWidth
         multiline
         rows={4}

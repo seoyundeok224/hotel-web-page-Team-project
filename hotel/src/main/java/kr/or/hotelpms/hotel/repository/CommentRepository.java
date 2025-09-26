@@ -7,5 +7,6 @@ import java.util.List;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    List<Comment> findByReviewIdAndParentIsNullOrderByCreatedAtAsc(Long reviewId);
+    
+    List<Comment> findByReviewIdOrderByCreatedAtAsc(Long reviewId);
 }
