@@ -7,7 +7,11 @@ import kr.or.hotelpms.hotel.repository.CommentRepository;
 import kr.or.hotelpms.hotel.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CommentService {
@@ -19,8 +23,32 @@ public class CommentService {
         this.reviewRepository = reviewRepository;
     }
 
+    @Transactional(readOnly = true)
     public List<Comment> getCommentsByReviewId(Long reviewId) {
-        return commentRepository.findByReviewIdAndParentIsNullOrderByCreatedAtAsc(reviewId);
+        // 1. 특정 후기에 달린 모든 댓글을 가져온다.
+        List<Comment> allComments = commentRepository.findByReviewIdOrderByCreatedAtAsc(reviewId);
+        
+        // 2. 계층 구조로 조립한다.
+        Map<Long, Comment> commentMap = new HashMap<>();
+        List<Comment> rootComments = new ArrayList<>();
+
+        allComments.forEach(comment -> {
+            comment.setChildren(new ArrayList<>()); // 자식 리스트 초기화
+            commentMap.put(comment.getId(), comment);
+        });
+
+        allComments.forEach(comment -> {
+            if (comment.getParent() != null) {
+                Comment parent = commentMap.get(comment.getParent().getId());
+                if (parent != null) {
+                    parent.getChildren().add(comment);
+                }
+            } else {
+                rootComments.add(comment);
+            }
+        });
+
+        return rootComments;
     }
 
     @Transactional

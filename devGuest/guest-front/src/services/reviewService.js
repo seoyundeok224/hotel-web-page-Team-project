@@ -13,9 +13,15 @@ const reviewService = {
   createReview: (reviewData, token) => {
     return axios.post(`${API_BASE_URL}/reviews`, reviewData, createAuthHeaders(token));
   },
-  updateReview: (id, reviewData, token) => { /* ... */ },
-  deleteReview: (id, token) => { /* ... */ },
-  likeReview: (id, token) => { /* ... */ },
+  updateReview: (id, reviewData, token) => {
+    return axios.put(`${API_BASE_URL}/reviews/${id}`, reviewData, createAuthHeaders(token));
+  },
+  deleteReview: (id, token) => {
+    return axios.delete(`${API_BASE_URL}/reviews/${id}`, createAuthHeaders(token));
+  },
+  likeReview: (id, token) => {
+    return axios.post(`${API_BASE_URL}/reviews/${id}/like`, {}, createAuthHeaders(token));
+  },
   getComments: (reviewId) => {
     return axios.get(`${API_BASE_URL}/reviews/${reviewId}/comments`);
   },

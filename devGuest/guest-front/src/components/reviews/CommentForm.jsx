@@ -6,6 +6,10 @@ const CommentForm = ({ reviewId, parentId = null, token, onCommentCreated, setSn
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  if (!token) {
+    return null; // 비로그인 시 폼 숨기기
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!content.trim()) return;
@@ -14,7 +18,6 @@ const CommentForm = ({ reviewId, parentId = null, token, onCommentCreated, setSn
       await reviewService.createComment(reviewId, { content, parentId }, token);
       setContent('');
       if(onCommentCreated) onCommentCreated();
-      setSnackbar({ open: true, message: '댓글이 등록되었습니다.', severity: 'success' });
     } catch (error) {
       setSnackbar({ open: true, message: '댓글 작성에 실패했습니다.', severity: 'error' });
     } finally {
@@ -24,8 +27,20 @@ const CommentForm = ({ reviewId, parentId = null, token, onCommentCreated, setSn
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', gap: 1, mt: 1 }}>
-      <TextField fullWidth size="small" value={content} onChange={(e) => setContent(e.target.value)} placeholder={parentId ? "답글 입력..." : "댓글 입력..."} disabled={isSubmitting}/>
-      <Button type="submit" variant="contained" disabled={isSubmitting} sx={{ flexShrink: 0 }}>
+      <TextField 
+        fullWidth 
+        size="small" 
+        value={content} 
+        onChange={(e) => setContent(e.target.value)} 
+        placeholder={parentId ? "답글을 입력하세요..." : "댓글을 입력하세요..."} 
+        disabled={isSubmitting}
+      />
+      <Button 
+        type="submit" 
+        variant="contained" 
+        disabled={!content.trim() || isSubmitting} 
+        sx={{ flexShrink: 0 }}
+      >
         {isSubmitting ? <CircularProgress size={24} /> : '등록'}
       </Button>
     </Box>
