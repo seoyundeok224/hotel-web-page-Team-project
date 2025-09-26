@@ -33,6 +33,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    // ... (passwordEncoder, authenticationManager, authenticationProvider Bean은 그대로 유지) ...
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -62,13 +63,13 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**", "/api/users/find-username").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 
-                // GET 방식으로 접근하는 API 경로는 대부분 허용
-                .requestMatchers(HttpMethod.GET, "/api/reviews").permitAll()
-                
-                // [수정] 댓글 보는 GET 요청도 누구나 허용하도록 규칙 추가
-                .requestMatchers(HttpMethod.GET, "/api/reviews/*/comments").permitAll()
+                // [수정] GET 방식으로 접근하는 API 경로는 대부분 허용
+                .requestMatchers(HttpMethod.GET, "/api/reviews", "/api/comments/review/*").permitAll()
 
-                // 나머지 /api/** 경로의 요청은 인증(로그인)이 필요함
+                // [추가] 댓글 삭제(DELETE)는 인증된 사용자만 가능하도록 설정
+                .requestMatchers(HttpMethod.DELETE, "/api/comments/*").authenticated()
+
+                // 나머지 /api/** 경로는 인증 필요
                 .requestMatchers("/api/**").authenticated()
                 
                 // 그 외 모든 요청(React의 정적 파일 등)은 일단 허용
@@ -79,7 +80,8 @@ public class SecurityConfig {
 
         return http.build();
     }
-
+    
+    // ... (corsConfigurationSource Bean은 그대로 유지) ...
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

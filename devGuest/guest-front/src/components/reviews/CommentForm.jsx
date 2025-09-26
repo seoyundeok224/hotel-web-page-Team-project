@@ -3,6 +3,7 @@ import { Box, TextField, Button, CircularProgress } from '@mui/material';
 import reviewService from '../../services/reviewService';
 
 const CommentForm = ({ reviewId, parentId = null, token, onCommentCreated, setSnackbar }) => {
+  // [수정] useState 오타를 바로잡았습니다.
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -13,15 +14,18 @@ const CommentForm = ({ reviewId, parentId = null, token, onCommentCreated, setSn
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!content.trim()) {
-        setSnackbar({ open: true, message: '댓글 내용을 입력해주세요.', severity: 'warning' });
-        return;
+      setSnackbar({ open: true, message: '댓글 내용을 입력해주세요.', severity: 'warning' });
+      return;
     }
 
     setIsSubmitting(true);
     try {
       await reviewService.createComment(reviewId, { content, parentId }, token);
       setContent('');
-      setSnackbar({ open: true, message: '댓글이 등록되었습니다.', severity: 'success' });
+      
+      // [수정] 요청하셨던 대로 댓글 등록 성공 메시지를 제거 (주석 처리)
+      // setSnackbar({ open: true, message: '댓글이 등록되었습니다.', severity: 'success' });
+      
       if (onCommentCreated) {
         onCommentCreated();
       }
@@ -39,7 +43,7 @@ const CommentForm = ({ reviewId, parentId = null, token, onCommentCreated, setSn
         size="small"
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder={parentId ? "답글을 입력하세요..." : "댓글을 입력하세요..."}
+        placeholder="당신의 소중한 댓글을 작성해주세요."
         disabled={isSubmitting}
         variant="outlined"
       />
