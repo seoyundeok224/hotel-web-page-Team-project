@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.HashSet; // 추가
+import java.util.Set;    // 추가
 
 @Entity
 @Table(name = "reviews")
@@ -22,6 +24,11 @@ public class Review {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Comment> comments;
+
+    // [추가] '좋아요' 관계 추가
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ReviewLike> likes = new HashSet<>();
+
 
     @PrePersist
     public void prePersist() { this.createdAt = LocalDateTime.now(); this.updatedAt = this.createdAt; }
@@ -45,4 +52,8 @@ public class Review {
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     public List<Comment> getComments() { return comments; }
     public void setComments(List<Comment> comments) { this.comments = comments; }
+    
+    // [추가] likes 필드의 Getter/Setter
+    public Set<ReviewLike> getLikes() { return likes; }
+    public void setLikes(Set<ReviewLike> likes) { this.likes = likes; }
 }

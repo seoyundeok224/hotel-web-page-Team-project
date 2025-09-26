@@ -3,7 +3,6 @@ package kr.or.hotelpms.hotel.controller;
 import kr.or.hotelpms.hotel.dto.ReviewDto;
 import kr.or.hotelpms.hotel.model.Review;
 import kr.or.hotelpms.hotel.service.ReviewService;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -70,12 +69,13 @@ public class ReviewController {
         return ResponseEntity.ok().build();
     }
 
+    // [수정] '좋아요' 엔드포인트 로직 수정
     @PostMapping("/{id}/like")
     public ResponseEntity<?> likeReview(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             return ResponseEntity.status(401).body("로그인이 필요합니다.");
         }
-        Review likedReview = reviewService.likeReview(id);
-        return ResponseEntity.ok(likedReview);
+        Review updatedReview = reviewService.toggleLike(id, userDetails.getUsername());
+        return ResponseEntity.ok(updatedReview);
     }
 }
