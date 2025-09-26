@@ -50,7 +50,7 @@
 - 환불 정책 및 로직 구현
 - 관리자 페이지 UI, 결제 요청/결과 처리 화면
 - 환불 페이지 구현
-- Gmail SMTP 대체 완료
+- Gmail SMTP 대체 완료 (Sendgrid > Gmail SMTP)
 - CloudFront 배포
 
 **기획 사항**:
@@ -85,6 +85,7 @@
 - UI/UX 개선
 - DB 초기화 스크립트 및 시연용 데이터 준비
 - 미완성 기능 정리 및 추가 작업
+- 동작속도 느려지는것 최적화 작업하기
 - Redis, Zustand, MyBatis 도입 검토
 
 ---
