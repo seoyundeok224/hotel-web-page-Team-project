@@ -102,6 +102,7 @@ public class ReservationService {
         reservation.setPeople(request.getPeople());
         reservation.setGuestName(request.getGuestName());
         reservation.setGuestPhone(request.getGuestPhone());
+        reservation.setMessage(request.getMessage()); // 요청사항 추가 (getSpecialRequests() -> getMessage())
         reservation.setPaymentStatus("PENDING");
         reservation.setStatus("RESERVED");
 
@@ -153,14 +154,15 @@ public class ReservationService {
         reservation.setPeople(request.getPeople());
         reservation.setGuestName(request.getGuestName());
         reservation.setGuestPhone(request.getGuestPhone());
+        reservation.setMessage(request.getMessage()); // 요청사항 추가 (getSpecialRequests() -> getMessage())
 
         return reservationRepository.saveAndFlush(reservation);
     }
 
     @Transactional(readOnly = true)
     public List<ReservationDto.ReservationResponse> getReservationsByDate(LocalDate date) {
-        return reservationRepository.findAll().stream()
-                .filter(r -> !date.isBefore(r.getCheckIn()) && date.isBefore(r.getCheckOut()))
+        // DB에서 직접 필터링하여 성능 개선
+        return reservationRepository.findByCheckInLessThanEqualAndCheckOutAfter(date, date).stream()
                 .map(ReservationDto.ReservationResponse::new)
                 .collect(Collectors.toList());
     }

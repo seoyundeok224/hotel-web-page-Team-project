@@ -17,4 +17,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     );
 
     List<Reservation> findByUserId(Long userId);
+
+    // 특정 날짜에 활성화된 예약 조회 (checkIn <= date < checkOut)
+    List<Reservation> findByCheckInLessThanEqualAndCheckOutAfter(LocalDate checkOutDate, LocalDate checkInDate);
 }

@@ -22,7 +22,7 @@ const Reservations = () => {
   const [rooms, setRooms] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [editingReservation, setEditingReservation] = useState(null); // This holds the full reservation object for editing
-  const [formData, setFormData] = useState({ guestName: '', guestPhone: '', roomNumber: '', checkIn: null, checkOut: null, people: 1 });
+  const [formData, setFormData] = useState({ guestName: '', guestPhone: '', roomNumber: '', checkIn: null, checkOut: null, people: 1, message: '' });
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const { user } = useAuth();
 
@@ -63,12 +63,13 @@ const Reservations = () => {
         roomNumber: reservation.roomNumber || '',
         checkIn: dayjs(reservation.checkIn),
         checkOut: dayjs(reservation.checkOut),
-        people: reservation.people
+        people: reservation.people,
+        message: reservation.message || ''
       });
     } else {
       setEditingReservation(null);
       // Reset form for new reservation
-      setFormData({ guestName: '', guestPhone: '', roomNumber: '', checkIn: null, checkOut: null, people: 1 });
+      setFormData({ guestName: '', guestPhone: '', roomNumber: '', checkIn: null, checkOut: null, people: 1, message: '' });
     }
     setOpenModal(true);
   };
@@ -113,7 +114,8 @@ const Reservations = () => {
         roomType: selectedRoom.roomType, // roomType 추가
         checkIn: formData.checkIn.format('YYYY-MM-DD'),
         checkOut: formData.checkOut.format('YYYY-MM-DD'),
-        people: formData.people
+        people: formData.people,
+        message: formData.message
       };
 
       if (editingReservation) {
@@ -267,6 +269,7 @@ const Reservations = () => {
             <DatePicker label="체크아웃" value={formData.checkOut} onChange={newValue => handleFormChange('checkOut', newValue)} renderInput={(params) => <TextField {...params} />} />
           </LocalizationProvider>
           <TextField label="투숙객 수" type="number" value={formData.people} onChange={e => handleFormChange('people', parseInt(e.target.value, 10) || 1)} InputProps={{ inputProps: { min: 1 } }} />
+          <TextField label="요청 사항" multiline rows={3} value={formData.message} onChange={e => handleFormChange('message', e.target.value)} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenModal(false)}>취소</Button>

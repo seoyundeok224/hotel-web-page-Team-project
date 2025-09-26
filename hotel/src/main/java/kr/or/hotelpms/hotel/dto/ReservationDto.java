@@ -23,7 +23,7 @@ public class ReservationDto {
         private LocalDate checkIn;
         private LocalDate checkOut;
         private int people;         // 투숙객 수
-        private String specialRequests; // 특별 요청사항
+        private String message; // 특별 요청사항
 
         // Getter 메소드들 (Lombok이 작동하지 않을 경우를 대비)
         public String getUsername() { return username; }
@@ -34,7 +34,7 @@ public class ReservationDto {
         public LocalDate getCheckIn() { return checkIn; }
         public LocalDate getCheckOut() { return checkOut; }
         public int getPeople() { return people; }
-        public String getSpecialRequests() { return specialRequests; }
+        public String getMessage() { return message; }
     }
 
         @Getter
@@ -52,6 +52,7 @@ public class ReservationDto {
         private int people;
         private String paymentStatus;
         private String status;
+        private String message;
 
         public ReservationResponse(Reservation reservation) {
             this.id = reservation.getId();
@@ -66,6 +67,7 @@ public class ReservationDto {
             this.people = reservation.getPeople();
             this.paymentStatus = reservation.getPaymentStatus();
             this.status = reservation.getStatus();
+            this.message = reservation.getMessage();
         }
     }
 }
