@@ -23,37 +23,41 @@ public class ReviewController {
     }
 
     @GetMapping
-    public Page<Review> getReviews(
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return reviewService.getAllReviews(pageable);
+    public Page<ReviewDto> getReviews(
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return reviewService.getAllReviews(pageable, userDetails);
     }
 
     @PostMapping
-    public ResponseEntity<?> createReview(@RequestBody ReviewDto reviewDto,
+    public ResponseEntity<ReviewDto> createReview(@RequestBody ReviewDto reviewDto,
                                           @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
-            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+            return ResponseEntity.status(401).build();
         }
         Review review = new Review();
         review.setUsername(userDetails.getUsername());
         review.setContent(reviewDto.getContent());
         review.setRating(reviewDto.getRating());
-        Review savedReview = reviewService.saveReview(review);
-        return ResponseEntity.ok(savedReview);
+        
+        ReviewDto savedReviewDto = reviewService.createReviewAndGetDto(review);
+        return ResponseEntity.ok(savedReviewDto);
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateReview(@PathVariable Long id, @RequestBody ReviewDto reviewDto,
+    public ResponseEntity<ReviewDto> updateReview(@PathVariable Long id, @RequestBody ReviewDto reviewDto,
                                           @AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails == null) return ResponseEntity.status(401).body("로그인이 필요합니다.");
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
 
         Review review = reviewService.findById(id);
         if (!review.getUsername().equals(userDetails.getUsername())) {
-            return ResponseEntity.status(403).body("수정 권한이 없습니다.");
+            return ResponseEntity.status(403).build();
         }
 
-        Review updatedReview = reviewService.updateReview(id, reviewDto.getContent(), reviewDto.getRating());
-        return ResponseEntity.ok(updatedReview);
+        ReviewDto updatedReviewDto = reviewService.updateReviewAndGetDto(id, reviewDto.getContent(), reviewDto.getRating(), userDetails);
+        return ResponseEntity.ok(updatedReviewDto);
     }
     
     @DeleteMapping("/{id}")
@@ -70,11 +74,11 @@ public class ReviewController {
     }
 
     @PostMapping("/{id}/like")
-    public ResponseEntity<?> likeReview(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<ReviewDto> likeReview(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
-            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+            return ResponseEntity.status(401).build();
         }
-        Review updatedReview = reviewService.toggleLike(id, userDetails.getUsername());
-        return ResponseEntity.ok(updatedReview);
+        ReviewDto responseDto = reviewService.toggleLikeAndGetDto(id, userDetails.getUsername());
+        return ResponseEntity.ok(responseDto);
     }
 }
